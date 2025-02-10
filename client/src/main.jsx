@@ -44,10 +44,18 @@ function LoginForm()
         })
     }
     
+    function test(e){
+        e.preventDefault();
+        fetch("/api/test")
+            .then(response=>response.json())
+            .then(data=>alert(data));
+    }
+    
     return <form onSubmit={verifyLogin}>
         <label>email: <input type="text" name="email"/></label>
         <label>password: <input type="password" name="password"/></label>
         <input type="submit" value="Sign in"/>
+        <button onClick={test}>test auth</button>
     </form>
 }
 
