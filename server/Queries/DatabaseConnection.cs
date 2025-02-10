@@ -17,9 +17,7 @@ public class DatabaseConnection
         {
             throw new Exception("no connectstring in .env");
         }
-        
-        Console.WriteLine(Environment.GetEnvironmentVariable("DatabaseConnectString"));
-        _connection = NpgsqlDataSource.Create(Environment.GetEnvironmentVariable("DatabaseConnectString"));
+        _connection = NpgsqlDataSource.Create(DotEnv.GetString("DatabaseConnectString"));
         
         Console.WriteLine(Environment.GetEnvironmentVariable("DatabaseConnectString"));
         using var conn = _connection.OpenConnection();
