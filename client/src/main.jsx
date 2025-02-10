@@ -14,6 +14,7 @@ function App()
     return <BrowserRouter>
         <Routes>
             <Route index element={<LoginForm/>}></Route>
+            <Route path="/register" element={<RegisterForm />} />
         </Routes>
     </BrowserRouter>
 }
@@ -28,6 +29,22 @@ function LoginForm()
         <label>email: <input type="text" name="email"/></label>
         <label>password: <input type="password" name="password"/></label>
         <input type="submit" value="Sign in"/>
+        <NavLink to="/register">
+            <button type="button">Register</button>
+        </NavLink>
     </form>
+}
+    function RegisterForm() {
+    function handleRegister() {
+        
+    }
+
+    return (
+        <form onSubmit={handleRegister}>
+            <label>email: <input type="text" name="email" /></label>
+            <label>password: <input type="password" name="password" /></label>
+            <input type="submit" value="Register" />
+        </form>
+    );
 }
 
