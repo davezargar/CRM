@@ -2,7 +2,7 @@ import { StrictMode, useState, createContext, use, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink} from "react-router";
 import DefaultPage from "./DefaultPage";
-
+import ActiveTickets from './ActiveTickets';
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
@@ -15,6 +15,7 @@ function App()
         <Routes>
             <Route index element={<LoginForm/>}></Route>
             <Route path="/DefaultPage" element={<DefaultPage/>}/>
+            <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
         </Routes>
     </BrowserRouter>
 }

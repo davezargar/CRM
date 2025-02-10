@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { NavLink } from "react-router";
+import "./style/NavBar.css"
 const NavLinks = {
     Admin:[
         {name: "Active Tickets", path: "/ActiveTickets"},
@@ -24,10 +25,10 @@ function NavBar()
     const [role, setRole] = useState("Admin");
     
     return (<nav>
-        <ul>
+        <ul><h1 id='Menu'>Menu</h1>
             {NavLinks[role].map((link, index) =>(
                 <li key={index}>
-                    <NavLink to={link.path}>{link.name}</NavLink>
+                    <NavLink className="Options" to={link.path}>{link.name}</NavLink>
                 </li>
             ))}
         </ul>
