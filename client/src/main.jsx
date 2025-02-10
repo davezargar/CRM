@@ -21,8 +21,28 @@ function App()
 
 function LoginForm()
 {
-    function verifyLogin(){
+    function verifyLogin(e){
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form)
+        const loginData = Object.fromEntries(formData.entries());
         
+        fetch("/api/login", {
+            headers: { "Content-Type": "application/json" },
+            method: "POST",
+            body: JSON.stringify(loginData)
+        })
+        .then(response=>{
+            if(response.ok)
+            {
+                console.log("response.ok")
+                console.log(response);
+                return response.json();
+            }
+        })
+        .then(data =>{
+            console.log(data);
+        })
     }
     
     return <form onSubmit={verifyLogin}>

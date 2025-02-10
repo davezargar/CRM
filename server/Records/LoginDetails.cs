@@ -1,3 +1,3 @@
 ﻿namespace server.Records;
 
-public record LoginDetails();
+public record LoginDetails(string Email, string Password);
