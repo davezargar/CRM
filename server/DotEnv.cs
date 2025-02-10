@@ -14,7 +14,6 @@ public static class DotEnv
         foreach (var line in File.ReadAllLines(filePath))
         {
             var parts = line.Split('=', 2, StringSplitOptions.RemoveEmptyEntries);
-            Console.WriteLine("key: " + parts[0] + "  Value: " + parts[1]);
             if (parts.Length == 2)
             {
                 Environment.SetEnvironmentVariable(parts[0], parts[1]);
