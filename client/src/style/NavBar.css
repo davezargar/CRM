@@ -1,0 +1,42 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+nav {
+    display: flex;
+    font-size: larger;
+    text-decoration: none;
+    max-width: 300px;
+    min-height: 100vh;
+    border-right: 1px solid 10% black;
+    box-shadow: 0 0 15px rgb(0, 0, 0);
+}
+
+ul {
+    flex-wrap: nowrap;
+    padding-left: 0;
+    position: relative;
+    width: 299px;
+    display: grid;
+grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    list-style-type: none;
+    height: 40vh;
+    flex-direction: column;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.Options {
+    display: flex;
+    text-decoration: none;
+    height: 100%;
+    border-bottom: 1px solid 0 black;
+    box-shadow: 0 2px 2px rgb(0, 0, 0);
+    align-items: center;
+    justify-items: center;
+    color: black;
+}
+
+#menu {
+    position: absolute;
+}
