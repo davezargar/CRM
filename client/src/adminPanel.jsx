@@ -1,31 +1,47 @@
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import NavBar from "./NavBar";
-import "./style/removeAddCustomerSupport.css"
+import "./style/removeAddCustomerSupport.css";
+import { useEffect, useState } from "react";
 
 
-function AddRemoveCustomerSupport() {
+
+
+export function AddRemoveCustomerSupport() {
+    const navigate = useNavigate();
+    const [redirect, setRedirect] = useState(false);
+
+    useEffect(() => {
+        if (redirect) {
+            navigate('/addCustomer');
+        }
+    }, [redirect, navigate])
+
     return (
         <div className="sec">
             <div className="buttonContainer">
-                <button onClick={addCustomer}>Add Customer Support</button>
-                <button onClick={removeCustomer}>Remove Customer Support</button>
+                <button onClick={() => setRedirect(true)}>Add Customer Support</button>
+                <button onClick={() => navigate('/removeCustomer')}>Remove Customer Support</button>
             </div>
+
         </div>
     )
 
 }
 
-function addCustomer() {
+export function AddCustomer() {
     console.log("hej")
     return (
         <form>
-            <NavLink to="/adminPanel"><label>Email: <input type="text" name="email" /></label></NavLink>
+            <NavLink to="/addCustomer"><label>Email: <input type="text" name="email" /></label></NavLink>
         </form>
     )
 }
 
-function removeCustomer() {
-
+export function RemoveCustomer() {
+    return (
+        <div>
+            <p>hej</p>
+        </div>
+    )
 }
 
-export default AddRemoveCustomerSupport;

@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink } from "react-router";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
-import NavBar from './NavBar';
-import AddRemoveCustomerSupport from './adminPanel';
+import { AddRemoveCustomerSupport } from './adminPanel';
+import { AddCustomer, RemoveCustomer } from './adminPanel';
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
@@ -19,7 +19,8 @@ function App() {
             <Route path="/DefaultPage" element={<DefaultPage />} />
             <Route path="/ActiveTickets" element={<ActiveTickets />} />
             <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
-            <Route path='/adminPanel' element={<addCustomer />} />
+            <Route path='/addCustomer' element={<AddCustomer />} />
+            <Route path='/removeCustomer' element={<RemoveCustomer />} />
             <Route path="/register" element={<RegisterForm />} />
         </Routes>
     </BrowserRouter>
