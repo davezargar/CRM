@@ -77,25 +77,3 @@ function LoginForm()
             <input type="submit" value="Register" />
         </form>
     );
-import ActiveTickets from './ActiveTickets';
-            <Route path="/register" element={<RegisterForm />} />
-            <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
-        <input type="submit" value="Sign in"/>
-        <NavLink to="/register">
-            <button type="button">Register</button>
-        </NavLink>
-}
-    function RegisterForm() {
-    function handleRegister() {
-        
-    }
-
-    return (
-        <form onSubmit={handleRegister}>
-            <label>email: <input type="text" name="email" /></label>
-            <label>password: <input type="password" name="password" /></label>
-            <input type="submit" value="Register" />
-        </form>
-    );
-}
-
