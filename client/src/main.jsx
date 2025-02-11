@@ -15,11 +15,8 @@ function App()
         <Routes>
             <Route index element={<LoginForm/>}></Route>
             <Route path="/DefaultPage" element={<DefaultPage/>}/>
-<<<<<<< HEAD
             <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
-=======
             <Route path="/register" element={<RegisterForm />} />
->>>>>>> 0722946e5f164347d9b98e618263d0a597fcce8d
         </Routes>
     </BrowserRouter>
 }
