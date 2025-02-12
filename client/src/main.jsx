@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink} from "react-router";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
+import CreateTicket from "./CreateTicket";
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
@@ -17,6 +18,7 @@ function App()
             <Route path="/DefaultPage" element={<DefaultPage/>}/>
             <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
             <Route path="/register" element={<RegisterForm />} />
+            <Route path="/CreateTicket" element={<CreateTicket/>}/>
         </Routes>
     </BrowserRouter>
 }
@@ -63,27 +65,9 @@ function LoginForm()
             <button type="button">Register</button>
         </NavLink>
         <button onClick={test}>test auth</button>
+        <NavLink to="/CreateTicket">
+        <button type="button">Create Ticket</button></NavLink>
     </form>
-}
-    function RegisterForm() {
-    function handleRegister() {
-        
-    }
-
-    return (
-        <form onSubmit={handleRegister}>
-            <label>email: <input type="text" name="email" /></label>
-            <label>password: <input type="password" name="password" /></label>
-            <input type="submit" value="Register" />
-        </form>
-    );
-import ActiveTickets from './ActiveTickets';
-            <Route path="/register" element={<RegisterForm />} />
-            <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
-        <input type="submit" value="Sign in"/>
-        <NavLink to="/register">
-            <button type="button">Register</button>
-        </NavLink>
 }
     function RegisterForm() {
     function handleRegister() {
