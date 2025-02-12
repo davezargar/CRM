@@ -6,6 +6,9 @@ import ActiveTickets from './ActiveTickets';
 import AdminPanel from "./AdminPanel";
 import CustomerServicePanel from "./CustomerServicePanel";
 import CustomerPanel from "./CustomerPanel";
+
+export const RoleContext = createContext({});
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App/>
@@ -14,17 +17,28 @@ createRoot(document.getElementById('root')).render(
 
 function App()
 {
-    return <BrowserRouter>
-        <Routes>
-            <Route index element={<div><LoginForm/><QuickNav/></div>}></Route>
-            <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
-            <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}/>
-            <Route path={"/AdminPanel"} element={<AdminPanel/>}/>
-            <Route path="/DefaultPage" element={<DefaultPage/>}/>
-            <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
-            <Route path="/register" element={<RegisterForm />} />
-        </Routes>
-    </BrowserRouter>
+    return <RoleContext.Provider value={"Customer"}>
+        <BrowserRouter>
+            <Routes>
+                <Route index element={<Index/>}></Route>
+                <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
+                <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}/>
+                <Route path={"/AdminPanel"} element={<AdminPanel/>}/>
+                
+                
+                <Route path="/DefaultPage" element={<DefaultPage/>}/>
+                <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
+                <Route path="/register" element={<RegisterForm />} />
+            </Routes>
+        </BrowserRouter>
+    </RoleContext.Provider>
+}
+
+function Index(){
+    return <div>
+        <LoginForm/>
+        <QuickNav/>
+    </div>
 }
 
 function QuickNav()
@@ -37,6 +51,9 @@ function QuickNav()
     
     return <div id={"QuickNav"}>
         <NavLink to="/DefaultPage"><button>Defualt page</button></NavLink>
+        <NavLink to="/CustomerPanel"><button>CustomerPanel</button></NavLink>
+        <NavLink to="/AdminPanel"><button>AdminPanel</button></NavLink>
+        <NavLink to="/CustomerServicePanel"><button>CustomerServicePanel</button></NavLink>
         <button onClick={test}>test auth</button>
     </div>
 }

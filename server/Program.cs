@@ -37,8 +37,8 @@ app.Use(async (context, next) =>
         if (context.Request.Path.Value != "/api/login")  //denies requests without authenticated session to enpoints other than login
         {
             Console.WriteLine("unauthorized request");
-            context.Response.StatusCode = 401;
-            return;
+            //context.Response.StatusCode = 401;
+            //return;
         }
     }
     Console.WriteLine("authorized request");

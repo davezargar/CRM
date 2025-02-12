@@ -3,6 +3,7 @@ body {
     padding: 0;
 }
 nav {
+    grid-area: navBar;
     display: flex;
     font-size: larger;
     text-decoration: none;

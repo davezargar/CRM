@@ -1,0 +1,18 @@
+﻿#CustomerServicePanel
+{
+    display: grid;
+    grid-template-areas: 
+                "header header"
+                "navBar main"
+                "footer footer";
+}
+
+#CustomerServicePanelMain
+{
+    grid-area: main;
+}
+
+p
+{
+    grid-area: footer;
+}
