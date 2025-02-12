@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 using server;
 using server.Queries;
 using server.Records;
@@ -54,8 +55,12 @@ app.MapPost("/api/login", async (HttpContext context) =>
         context.Session.SetString("Authenticated", "True");// add data to a session
         context.Session.SetString("Email", requestBody.Email);
         context.Session.SetString("Role", role);
+        return Results.Ok(role);
     }
-    return Results.Ok(verified);
+    else
+    {
+        return TypedResults.Forbid();
+    }
 });
 
 app.MapGet("/api/test", async (HttpContext context) =>

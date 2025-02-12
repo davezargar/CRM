@@ -1,8 +1,9 @@
 import { StrictMode, useState, createContext, use, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Routes, Route, NavLink} from "react-router";
+import { BrowserRouter, Routes, Route, NavLink, useNavigate} from "react-router";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
+import customePanel from "./customerPanel"
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
@@ -14,6 +15,7 @@ function App()
     return <BrowserRouter>
         <Routes>
             <Route index element={<LoginForm/>}></Route>
+            <Route path={"/customerPanel"} element={<customerPanel/>}/>
             <Route path="/DefaultPage" element={<DefaultPage/>}/>
             <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
             <Route path="/register" element={<RegisterForm />} />
@@ -28,6 +30,8 @@ function LoginForm()
         const form = e.target;
         const formData = new FormData(form)
         const loginData = Object.fromEntries(formData.entries());
+        
+        const navigate = useNavigate();
         
         fetch("/api/login", {
             headers: { "Content-Type": "application/json" },
@@ -44,6 +48,11 @@ function LoginForm()
         })
         .then(data =>{
             console.log(data);
+            if(data === "customer")
+            {
+                console.log("hi");
+                navigate(customerPanel);
+            }
         })
     }
     
@@ -65,9 +74,9 @@ function LoginForm()
         <button onClick={test}>test auth</button>
     </form>
 }
-    function RegisterForm() {
+function RegisterForm() {
     function handleRegister() {
-        
+
     }
 
     return (
@@ -77,3 +86,4 @@ function LoginForm()
             <input type="submit" value="Register" />
         </form>
     );
+}
