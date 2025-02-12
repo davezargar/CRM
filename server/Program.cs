@@ -24,6 +24,7 @@ var app = builder.Build();
 
 app.UseSession();
 
+
 app.Use(async (context, next) =>
 {
     if (context.Session.GetString("Authenticated") == null)
@@ -31,13 +32,35 @@ app.Use(async (context, next) =>
         if (context.Request.Path.Value != "/api/login")
         {
             Console.WriteLine("unauthorized request");
-            context.Response.StatusCode = 401;
-            return;
+            //context.Response.StatusCode = 401;
+            //return;
         }
     }
     Console.WriteLine("authorized request");
     await next();
 });
+
+app.MapPost("/api/addCustomer", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("Invalid email");
+    }
+    Console.WriteLine($"received email: {requestBody.Email}");
+    int companyId = requestBody.CompanyId ?? 1;
+
+    bool success = await queries.AddCustomerTask(requestBody.Email, companyId);
+
+    if (!success)
+    {
+        Results.Problem("Failed to add worker");
+    }
+
+    return Results.Ok(new { message = "Valid mail" });
+});
+
+
 
 app.MapPost("/api/login", async (HttpContext context) =>
 {

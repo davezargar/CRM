@@ -1,5 +1,8 @@
 ﻿using Npgsql;
 using server.Records;
+using NpgsqlTypes;
+using System.Text.RegularExpressions;
+
 
 namespace server.Queries;
 
@@ -27,7 +30,38 @@ public class Queries
         var result2 = await cmd2.ExecuteScalarAsync();
         Console.WriteLine();
         string role = (string?)result2 ?? "";
-        
+
         return (verified, role);
+    }
+
+    public bool IsValidEmail(string email)
+{
+    var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";  // En vanlig e-postformatregex
+    return Regex.IsMatch(email, emailRegex);
+}
+    public async Task<bool> AddCustomerTask(string email, int companyId)
+    {
+
+        try
+        {
+            if (!IsValidEmail(email))
+            {
+                Console.WriteLine("Invalid email format.");
+                return false;  // Stop and return false if email is invalid
+            }
+
+            await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_fk, verified, role) VALUES ($1, $2, $3, $4)");
+            cmd.Parameters.Add(email, NpgsqlDbType.Text).Value = email;
+            cmd.Parameters.AddWithValue(companyId);
+            cmd.Parameters.AddWithValue(true);
+            cmd.Parameters.AddWithValue("admin");
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("error adding customer support worker:" + ex);
+            return false;
+        }
     }
 }

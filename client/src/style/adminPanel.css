@@ -1,0 +1,11 @@
+.sec {
+    display: grid;
+    grid-template-areas:
+        "header header"
+        "navBar main"
+        "footer footer";
+}
+
+.buttonContainer {
+    grid-area: main;
+}
