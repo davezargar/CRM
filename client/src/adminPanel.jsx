@@ -8,18 +8,12 @@ import { useEffect, useState } from "react";
 
 export function AddRemoveCustomerSupport() {
     const navigate = useNavigate();
-    const [redirect, setRedirect] = useState(false);
 
-    useEffect(() => {
-        if (redirect) {
-            navigate('/addCustomer');
-        }
-    }, [redirect, navigate])
 
     return (
         <div className="sec">
             <div className="buttonContainer">
-                <button onClick={() => setRedirect(true)}>Add Customer Support</button>
+                <button onClick={() => navigate('/addCustomer')}>Add Customer Support</button>
                 <button onClick={() => navigate('/removeCustomer')}>Remove Customer Support</button>
             </div>
 
@@ -29,10 +23,34 @@ export function AddRemoveCustomerSupport() {
 }
 
 export function AddCustomer() {
-    console.log("hej")
+    const [email, setEmail] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch("http://localhost:5173/addCustomer", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+            if (!response.ok) {
+                throw new Error("Something went wrong with adding worker");
+            }
+            alert("Worker added!");
+        } catch (error) {
+            console.error(error);
+            alert("Couldn't add custom service worker");
+        }
+    }
+
     return (
-        <form>
-            <NavLink to="/addCustomer"><label>Email: <input type="text" name="email" /></label></NavLink>
+        <form onSubmit={handleSubmit}>
+            <NavLink to="/addCustomer"><label>Email: <input type="text" name="email" value={email}
+                onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
+            <button type="submit">Add Customer Support Worker</button>
         </form>
     )
 }
