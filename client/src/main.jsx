@@ -3,11 +3,13 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate} from "react-router";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
-import customePanel from "./customerPanel"
+import AdminPanel from "./AdminPanel";
+import CustomerServicePanel from "./CustomerServicePanel";
+import CustomerPanel from "./CustomerPanel";
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 )
 
 function App()
@@ -15,7 +17,9 @@ function App()
     return <BrowserRouter>
         <Routes>
             <Route index element={<LoginForm/>}></Route>
-            <Route path={"/customerPanel"} element={<customerPanel/>}/>
+            <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
+            <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}/>
+            <Route path={"/AdminPanel"} element={<AdminPanel/>}/>
             <Route path="/DefaultPage" element={<DefaultPage/>}/>
             <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
             <Route path="/register" element={<RegisterForm />} />
@@ -25,13 +29,13 @@ function App()
 
 function LoginForm()
 {
+    const navigate = useNavigate();
+    
     function verifyLogin(e){
         e.preventDefault();
         const form = e.target;
         const formData = new FormData(form)
         const loginData = Object.fromEntries(formData.entries());
-        
-        const navigate = useNavigate();
         
         fetch("/api/login", {
             headers: { "Content-Type": "application/json" },
@@ -48,10 +52,17 @@ function LoginForm()
         })
         .then(data =>{
             console.log(data);
-            if(data === "customer")
+            switch(data)
             {
-                console.log("hi");
-                navigate(customerPanel);
+                case "customer":
+                    navigate("/customerPanel");
+                    break;
+                case "admin":
+                    navigate("/AdminPanel");
+                    break;
+                case "customerService":
+                    navigate("/CustomerServicePanel");
+                    break;
             }
         })
     }
