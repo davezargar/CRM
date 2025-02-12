@@ -1,6 +1,8 @@
 import { StrictMode, useState, createContext, use, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate} from "react-router";
+
+import TicketDisplayActive from "./TicketDisplayActive.jsx";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
 import AdminPanel from "./AdminPanel";
@@ -20,9 +22,11 @@ function App()
     return <RoleContext.Provider value={"Customer"}>
         <BrowserRouter>
             <Routes>
-                <Route index element={<Index/>}></Route>
+                <Route index element={<Index/>}/>
                 <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
-                <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}/>
+                <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}>
+                    <Route index element={<TicketDisplayActive/>}/>  
+                </Route>
                 <Route path={"/AdminPanel"} element={<AdminPanel/>}/>
                 
                 

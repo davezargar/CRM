@@ -1,21 +1,22 @@
 import { useState, use, createContext } from 'react';
 import {RoleContext} from "./main.jsx";
+import { Outlet } from "react-router";
+
 import NavBar from "./NavBar.jsx";
 import "./style/CustomerServicePanel.css"
-import TicketDisplayAll from "./TicketDisplayAll.jsx";
 
 export default CustomerServicePanel;
 
 function CustomerServicePanel()
 {
-    return <RoleContext.Provider value={"CustomerService"}>
-        <div id="CustomerServicePanel">
-            <NavBar/>
-            <p>hi customer service :)</p>
-            <div id={"CustomerServicePanelMain"}>
-                <TicketDisplayAll/>
-            </div>
-            
-        </div>
-    </RoleContext.Provider>
+    return <div id="CustomerServicePanel">
+            <RoleContext.Provider value={"CustomerService"}>
+                <NavBar/>
+                <p>hi customer service :) also footer</p>
+                <div id={"CustomerServicePanelMain"}>
+                    <Outlet/> {/*child routes will be rendered here??*/}
+                </div>
+            </RoleContext.Provider>
+    </div>
+    
 }
