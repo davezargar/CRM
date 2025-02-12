@@ -29,7 +29,7 @@ export function AddCustomer() {
         e.preventDefault();
 
         try {
-            const response = await fetch("http://localhost:5173/addCustomer", {
+            const response = await fetch("http://localhost:5000/addCustomer", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
