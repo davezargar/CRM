@@ -78,12 +78,17 @@ public class Queries
     {
         try
         {
+            await using var loginCmd = _db.CreateCommand("DELETE FROM login_credentials WHERE email = $1");
+            loginCmd.Parameters.AddWithValue(email);
+            int loginRowsAffected = await loginCmd.ExecuteNonQueryAsync();   
+
             await using var cmd = _db.CreateCommand("DELETE FROM users WHERE email = $1");
             cmd.Parameters.AddWithValue(email);
-            int rowsAffected = await cmd.ExecuteNonQueryAsync();
-        
+            int usersRowsAffected = await cmd.ExecuteNonQueryAsync();
 
-            bool success = (rowsAffected > 0) ? true : false;
+            
+
+            bool success = (usersRowsAffected > 0 || loginRowsAffected > 0) ? true : false;
             return success;
             
         }
