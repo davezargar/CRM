@@ -30,4 +30,34 @@ public class Queries
         
         return (verified, role);
     }
+
+    public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag
+    {
+        List<TicketRecord> tickets = new List<TicketRecord>();
+        await using var cmd =
+            _db.CreateCommand(
+                "SELECT ticket_id, category, subcategory, title, time_posted, time_closed, user_fk, response_email, tickets.company_fk FROM tickets " +
+                "INNER JOIN users ON tickets.company_fk = users.company_fk WHERE email = $1");
+        cmd.Parameters.AddWithValue(email);
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            tickets.Add(
+                new(
+                    reader.GetInt32(0), 
+                    reader.GetString(1), 
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetDateTime(4),
+                    reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    reader.GetString(6),
+                    reader.GetString(7),
+                    reader.GetInt32(8)
+                )
+            );
+            
+        }
+
+        return tickets;
+    }
 }

@@ -40,13 +40,12 @@ app.Use(async (context, next) =>
             return;
         }
     }
-    Console.WriteLine("authorized request");
     await next();
 });
 
 app.MapPost("/api/login", async (HttpContext context) =>
 {
-    var requestBody = await context.Request.ReadFromJsonAsync<LoginDetails>();
+    var requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
     (bool verified, string role) = await queries.VerifyLoginTask(requestBody.Email, requestBody.Password);
     Console.WriteLine(verified);
     if (verified)
@@ -60,6 +59,18 @@ app.MapPost("/api/login", async (HttpContext context) =>
     {
         return TypedResults.Forbid();
     }
+});
+
+app.MapGet("/api/ticketList", async (HttpContext context) =>
+{
+    string? requesterEmail = context.Session.GetString("Email");
+    
+    if (String.IsNullOrEmpty(requesterEmail) || context.Session.GetString("Role") == "customer") 
+        return Results.Unauthorized();
+
+    List<TicketRecord> tickets = await queries.GetTicketsAll(requesterEmail);
+
+    return Results.Ok(tickets);
 });
 
 app.MapGet("/api/test", async (HttpContext context) =>
