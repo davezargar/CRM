@@ -1,6 +1,5 @@
 ﻿using Npgsql;
 using server.Records;
-using NpgsqlTypes;
 using System.Text.RegularExpressions;
 
 
@@ -35,10 +34,10 @@ public class Queries
     }
 
     public bool IsValidEmail(string email)
-{
-    var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";  // En vanlig e-postformatregex
-    return Regex.IsMatch(email, emailRegex);
-}
+    {
+        var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";  // En vanlig e-postformatregex
+        return Regex.IsMatch(email, emailRegex);
+    }
     public async Task<bool> AddCustomerTask(string email, int companyId)
     {
 
@@ -51,16 +50,33 @@ public class Queries
             }
 
             await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_fk, verified, role) VALUES ($1, $2, $3, $4)");
-            cmd.Parameters.Add(email, NpgsqlDbType.Text).Value = email;
+            cmd.Parameters.AddWithValue(email);
             cmd.Parameters.AddWithValue(companyId);
             cmd.Parameters.AddWithValue(true);
-            cmd.Parameters.AddWithValue("admin");
+            cmd.Parameters.AddWithValue("customerSupport");
             await cmd.ExecuteNonQueryAsync();
             return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine("error adding customer support worker:" + ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> RemoveCustomerTask(string email)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("DELETE FROM users WHERE email = $1");
+            cmd.Parameters.AddWithValue(email);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("error removing customer support worker:" + ex);
             return false;
         }
     }

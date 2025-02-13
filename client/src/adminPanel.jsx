@@ -57,10 +57,36 @@ export function AddCustomer() {
 }
 
 export function RemoveCustomer() {
+    const [email, setEmail] = useState("");
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        try {
+            const response = await fetch("/api/removeCustomer", {
+                method: "DELETE",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ email }),
+            });
+            if (!response.ok) {
+                throw new Error("Something went wrong with adding worker");
+            }
+            alert("Customer Support Worker Removed!");
+        } catch (error) {
+            console.error(error);
+            alert("Couldn't add custom service worker");
+        }
+    }
+
     return (
-        <div>
-            <p>hej</p>
-        </div>
+        <form onSubmit={handleSubmit}>
+            <NavLink to="/removeCustomer"><label>Email: <input type="text" name="email" value={email}
+                onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
+            <button type="submit">Remove Customer Support Worker</button>
+            <NavBar />
+        </form>
     )
 }
 

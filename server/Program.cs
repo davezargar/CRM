@@ -60,6 +60,24 @@ app.MapPost("/api/addCustomer", async (HttpContext context) =>
     return Results.Ok(new { message = "Valid mail" });
 });
 
+app.MapDelete("/api/removeCustomer", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("Invalid email");
+    }
+
+    bool success = await queries.RemoveCustomerTask(requestBody.Email);
+
+    if (!success)
+    {
+        Results.Problem("failed to remove worker");
+    }
+
+    return Results.Ok(new { message = "Successfully removed wroker" });
+});
+
 
 
 app.MapPost("/api/login", async (HttpContext context) =>
