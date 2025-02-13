@@ -1,5 +1,6 @@
 ﻿using Npgsql;
 using server.Records;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 
@@ -55,7 +56,16 @@ public class Queries
             cmd.Parameters.AddWithValue(true);
             cmd.Parameters.AddWithValue("customerSupport");
             await cmd.ExecuteNonQueryAsync();
+
+            string defaultPassword = "password123";
+            await using var loginCmd = _db.CreateCommand("INSERT INTO login_credentials (email, password) VALUES ($1, $2)");
+            loginCmd.Parameters.AddWithValue(email);
+            loginCmd.Parameters.AddWithValue(defaultPassword);
+            await loginCmd.ExecuteNonQueryAsync();
+
             return true;
+
+
         }
         catch (Exception ex)
         {
@@ -70,9 +80,12 @@ public class Queries
         {
             await using var cmd = _db.CreateCommand("DELETE FROM users WHERE email = $1");
             cmd.Parameters.AddWithValue(email);
-            await cmd.ExecuteNonQueryAsync();
-            return true;
+            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+        
 
+            bool success = (rowsAffected > 0) ? true : false;
+            return success;
+            
         }
         catch (Exception ex)
         {

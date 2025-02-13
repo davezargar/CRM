@@ -62,12 +62,13 @@ app.MapPost("/api/addCustomer", async (HttpContext context) =>
 
 app.MapDelete("/api/removeCustomer", async (HttpContext context) =>
 {
+    Console.WriteLine("HEEEEEEEEEEEEEEEEEJ");
     var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
     if (requestBody == null)
     {
         return Results.BadRequest("Invalid email");
     }
-
+    Console.WriteLine(requestBody.Email);
     bool success = await queries.RemoveCustomerTask(requestBody.Email);
 
     if (!success)
