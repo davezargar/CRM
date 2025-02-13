@@ -1,4 +1,5 @@
 ﻿export default TicketDisplayActive;
+import "./style/TicketDisplayActive.css";
 
 function TicketDisplayActive()
 {
