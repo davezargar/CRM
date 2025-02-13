@@ -1,1 +1,8 @@
-﻿
+﻿#ticketList>li{
+    display: flex;
+    background-color: antiquewhite;
+    border: 1px solid red;
+    p{
+        margin: 5px;
+    }
+}
