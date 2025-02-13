@@ -17,10 +17,9 @@ Queries queries = new Queries(database.Connection());
 // accesses server stored data. Data is not sent to client
 
 builder.Services.AddDistributedMemoryCache(); //part of setting up session
-
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(10); //time until session expires, all session data is lost
+    options.IdleTimeout = TimeSpan.FromSeconds(600); //time until session expires, all session data is lost
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -37,8 +36,8 @@ app.Use(async (context, next) =>
         if (context.Request.Path.Value != "/api/login")  //denies requests without authenticated session to enpoints other than login
         {
             Console.WriteLine("unauthorized request");
-            //context.Response.StatusCode = 401;
-            //return;
+            context.Response.StatusCode = 401;
+            return;
         }
     }
     Console.WriteLine("authorized request");

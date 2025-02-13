@@ -25,7 +25,7 @@ function App()
                 <Route index element={<Index/>}/>
                 <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
                 <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}>
-                    <Route index element={<TicketDisplayActive/>}/>  
+                    <Route index element={<TicketDisplayActive}/>}/>
                 </Route>
                 <Route path={"/AdminPanel"} element={<AdminPanel/>}/>
                 
