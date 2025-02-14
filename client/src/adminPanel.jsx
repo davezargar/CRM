@@ -48,7 +48,7 @@ export function AddCustomer() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <NavLink to="/addCustomer"><label>Email: <input type="text" name="email" value={email}
+            <NavLink to="/addCustomer"><label>Email: <input type="email" name="email" required value={email}
                 onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
             <button type="submit">Add Customer Support Worker</button>
             <NavBar />
@@ -82,7 +82,7 @@ export function RemoveCustomer() {
 
     return (
         <form onSubmit={handleSubmit}>
-            <NavLink to="/removeCustomer"><label>Email: <input type="text" name="email" value={email}
+            <NavLink to="/removeCustomer"><label>Email: <input type="text" name="email" required value={email}
                 onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
             <button type="submit">Remove Customer Support Worker</button>
             <NavBar />

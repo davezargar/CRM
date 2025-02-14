@@ -53,7 +53,7 @@ public class Queries
             await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_fk, verified, role) VALUES ($1, $2, $3, $4)");
             cmd.Parameters.AddWithValue(email);
             cmd.Parameters.AddWithValue(companyId);
-            cmd.Parameters.AddWithValue(true);
+            cmd.Parameters.AddWithValue(false);
             cmd.Parameters.AddWithValue("customerSupport");
             await cmd.ExecuteNonQueryAsync();
 
