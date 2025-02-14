@@ -7,6 +7,7 @@ import { AddRemoveCustomerSupport } from './adminPanel';
 import { AddCustomer, RemoveCustomer } from './adminPanel';
 import CustomerServicePanel from "./CustomerServicePanel";
 import CustomerPanel from "./CustomerPanel";
+import CreateTicket from "./CreateTicket";
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App/>
@@ -27,6 +28,7 @@ function App()
             <Route path="/register" element={<RegisterForm />} />
             <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
 
+            <Route path="/CreateTicket" element={<CreateTicket/>}/>
         </Routes>
     </BrowserRouter>
 }
@@ -93,6 +95,8 @@ function LoginForm() {
             <button type="button">Register</button>
         </NavLink>
         
+        <NavLink to="/CreateTicket">
+        <button type="button">Create Ticket</button></NavLink>
     </form>
 }
 function RegisterForm() {
