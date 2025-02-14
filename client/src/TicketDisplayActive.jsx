@@ -28,7 +28,7 @@ function TicketList({refresh}) {
     
     function datetimeFormatter(datetime){
         const date = new Date(Date.parse(datetime));
-        const formattedDate = date.toLocaleString('en-US', { timeZoneName: 'short' });
+        const formattedDate = date.toLocaleString('en-GB', { timeZoneName: 'short' });
         return  formattedDate;
     }
     

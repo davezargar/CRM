@@ -1,4 +1,8 @@
-﻿#ticketList{
+﻿#CustomerServicePanelMain{
+    padding: 15px;
+}
+
+#ticketList{
     width: 100%;
     padding: 0;
     li {
