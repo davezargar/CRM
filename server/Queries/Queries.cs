@@ -1,4 +1,5 @@
-﻿using Npgsql;
+﻿using System.Linq.Expressions;
+using Npgsql;
 using server.Records;
 
 namespace server.Queries;
@@ -29,5 +30,27 @@ public class Queries
         string role = (string?)result2 ?? "";
         
         return (verified, role);
+    }
+
+public async Task<bool> CreateTicketTask(TicketRequest ticket)
+{
+
+    try
+        {
+        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
+        cmd.Parameters.AddWithValue(ticket.Category.ToString());
+        cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
+        cmd.Parameters.AddWithValue(ticket.Title.ToString());
+        cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
+        cmd.Parameters.AddWithValue(ticket.Response_email.ToString());
+        cmd.Parameters.AddWithValue(ticket.Company_fk);
+        await cmd.ExecuteNonQueryAsync();
+        return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error creating ticket" + ex);
+            return false;
+        }
     }
 }

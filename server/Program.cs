@@ -30,9 +30,9 @@ app.Use(async (context, next) =>
     {
         if (context.Request.Path.Value != "/api/login")
         {
-            Console.WriteLine("unauthorized request");
-            context.Response.StatusCode = 401;
-            return;
+            //Console.WriteLine("unauthorized request");
+            //context.Response.StatusCode = 401;
+            //return;
         }
     }
     Console.WriteLine("authorized request");
@@ -57,6 +57,13 @@ app.MapGet("/api/test", async (HttpContext context) =>
     return Results.Ok(context.Session.GetString("Authenticated"));
 });
 
+app.MapPost("/api/CreateTicket", async (HttpContext context) =>
+{
+    var ticketRequest = await context.Request.ReadFromJsonAsync<TicketRequest>();
+
+    bool success = await queries.CreateTicketTask(ticketRequest);
+    return Results.Ok(success);
+});
 
 
 app.Run();
