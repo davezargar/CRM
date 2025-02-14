@@ -3,7 +3,8 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate} from "react-router";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
-import AdminPanel from "./AdminPanel";
+import { AddRemoveCustomerSupport } from './adminPanel';
+import { AddCustomer, RemoveCustomer } from './adminPanel';
 import CustomerServicePanel from "./CustomerServicePanel";
 import CustomerPanel from "./CustomerPanel";
 createRoot(document.getElementById('root')).render(
@@ -19,10 +20,13 @@ function App()
             <Route index element={<div><LoginForm/><QuickNav/></div>}></Route>
             <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
             <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}/>
-            <Route path={"/AdminPanel"} element={<AdminPanel/>}/>
             <Route path="/DefaultPage" element={<DefaultPage/>}/>
             <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
+            <Route path='/addCustomer' element={<AddCustomer />} />
+            <Route path='/removeCustomer' element={<RemoveCustomer />}/>
             <Route path="/register" element={<RegisterForm />} />
+            <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
+
         </Routes>
     </BrowserRouter>
 }
@@ -49,7 +53,7 @@ function LoginForm() {
         const form = e.target;
         const formData = new FormData(form)
         const loginData = Object.fromEntries(formData.entries());
-        
+
         fetch("/api/login", {
             headers: { "Content-Type": "application/json" },
             method: "POST",
@@ -93,7 +97,7 @@ function LoginForm() {
 }
 function RegisterForm() {
     function handleRegister() {
-
+        
     }
 
     return (
@@ -104,3 +108,4 @@ function RegisterForm() {
         </form>
     );
 }
+

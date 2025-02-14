@@ -30,6 +30,7 @@ var app = builder.Build();
 
 app.UseSession(); // where the session middleware is run, ordering is important, must be before middleware using it
 
+
 app.Use(async (context, next) =>
 {
     if (context.Session.GetString("Authenticated") == null) //if the value in the session is null then it did not exist before this request
@@ -37,13 +38,54 @@ app.Use(async (context, next) =>
         if (context.Request.Path.Value != "/api/login")  //denies requests without authenticated session to enpoints other than login
         {
             Console.WriteLine("unauthorized request");
-            context.Response.StatusCode = 401;
-            return;
+            //context.Response.StatusCode = 401;
+            //return;
         }
     }
     Console.WriteLine("authorized request");
     await next();
 });
+
+app.MapPost("/api/addCustomer", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("Invalid email");
+    }
+    Console.WriteLine($"received email: {requestBody.Email}");
+    int companyId = requestBody.CompanyId ?? 1;
+
+    bool success = await queries.AddCustomerTask(requestBody.Email, companyId);
+
+    if (!success)
+    {
+        Results.Problem("Failed to add worker");
+    }
+
+    return Results.Ok(new { message = "Valid mail" });
+});
+
+app.MapDelete("/api/removeCustomer", async (HttpContext context) =>
+{
+    Console.WriteLine("HEEEEEEEEEEEEEEEEEJ");
+    var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("Invalid email");
+    }
+    Console.WriteLine(requestBody.Email);
+    bool success = await queries.RemoveCustomerTask(requestBody.Email);
+
+    if (!success)
+    {
+        Results.Problem("failed to remove worker");
+    }
+
+    return Results.Ok(new { message = "Successfully removed wroker" });
+});
+
+
 
 app.MapPost("/api/login", async (HttpContext context) =>
 {
