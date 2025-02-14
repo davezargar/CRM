@@ -5,9 +5,11 @@ import { BrowserRouter, Routes, Route, NavLink, useNavigate} from "react-router"
 import TicketDisplayActive from "./TicketDisplayActive.jsx";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
-import AdminPanel from "./AdminPanel";
+import { AddRemoveCustomerSupport } from './adminPanel';
+import { AddCustomer, RemoveCustomer } from './adminPanel';
 import CustomerServicePanel from "./CustomerServicePanel";
 import CustomerPanel from "./CustomerPanel";
+import CreateTicket from "./CreateTicket";
 
 export const RoleContext = createContext({});
 
@@ -27,9 +29,12 @@ function App()
                 <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}>
                     <Route index element={<TicketDisplayActive/>}/>
                 </Route>
-                <Route path={"/AdminPanel"} element={<AdminPanel/>}/>
                 
-                
+                <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
+                <Route path='/addCustomer' element={<AddCustomer />} />
+                <Route path='/removeCustomer' element={<RemoveCustomer />}/>
+
+                <Route path="/CreateTicket" element={<CreateTicket/>}/>
                 <Route path="/DefaultPage" element={<DefaultPage/>}/>
                 <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
                 <Route path="/register" element={<RegisterForm />} />
@@ -58,6 +63,7 @@ function QuickNav()
         <NavLink to="/CustomerPanel"><button>CustomerPanel</button></NavLink>
         <NavLink to="/AdminPanel"><button>AdminPanel</button></NavLink>
         <NavLink to="/CustomerServicePanel"><button>CustomerServicePanel</button></NavLink>
+        <NavLink to="/CreateTicket"><button type="button">Create Ticket</button></NavLink>
         <button onClick={test}>test auth</button>
     </div>
 }
@@ -70,7 +76,7 @@ function LoginForm() {
         const form = e.target;
         const formData = new FormData(form)
         const loginData = Object.fromEntries(formData.entries());
-        
+
         fetch("/api/login", {
             headers: { "Content-Type": "application/json" },
             method: "POST",
@@ -109,12 +115,11 @@ function LoginForm() {
         <NavLink to="/register">
             <button type="button">Register</button>
         </NavLink>
-        
     </form>
 }
 function RegisterForm() {
     function handleRegister() {
-
+        
     }
 
     return (
@@ -125,3 +130,4 @@ function RegisterForm() {
         </form>
     );
 }
+

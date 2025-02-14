@@ -1,0 +1,10 @@
+#createTicket {
+    display: grid;
+    justify-content: center;
+    }
+
+#formId {
+    background-color: grey;
+    padding: 20px;
+    border-radius: 10px;
+}

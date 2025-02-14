@@ -2,6 +2,7 @@ body {
     margin: 0;
     padding: 0;
 }
+
 nav {
     grid-area: navBar;
     display: flex;
@@ -19,7 +20,7 @@ nav>ul {
     position: relative;
     width: 299px;
     display: grid;
-grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
     list-style-type: none;
     height: 40vh;
     flex-direction: column;
