@@ -26,11 +26,10 @@ function TicketDetailed(){
         const formattedDate = date.toLocaleString('en-GB', { timeZoneName: 'short' });
         return  formattedDate;
     }
-    return <div>
+    return <div id={"ticketDetailed"}>
         <p>HELOJ detta en detailed ticket for ticket id: {ticketId} </p>
         <button onClick={() => SetRefresh(current => !current)}>Refresh</button>
         <ul id={"ticketList"}>
-        
             <li key={Ticket.ticketId}>
                 <p className={"ticketId"}>{Ticket.ticketId}</p>
                 <p className={"category"}>{Ticket.category}</p>
@@ -38,18 +37,18 @@ function TicketDetailed(){
                 <p className={"title"}>{Ticket.title}</p>
                 <p className={"timeposted"}>{datetimeFormatter(Ticket.timePosted)}</p>
             </li>
-    </ul>
-    <ul id={"messageList"}>
-        {Messages.map((Message=>
-            <li key={Message.messageId}>
-                <p className={"messageId"}>{Message.messageId}</p>
-                <p className={"title"}>{Message.title}</p>
-                <p className={"message"}>{Message.message}</p>
-                <p className={"messageSender"}>{Message.userId}</p>
-            </li>
-        ))}
-    </ul>
-        
+        </ul>
+        <ul id={"messageList"}>
+            {Messages.map((Message=>
+                    <li key={Message.messageId}>
+                        <p className={"messageId"}>{Message.messageId}</p>
+                        <p className={"title"}>{Message.title}</p>
+                        <p className={"message"}>{Message.message}</p>
+                        <p className={"messageSender"}>{Message.userId}</p>
+                        <p className={"messageTimeSent"}>{datetimeFormatter(Message.timeSent)}</p>
+                    </li>
+            ))}
+        </ul>
     </div>
 }
 
