@@ -123,6 +123,7 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
 
     public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag
     {
+        
         List<TicketRecord> tickets = new List<TicketRecord>();
         await using var cmd =
             _db.CreateCommand(
