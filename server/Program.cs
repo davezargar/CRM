@@ -118,6 +118,23 @@ app.MapPost("/api/CreateTicket", async (HttpContext context) =>
     return Results.Ok(success);
 });
 
+app.MapPost("/api/sendMessage", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<SendEmail>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+    bool success = await queries.PostMessageTask(requestBody.Title, requestBody.Description);
+
+    if (!success)
+    {
+        Results.Problem("Couldn't process the Sql Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the message to database" });
+});
+
 
 app.Run();
 

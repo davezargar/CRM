@@ -1,4 +1,5 @@
-import "./style/CustomerServicePanel.css"
+import "./style/CustomerServicePanel.css";
+import { useEffect, useState } from "react";
 
 export default function CustomerServicePanel() {
     return DisplayMailWindow();
@@ -10,17 +11,43 @@ export function ReplyButtonDisplay() {
 }
 
 function DisplayMailWindow() {
+
+    const [title, setTitle] = useState("");
+    const [description, setDescription] = useState("")
+
+    async function handleSubmit(e) {
+        e.preventDefault();
+
+        try {
+            const response = await fetch("/api/sendMessage", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ title, description })
+            });
+            if (!response) {
+                throw new Error("Response failed");
+            }
+            alert("Successfully sent the message to the endpoint");
+        } catch (error) {
+            console.error(error);
+            alert("couldnt send the form")
+        }
+    }
+
     return <div className="mainContainer">
-        <form className="mailContainer">
+        <form className="mailContainer" onSubmit={handleSubmit}>
 
             <div className="formRow">
-                <label>Title: <input type="text" name="title" required value={Text}></input></label>
+                <label>Title: <input type="text" name="title" required value={title}
+                    onChange={(e) => setTitle(e.target.value)} ></input></label>
             </div>
 
             <div className="formRow">
-                <label htmlFor="desc">Description:</label>
-                <textarea name="desc" required rows="4"></textarea>
-
+                <label htmlFor="desc-id">Description:</label>
+                <textarea id="desc-id" name="desc" required rows="4" value={description}
+                    onChange={(e) => setDescription(e.target.value)}></textarea>
             </div>
 
             <div className="checkboxRow">

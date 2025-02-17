@@ -81,17 +81,17 @@ public class Queries
         {
             await using var loginCmd = _db.CreateCommand("DELETE FROM login_credentials WHERE email = $1");
             loginCmd.Parameters.AddWithValue(email);
-            int loginRowsAffected = await loginCmd.ExecuteNonQueryAsync();   
+            int loginRowsAffected = await loginCmd.ExecuteNonQueryAsync();
 
             await using var cmd = _db.CreateCommand("DELETE FROM users WHERE email = $1");
             cmd.Parameters.AddWithValue(email);
             int usersRowsAffected = await cmd.ExecuteNonQueryAsync();
 
-            
+
 
             bool success = (usersRowsAffected > 0 || loginRowsAffected > 0) ? true : false;
             return success;
-            
+
         }
         catch (Exception ex)
         {
@@ -100,24 +100,37 @@ public class Queries
         }
     }
 
-public async Task<bool> CreateTicketTask(TicketRequest ticket)
-{
+    public async Task<bool> CreateTicketTask(TicketRequest ticket)
+    {
 
-    try
+        try
         {
-        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
-        cmd.Parameters.AddWithValue(ticket.Category.ToString());
-        cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
-        cmd.Parameters.AddWithValue(ticket.Title.ToString());
-        cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
-        cmd.Parameters.AddWithValue(ticket.Response_email.ToString());
-        cmd.Parameters.AddWithValue(ticket.Company_fk);
-        await cmd.ExecuteNonQueryAsync();
-        return true;
+            await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
+            cmd.Parameters.AddWithValue(ticket.Category.ToString());
+            cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
+            cmd.Parameters.AddWithValue(ticket.Title.ToString());
+            cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
+            cmd.Parameters.AddWithValue(ticket.Response_email.ToString());
+            cmd.Parameters.AddWithValue(ticket.Company_fk);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error creating ticket" + ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> PostMessageTask(SendEmail message)
+    {
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Couldn't post message" + ex);
             return false;
         }
     }
