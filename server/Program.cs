@@ -107,8 +107,12 @@ app.MapGet("/api/ticketList", async (HttpContext context) =>
 {
     string? requesterEmail = context.Session.GetString("Email");
     
-    if (String.IsNullOrEmpty(requesterEmail) || context.Session.GetString("Role") == "customer") 
+    if (String.IsNullOrEmpty(requesterEmail)) 
         return Results.Unauthorized();
+    if (context.Session.GetString("Role") == "customer")
+    {
+        
+    }
 
     List<TicketRecord> tickets = await queries.GetTicketsAll(requesterEmail);
 
