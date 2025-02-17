@@ -2,6 +2,7 @@
     width: 120px;
     height: 40px;
     cursor: pointer;
+
 }
 
 .replyContainer {
@@ -9,4 +10,54 @@
     justify-content: flex-end;
     align-self: flex-end;
     margin-top: 600px;
+}
+
+#sendButton {
+    width: 100px;
+    height: 35px;
+    cursor: pointer;
+    margin-top: 0;
+    margin-left: 160px;
+}
+
+.mailContainer {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+}
+
+.formRow input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.mainContainer {
+    display: flex;
+}
+
+.formRow {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.checkboxRow {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.formRow textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    resize: vertical;
+    min-height: 100px;
 }
