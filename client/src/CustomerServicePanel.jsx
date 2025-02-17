@@ -24,6 +24,12 @@ function DisplayMailWindow({ onClose }) {
 
     const [title, setTitle] = useState(() => localStorage.getItem("title") || (""));
     const [description, setDescription] = useState(() => localStorage.getItem("description") || (""));
+    const [isChecked, setIsChecked] = useState(false);
+
+    const handleCheckboxChange = (e) => {
+        setIsChecked(e.target.checked)
+    }
+
 
 
     useEffect(() => {
@@ -43,7 +49,7 @@ function DisplayMailWindow({ onClose }) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ title, description })
+                body: JSON.stringify({ title, description, resolved: isChecked })
             });
             if (!response) {
                 throw new Error("Response failed");
@@ -79,8 +85,8 @@ function DisplayMailWindow({ onClose }) {
             </div>
 
             <div className="checkboxRow">
-                <input type="checkbox" id="checkResolveTickets" name="resolveTickets" value="check"></input>
-                <label for="resolveTickets">Resolve Ticket</label>
+                <input type="checkbox" checked={isChecked} onChange={handleCheckboxChange} id="checkResolveTickets" name="resolveTickets" value="check"></input>
+                <label htmlFor="sendButton">Resolve Ticket</label>
                 <button type="submit" id="sendButton">Send</button>
             </div>
 
