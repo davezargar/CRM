@@ -15,9 +15,9 @@ const NavLinks = {
         { name: "Your Ticket History", path: "/YourTicketHistory" }
     ],
     CustomerService: [
-        { name: "Active Tickets", path: "/ActiveTickets" },
-        { name: "Edit/Redirect Ticket", path: "/Edit/RedirectTicket" },
-        { name: "Resolved tickets", path: "/ResolvedTickets" },
+        { name: "Active Tickets", path: "/CustomerServicePanel/tickets" },
+        { name: "Resolved tickets", path: "/CustomerServicePanel/ResolvedTickets" },
+        { name: "account settings", path: "/CustomerServicePanel/accountSettings" },
     ]
 };
 

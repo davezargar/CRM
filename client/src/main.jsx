@@ -2,12 +2,16 @@ import { StrictMode, useState, createContext, use, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate} from "react-router";
 
-import TicketDisplayActive from "./TicketDisplayActive.jsx";
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
+
+import CustomerServicePanel from "./CustomerServicePanel";
+import TicketDisplayActive from "./TicketDisplayActive.jsx";
+import TicketDetailed from "./TicketDetailed.jsx";
+
 import { AddRemoveCustomerSupport } from './adminPanel';
 import { AddCustomer, RemoveCustomer } from './adminPanel';
-import CustomerServicePanel from "./CustomerServicePanel";
+
 import CustomerPanel from "./CustomerPanel";
 import CreateTicket from "./CreateTicket";
 
@@ -26,8 +30,11 @@ function App()
             <Routes>
                 <Route index element={<Index/>}/>
                 <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
+                
                 <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}>
-                    <Route index element={<TicketDisplayActive/>}/>
+                    <Route path={"/CustomerServicePanel/tickets"} element={<TicketDisplayActive/>}/> {/*Should default to this path dont know how*/}
+                    <Route path={"/CustomerServicePanel/ticket/:ticketId"} element={<TicketDetailed/>}/>
+                    {/*Route account settings*/}
                 </Route>
                 
                 <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
@@ -62,7 +69,7 @@ function QuickNav()
         <NavLink to="/DefaultPage"><button>Defualt page</button></NavLink>
         <NavLink to="/CustomerPanel"><button>CustomerPanel</button></NavLink>
         <NavLink to="/AdminPanel"><button>AdminPanel</button></NavLink>
-        <NavLink to="/CustomerServicePanel"><button>CustomerServicePanel</button></NavLink>
+        <NavLink to="/CustomerServicePanel/tickets"><button>CustomerServicePanel</button></NavLink>
         <NavLink to="/CreateTicket"><button type="button">Create Ticket</button></NavLink>
         <button onClick={test}>test auth</button>
     </div>
@@ -101,7 +108,7 @@ function LoginForm() {
                     navigate("/AdminPanel");
                     break;
                 case "customerService":
-                    navigate("/CustomerServicePanel");
+                    navigate("/CustomerServicePanel/tickets");
                     break;
             }
         })
