@@ -2,15 +2,25 @@ import "./style/CustomerServicePanel.css";
 import { useEffect, useState } from "react";
 
 export default function CustomerServicePanel() {
-    return DisplayMailWindow();
+    const [showMailWindow, setShowMailWindow] = useState(false)
+    return (
+        <div>
+            {!showMailWindow && <ReplyButtonDisplay onClick={() => setShowMailWindow(true)} />}
+            {showMailWindow && <DisplayMailWindow onClose={() => setShowMailWindow(false)} />}
+        </div>
+    )
 }
 
-export function ReplyButtonDisplay() {
-    return <div className="replyContainer"><button id="replyButton" onClick={DisplayMailWindow}>Reply</button></div>
+export function ReplyButtonDisplay({ onClick }) {
+    return <div className="replyContainer">
+        <button id="replyButton" onClick={onClick}>Reply</button>
+    </div>
 
 }
 
-function DisplayMailWindow() {
+
+
+function DisplayMailWindow({ onClose }) {
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("")
@@ -37,9 +47,12 @@ function DisplayMailWindow() {
     }
 
     return <div className="mainContainer">
+
+
         <form className="mailContainer" onSubmit={handleSubmit}>
 
             <div className="formRow">
+                <button className="closeButton" onClick={onClose}>X</button>
                 <label>Title: <input type="text" name="title" required value={title}
                     onChange={(e) => setTitle(e.target.value)} ></input></label>
             </div>
