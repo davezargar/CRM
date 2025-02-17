@@ -110,7 +110,6 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
         cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
         cmd.Parameters.AddWithValue(ticket.Title.ToString());
         cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
-        cmd.Parameters.AddWithValue(ticket.Response_email.ToString());
         cmd.Parameters.AddWithValue(ticket.Company_fk);
         await cmd.ExecuteNonQueryAsync();
         return true;
@@ -127,7 +126,7 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
         List<TicketRecord> tickets = new List<TicketRecord>();
         await using var cmd =
             _db.CreateCommand(
-                "SELECT ticket_id, category, subcategory, title, time_posted, time_closed, user_fk, response_email, tickets.company_fk FROM tickets " +
+                "SELECT ticket_id, category, subcategory, title, time_posted, time_closed, user_fk, tickets.company_fk FROM tickets " +
                 "INNER JOIN users ON tickets.company_fk = users.company_fk WHERE email = $1");
         cmd.Parameters.AddWithValue(email);
         using var reader = await cmd.ExecuteReaderAsync();
@@ -142,8 +141,7 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
                     reader.GetDateTime(4),
                     reader.IsDBNull(5) ? null : reader.GetDateTime(5),
                     reader.GetString(6),
-                    reader.GetString(7),
-                    reader.GetInt32(8)
+                    reader.GetInt32(7)
                 )
             );
             

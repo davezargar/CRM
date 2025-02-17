@@ -48,8 +48,6 @@ function CreateTicket() {
     <textarea id="Title" rows={12} cols={100} value={formData.description} onChange={handleChange}></textarea>
     <h3>Enter your email:</h3>
     <input type="text" id="User_fk" value={formData.User_fk} onChange={handleChange} />
-    <h3>Enter your response email:</h3>
-    <input type="email" id="Response_email" value={formData.Response_email} onChange={handleChange} />
     <br />
     <button type="submit">Create Ticket</button>
     </form>
