@@ -1,7 +1,10 @@
-export default CustomerServicePanel
+import "./style/CustomerServicePanel.css"
 
-function CustomerServicePanel(){
-    return <div>
-        <p>hi customer service :)</p>
-    </div>
+export default function CustomerServicePanel() {
+    return ReplyButtonDisplay();
+}
+
+export function ReplyButtonDisplay() {
+    return <div className="replyContainer"><button id="replyButton">Reply</button></div>
+
 }

@@ -1,0 +1,12 @@
+#replyButton {
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.replyContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-end;
+    margin-top: 600px;
+}
