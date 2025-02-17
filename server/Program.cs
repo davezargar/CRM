@@ -128,6 +128,18 @@ app.MapPost("/api/CreateTicket", async (HttpContext context) =>
     return Results.Ok(success);
 });
 
+app.MapGet("/api/ticket/{ticketId:int}", async (HttpContext context, int ticketId) =>
+{
+    string? requesterEmail = context.Session.GetString("Email");
+    
+    if (String.IsNullOrEmpty(requesterEmail)) 
+        return Results.Unauthorized();
+
+    TicketRecord ticket = await queries.GetTicket(requesterEmail, ticketId);
+    List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
+    TicketMessagesRecord ticketMessages = new(ticket, messages);
+    return Results.Ok(ticketMessages);
+});
 
 app.Run();
 
