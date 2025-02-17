@@ -110,7 +110,6 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
         cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
         cmd.Parameters.AddWithValue(ticket.Title.ToString());
         cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
-        cmd.Parameters.AddWithValue(ticket.Response_email.ToString());
         cmd.Parameters.AddWithValue(ticket.Company_fk);
         await cmd.ExecuteNonQueryAsync();
         return true;
