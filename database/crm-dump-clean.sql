@@ -142,7 +142,8 @@ CREATE TABLE public.messages (
     message text NOT NULL,
     ticket_id_fk integer NOT NULL,
     title text NOT NULL,
-    user_fk text NOT NULL
+    user_fk text NOT NULL,
+    time_sent timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -256,7 +257,10 @@ test3@mail.com	test3
 -- Data for Name: messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.messages (message_id, message, ticket_id_fk, title, user_fk) FROM stdin;
+COPY public.messages (message_id, message, ticket_id_fk, title, user_fk, time_sent) FROM stdin;
+1	Test  test test	3	test help me	test1@mail.com	2025-02-17 17:22:40.109025
+2	test response 	3	Test help response	test3@mail.com	2025-02-17 17:22:40.109025
+3	test text	4	hlpe me	test1@mail.com	2025-02-17 17:22:40.109025
 \.
 
 
@@ -299,7 +303,7 @@ SELECT pg_catalog.setval('public.forms_form_id_seq', 1, false);
 -- Name: messages_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messages_message_id_seq', 1, false);
+SELECT pg_catalog.setval('public.messages_message_id_seq', 3, true);
 
 
 --
