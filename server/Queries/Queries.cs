@@ -30,4 +30,31 @@ public class Queries
         
         return (verified, role);
     }
+
+    public async Task<List<TicketRecord>> GetTicketHistory(string email)
+    {
+        List<TicketRecord> Tickets = new List<TicketRecord>();
+        await using var cmd = _db.CreateCommand("SELECT * from tickets where user_fk = $1");
+        cmd.Parameters.AddWithValue(email);
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            Tickets.Add(
+                new(
+                    reader.GetInt32(0), 
+                    reader.GetString(1), 
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetDateTime(4),
+                    reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    reader.GetString(6),
+                    reader.GetInt32(7)
+                )
+            );
+            
+        }
+
+        return Tickets;
+    }
 }
+
