@@ -1,4 +1,5 @@
 ﻿import { useState, useEffect } from "react";
+import { NavLink } from "react-router";
 import "./style/TicketDisplayActive.css";
 
 export default TicketDisplayActive
@@ -33,12 +34,14 @@ function TicketList({refresh}) {
     }
     
     return <ul id={"ticketList"}>
-        {Tickets.map((ticket)=><li key={ticket.ticketId}>
-            <p className={"ticketId"}>{ticket.ticketId}</p>
-            <p className={"category"}>{ticket.category}</p>
-            <p className={"subcategory"}>{ticket.subcategory}</p>
-            <p className={"title"}>{ticket.title}</p>
-            <p className={"timeposted"}>{datetimeFormatter(ticket.timePosted)}</p>
-        </li>)}
+        {Tickets.map((ticket)=><NavLink to={`/CustomerServicePanel/ticket/${ticket.ticketId}`}>
+            <li key={ticket.ticketId}>
+                <p className={"ticketId"}>{ticket.ticketId}</p>
+                <p className={"category"}>{ticket.category}</p>
+                <p className={"subcategory"}>{ticket.subcategory}</p>
+                <p className={"title"}>{ticket.title}</p>
+                <p className={"timeposted"}>{datetimeFormatter(ticket.timePosted)}</p>
+            </li>
+        </NavLink>)}
     </ul>
 }

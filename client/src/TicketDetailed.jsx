@@ -5,7 +5,6 @@ export default TicketDetailed;
 
 function TicketDetailed(){
     let params = useParams();
-    
     let ticketId = params.ticketId;
     
     return <div>
