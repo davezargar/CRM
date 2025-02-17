@@ -22,8 +22,17 @@ export function ReplyButtonDisplay({ onClick }) {
 
 function DisplayMailWindow({ onClose }) {
 
-    const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("")
+    const [title, setTitle] = useState(() => localStorage.getItem("title") || (""));
+    const [description, setDescription] = useState(() => localStorage.getItem("description") || (""));
+
+
+    useEffect(() => {
+        localStorage.setItem("title", title);
+    }, [title]);
+
+    useEffect(() => {
+        localStorage.setItem("description", description)
+    }, [description]);
 
     async function handleSubmit(e) {
         e.preventDefault();
@@ -40,6 +49,12 @@ function DisplayMailWindow({ onClose }) {
                 throw new Error("Response failed");
             }
             alert("Successfully sent the message to the endpoint");
+            localStorage.removeItem("title");
+            localStorage.removeItem("description");
+
+            setTitle("");
+            setDescription("");
+
         } catch (error) {
             console.error(error);
             alert("couldnt send the form")
