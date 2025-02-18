@@ -134,4 +134,17 @@ public class Queries
             return false;
         }
     }
+
+    public async Task<bool> PostTicketStatusTask(bool TicketResolved)
+    {
+        try
+        {
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Couldn't post message" + ex);
+            return false;
+        }
+    }
 }

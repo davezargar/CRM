@@ -135,6 +135,23 @@ app.MapPost("/api/sendMessage", async (HttpContext context) =>
     return Results.Ok(new { message = "Successfully posted the message to database" });
 });
 
+app.MapPost("/api/ticketResolved", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+    bool success = await queries.PostTicketStatusTask(requestBody.TicketResolved, requestBody.);
+
+    if (!success)
+    {
+        Results.Problem("Couldn't process the Sql Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the ticket status to database" });
+});
+
 
 app.Run();
 

@@ -44,12 +44,30 @@ function DisplayMailWindow({ onClose }) {
         e.preventDefault();
 
         try {
+            if (isChecked == true) {
+                const response = await fetch("/api/ticketResolved", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ resolved: isChecked })
+                });
+                if (!response) {
+                    throw new Error("Response failed");
+                }
+                localStorage.removeItem("title");
+                localStorage.removeItem("description");
+
+                setTitle("");
+                setDescription("");
+            }
+
             const response = await fetch("/api/sendMessage", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ title, description, resolved: isChecked })
+                body: JSON.stringify({ title, description })
             });
             if (!response) {
                 throw new Error("Response failed");
