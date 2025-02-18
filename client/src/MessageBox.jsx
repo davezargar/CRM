@@ -1,17 +1,17 @@
 import "./style/MessageBox.css";
-import { useEffect, useState, useContext } from "react";
+import { useEffect, useState, useContext, createContext } from "react";
 
 export default function MessageBox({ ticket_Id }) {
     const [showMailWindow, setShowMailWindow] = useState(false);
-    const ticketId = useContext(ticket_Id)
+    const TicketContext = createContext();
 
     return (
-        <ThemeContext.Provider value={ticketId}>
+        <TicketContext.Provider value={ticket_Id}>
             <div>
                 {!showMailWindow && <ReplyButtonDisplay onClick={() => setShowMailWindow(true)} />}
                 {showMailWindow && <DisplayMailWindow onClose={() => setShowMailWindow(false)} />}
             </div>
-        </ThemeContext.Provider>
+        </TicketContext.Provider>
     )
 }
 
@@ -29,6 +29,7 @@ function DisplayMailWindow({ onClose }) {
     const [title, setTitle] = useState(() => localStorage.getItem("title") || (""));
     const [description, setDescription] = useState(() => localStorage.getItem("description") || (""));
     const [isChecked, setIsChecked] = useState(false);
+    const ticket_id = useContext(TicketContext)
 
     const handleCheckboxChange = (e) => {
         setIsChecked(e.target.checked)
@@ -71,7 +72,7 @@ function DisplayMailWindow({ onClose }) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ title, description })
+                body: JSON.stringify({ title, description, ticket_id })
             });
             if (!response) {
                 throw new Error("Response failed");
