@@ -1,13 +1,22 @@
 import { StrictMode, useState, createContext, use, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate} from "react-router";
+
 import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
+
+import CustomerServicePanel from "./CustomerServicePanel";
+import TicketDisplayActive from "./TicketDisplayActive.jsx";
+import TicketDetailed from "./TicketDetailed.jsx";
+
 import { AddRemoveCustomerSupport } from './adminPanel';
 import { AddCustomer, RemoveCustomer } from './adminPanel';
-import CustomerServicePanel from "./CustomerServicePanel";
+
 import CustomerPanel from "./CustomerPanel";
 import CreateTicket from "./CreateTicket";
+
+export const RoleContext = createContext({});
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App/>
@@ -16,21 +25,36 @@ createRoot(document.getElementById('root')).render(
 
 function App()
 {
-    return <BrowserRouter>
-        <Routes>
-            <Route index element={<div><LoginForm/><QuickNav/></div>}></Route>
-            <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
-            <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}/>
-            <Route path="/DefaultPage" element={<DefaultPage/>}/>
-            <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
-            <Route path='/addCustomer' element={<AddCustomer />} />
-            <Route path='/removeCustomer' element={<RemoveCustomer />}/>
-            <Route path="/register" element={<RegisterForm />} />
-            <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
+    return <RoleContext.Provider value={"Customer"}>
+        <BrowserRouter>
+            <Routes>
+                <Route index element={<Index/>}/>
+                <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
+                
+                <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}>
+                    <Route path={"/CustomerServicePanel/tickets"} element={<TicketDisplayActive/>}/> {/*Should default to this path dont know how*/}
+                    <Route path={"/CustomerServicePanel/ticket/:ticketId"} element={<TicketDetailed/>}/>
+                    {/*Route account settings*/}
+                </Route>
+                
+                <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
+                <Route path='/addCustomer' element={<AddCustomer />} />
+                <Route path='/removeCustomer' element={<RemoveCustomer />}/>
 
-            <Route path="/CreateTicket" element={<CreateTicket/>}/>
-        </Routes>
-    </BrowserRouter>
+                <Route path="/CreateTicket" element={<CreateTicket/>}/>
+                <Route path="/DefaultPage" element={<DefaultPage/>}/>
+                <Route path="/ActiveTickets" element={<ActiveTickets/>}/>
+                <Route path="/register" element={<RegisterForm />} />
+            </Routes>
+        </BrowserRouter>
+    </RoleContext.Provider>
+}
+
+function Index(){
+    return <div>
+        <LoginForm/>
+        <QuickNav/>
+    </div>
 }
 
 function QuickNav()
@@ -43,6 +67,10 @@ function QuickNav()
     
     return <div id={"QuickNav"}>
         <NavLink to="/DefaultPage"><button>Defualt page</button></NavLink>
+        <NavLink to="/CustomerPanel"><button>CustomerPanel</button></NavLink>
+        <NavLink to="/AdminPanel"><button>AdminPanel</button></NavLink>
+        <NavLink to="/CustomerServicePanel/tickets"><button>CustomerServicePanel</button></NavLink>
+        <NavLink to="/CreateTicket"><button type="button">Create Ticket</button></NavLink>
         <button onClick={test}>test auth</button>
     </div>
 }
@@ -80,7 +108,7 @@ function LoginForm() {
                     navigate("/AdminPanel");
                     break;
                 case "customerService":
-                    navigate("/CustomerServicePanel");
+                    navigate("/CustomerServicePanel/tickets");
                     break;
             }
         })
@@ -94,9 +122,6 @@ function LoginForm() {
         <NavLink to="/register">
             <button type="button">Register</button>
         </NavLink>
-        
-        <NavLink to="/CreateTicket">
-        <button type="button">Create Ticket</button></NavLink>
     </form>
 }
 function RegisterForm() {

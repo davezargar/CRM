@@ -8,13 +8,13 @@ nav {
     display: flex;
     font-size: larger;
     text-decoration: none;
-    max-width: 300px;
+    width:100%;
     min-height: 100vh;
     border-right: 1px solid 10% black;
     box-shadow: 0 0 15px rgb(0, 0, 0);
 }
 
-ul {
+nav>ul {
     flex-wrap: nowrap;
     padding-left: 0;
     position: relative;
