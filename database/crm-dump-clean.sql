@@ -258,6 +258,9 @@ test3@mail.com	test3
 --
 
 COPY public.messages (message_id, message, ticket_id_fk, title, user_fk, time_sent) FROM stdin;
+1	Test  test test	3	test help me	test1@mail.com	2025-02-17 17:22:40.109025
+2	test response 	3	Test help response	test3@mail.com	2025-02-17 17:22:40.109025
+3	test text	4	hlpe me	test1@mail.com	2025-02-17 17:22:40.109025
 \.
 
 
@@ -300,7 +303,7 @@ SELECT pg_catalog.setval('public.forms_form_id_seq', 1, false);
 -- Name: messages_message_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.messages_message_id_seq', 1, false);
+SELECT pg_catalog.setval('public.messages_message_id_seq', 3, true);
 
 
 --

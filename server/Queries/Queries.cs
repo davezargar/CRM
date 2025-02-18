@@ -3,6 +3,7 @@ using Npgsql;
 using server.Records;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
+using System.ComponentModel.Design;
 
 
 namespace server.Queries;
@@ -81,17 +82,17 @@ public class Queries
         {
             await using var loginCmd = _db.CreateCommand("DELETE FROM login_credentials WHERE email = $1");
             loginCmd.Parameters.AddWithValue(email);
-            int loginRowsAffected = await loginCmd.ExecuteNonQueryAsync();
+            int loginRowsAffected = await loginCmd.ExecuteNonQueryAsync();   
 
             await using var cmd = _db.CreateCommand("DELETE FROM users WHERE email = $1");
             cmd.Parameters.AddWithValue(email);
             int usersRowsAffected = await cmd.ExecuteNonQueryAsync();
 
-
+            
 
             bool success = (usersRowsAffected > 0 || loginRowsAffected > 0) ? true : false;
             return success;
-
+            
         }
         catch (Exception ex)
         {
@@ -100,20 +101,19 @@ public class Queries
         }
     }
 
-    public async Task<bool> CreateTicketTask(TicketRequest ticket)
-    {
+public async Task<bool> CreateTicketTask(TicketRequest ticket)
+{
 
-        try
+    try
         {
-            await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
-            cmd.Parameters.AddWithValue(ticket.Category.ToString());
-            cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
-            cmd.Parameters.AddWithValue(ticket.Title.ToString());
-            cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
-            cmd.Parameters.AddWithValue(ticket.Response_email.ToString());
-            cmd.Parameters.AddWithValue(ticket.Company_fk);
-            await cmd.ExecuteNonQueryAsync();
-            return true;
+        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
+        cmd.Parameters.AddWithValue(ticket.Category.ToString());
+        cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
+        cmd.Parameters.AddWithValue(ticket.Title.ToString());
+        cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
+        cmd.Parameters.AddWithValue(ticket.Company_fk);
+        await cmd.ExecuteNonQueryAsync();
+        return true;
         }
         catch (Exception ex)
         {
@@ -121,6 +121,82 @@ public class Queries
             return false;
         }
     }
+
+    public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag
+    {
+        List<TicketRecord> tickets = new List<TicketRecord>();
+        await using var cmd =
+            _db.CreateCommand(
+                "SELECT ticket_id, category, subcategory, title, time_posted, time_closed, user_fk, tickets.company_fk FROM tickets " +
+                "INNER JOIN users ON tickets.company_fk = users.company_fk WHERE email = $1");
+        cmd.Parameters.AddWithValue(email);
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            tickets.Add(
+                new(
+                    reader.GetInt32(0), 
+                    reader.GetString(1), 
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetDateTime(4),
+                    reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    reader.GetString(6),
+                    reader.GetInt32(7)
+                )
+            );
+            
+        }
+
+        return tickets;
+    }
+
+    public async Task<TicketRecord> GetTicket(string email, int id) //email för den som gjort request används för att få vilket företag
+    {
+        TicketRecord ticket;
+        await using var cmd =
+            _db.CreateCommand(
+                "SELECT ticket_id, category, subcategory, title, time_posted, time_closed, user_fk, tickets.company_fk FROM tickets " +
+                "INNER JOIN users ON tickets.company_fk = users.company_fk WHERE ticket_id = $1 AND email = $2");
+        cmd.Parameters.AddWithValue(id);
+        cmd.Parameters.AddWithValue(email);
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            ticket = new(
+                    reader.GetInt32(0), 
+                    reader.GetString(1), 
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetDateTime(4),
+                    reader.IsDBNull(5) ? null : reader.GetDateTime(5),
+                    reader.GetString(6),
+                    reader.GetInt32(7)
+                );
+            return ticket;
+        }
+        return null;
+    }
+
+    public async Task<List<MessagesRecord>> GetTicketMessages(int id)
+    {
+        List<MessagesRecord> messages = new List<MessagesRecord>();
+        await using var cmd =_db.CreateCommand("SELECT * FROM messages WHERE ticket_id_fk = $1");
+        cmd.Parameters.AddWithValue(id);
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            messages.Add( new(
+                reader.GetInt32(0),
+                reader.GetString(1),
+                reader.GetInt32(2),
+                reader.GetString(3),
+                reader.GetString(4)
+            ));
+        }
+        return messages;
+    }
+
 
     public async Task<bool> PostMessageTask(SendEmail message)
     {

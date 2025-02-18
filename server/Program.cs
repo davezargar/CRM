@@ -17,10 +17,9 @@ Queries queries = new Queries(database.Connection());
 // accesses server stored data. Data is not sent to client
 
 builder.Services.AddDistributedMemoryCache(); //part of setting up session
-
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(10); //time until session expires, all session data is lost
+    options.IdleTimeout = TimeSpan.FromSeconds(600); //time until session expires, all session data is lost
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -42,7 +41,6 @@ app.Use(async (context, next) =>
             //return;
         }
     }
-    Console.WriteLine("authorized request");
     await next();
 });
 
@@ -89,7 +87,7 @@ app.MapDelete("/api/removeCustomer", async (HttpContext context) =>
 
 app.MapPost("/api/login", async (HttpContext context) =>
 {
-    var requestBody = await context.Request.ReadFromJsonAsync<LoginDetails>();
+    var requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
     (bool verified, string role) = await queries.VerifyLoginTask(requestBody.Email, requestBody.Password);
     Console.WriteLine(verified);
     if (verified)
@@ -105,6 +103,18 @@ app.MapPost("/api/login", async (HttpContext context) =>
     }
 });
 
+app.MapGet("/api/ticketList", async (HttpContext context) =>
+{
+    string? requesterEmail = context.Session.GetString("Email");
+    
+    if (String.IsNullOrEmpty(requesterEmail) || context.Session.GetString("Role") == "customer") 
+        return Results.Unauthorized();
+
+    List<TicketRecord> tickets = await queries.GetTicketsAll(requesterEmail);
+
+    return Results.Ok(tickets);
+});
+
 app.MapGet("/api/test", async (HttpContext context) =>
 {
     return Results.Ok(context.Session.GetString("Authenticated"));
@@ -118,6 +128,18 @@ app.MapPost("/api/CreateTicket", async (HttpContext context) =>
     return Results.Ok(success);
 });
 
+app.MapGet("/api/ticket/{ticketId:int}", async (HttpContext context, int ticketId) =>
+{
+    string? requesterEmail = context.Session.GetString("Email");
+    
+    if (String.IsNullOrEmpty(requesterEmail)) 
+        return Results.Unauthorized();
+
+    TicketRecord ticket = await queries.GetTicket(requesterEmail, ticketId);
+    List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
+    TicketMessagesRecord ticketMessages = new(ticket, messages);
+    return Results.Ok(ticketMessages);
+});
 app.MapPost("/api/sendMessage", async (HttpContext context) =>
 {
     var requestBody = await context.Request.ReadFromJsonAsync<SendEmail>();

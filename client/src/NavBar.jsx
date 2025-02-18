@@ -1,6 +1,7 @@
-import { useState } from 'react'
+import { useState, use } from 'react'
 import { NavLink } from "react-router";
 import "./style/NavBar.css"
+import {RoleContext} from "./main.jsx";
 const NavLinks = {
     Admin: [
         { name: "Active Tickets", path: "/ActiveTickets" },
@@ -14,15 +15,17 @@ const NavLinks = {
         { name: "Your Ticket History", path: "/YourTicketHistory" }
     ],
     CustomerService: [
-        { name: "Active Tickets", path: "/ActiveTickets" },
-        { name: "Edit/Redirect Ticket", path: "/Edit/RedirectTicket" },
-        { name: "Resolved tickets", path: "/ResolvedTickets" },
+        { name: "Active Tickets", path: "/CustomerServicePanel/tickets" },
+        { name: "Resolved tickets", path: "/CustomerServicePanel/ResolvedTickets" },
+        { name: "account settings", path: "/CustomerServicePanel/accountSettings" },
     ]
 };
 
-function NavBar() {
-    const [role, setRole] = useState("Admin");
+function NavBar()
+{
+    const role = use(RoleContext);
 
+    
     return (<nav>
         <ul><h1 id='Menu'>Menu</h1>
             {NavLinks[role].map((link, index) => (
