@@ -126,7 +126,12 @@ public class Queries
     {
         try
         {
-
+            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, Description, User_fk) VALUES ($1, $2, $3)");
+            cmd.Parameters.AddWithValue(message.Title.ToString());
+            cmd.Parameters.AddWithValue(message.Description.ToString());
+            cmd.Parameters.AddWithValue(message.User_fk.ToString());
+            await cmd.ExecuteNonQueryAsync();
+            return true;
         }
         catch (Exception ex)
         {

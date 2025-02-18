@@ -18,9 +18,12 @@ SET row_security = off;
 
 ALTER TABLE IF EXISTS ONLY public.tickets DROP CONSTRAINT IF EXISTS tickets_users_email_fk;
 ALTER TABLE IF EXISTS ONLY public.tickets DROP CONSTRAINT IF EXISTS tickets_companies_company_id_fk;
+ALTER TABLE IF EXISTS ONLY public.messages DROP CONSTRAINT IF EXISTS messages_users_email_fk;
 ALTER TABLE IF EXISTS ONLY public.messages DROP CONSTRAINT IF EXISTS messages_tickets_ticket_id_fk;
 ALTER TABLE IF EXISTS ONLY public.login_credentials DROP CONSTRAINT IF EXISTS login_credentials_users_email_fk;
 ALTER TABLE IF EXISTS ONLY public.forms DROP CONSTRAINT IF EXISTS forms_companies_company_id_fk;
+ALTER TABLE IF EXISTS ONLY public.categories_x_users DROP CONSTRAINT IF EXISTS categories_x_users_users_email_fk;
+ALTER TABLE IF EXISTS ONLY public.categories_x_users DROP CONSTRAINT IF EXISTS categories_x_users_categories_category_fk;
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pk_2;
 ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_pk;
 ALTER TABLE IF EXISTS ONLY public.tickets DROP CONSTRAINT IF EXISTS tickets_pk;
@@ -28,15 +31,42 @@ ALTER TABLE IF EXISTS ONLY public.messages DROP CONSTRAINT IF EXISTS messages_pk
 ALTER TABLE IF EXISTS ONLY public.login_credentials DROP CONSTRAINT IF EXISTS login_credentials_pk;
 ALTER TABLE IF EXISTS ONLY public.forms DROP CONSTRAINT IF EXISTS forms_pk;
 ALTER TABLE IF EXISTS ONLY public.companies DROP CONSTRAINT IF EXISTS companies_pk;
+ALTER TABLE IF EXISTS ONLY public.categories_x_users DROP CONSTRAINT IF EXISTS categories_x_users_pk;
+ALTER TABLE IF EXISTS ONLY public.categories DROP CONSTRAINT IF EXISTS categories_pk;
 DROP TABLE IF EXISTS public.users;
 DROP TABLE IF EXISTS public.tickets;
 DROP TABLE IF EXISTS public.messages;
 DROP TABLE IF EXISTS public.login_credentials;
 DROP TABLE IF EXISTS public.forms;
 DROP TABLE IF EXISTS public.companies;
+DROP TABLE IF EXISTS public.categories_x_users;
+DROP TABLE IF EXISTS public.categories;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
+
+--
+-- Name: categories; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.categories (
+    category text NOT NULL
+);
+
+
+ALTER TABLE public.categories OWNER TO postgres;
+
+--
+-- Name: categories_x_users; Type: TABLE; Schema: public; Owner: postgres
+--
+
+CREATE TABLE public.categories_x_users (
+    user_fk text NOT NULL,
+    category_fk text NOT NULL
+);
+
+
+ALTER TABLE public.categories_x_users OWNER TO postgres;
 
 --
 -- Name: companies; Type: TABLE; Schema: public; Owner: postgres
@@ -110,7 +140,10 @@ ALTER TABLE public.login_credentials OWNER TO postgres;
 CREATE TABLE public.messages (
     message_id integer NOT NULL,
     message text NOT NULL,
-    ticket_id_fk integer NOT NULL
+    ticket_id_fk integer NOT NULL,
+    title text NOT NULL,
+    user_fk text NOT NULL,
+    time_sent timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -142,7 +175,6 @@ CREATE TABLE public.tickets (
     time_posted timestamp without time zone DEFAULT CURRENT_TIMESTAMP,
     time_closed timestamp without time zone,
     user_fk text NOT NULL,
-    response_email text NOT NULL,
     company_fk integer NOT NULL
 );
 
@@ -178,11 +210,27 @@ CREATE TABLE public.users (
 ALTER TABLE public.users OWNER TO postgres;
 
 --
+-- Data for Name: categories; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.categories (category) FROM stdin;
+\.
+
+
+--
+-- Data for Name: categories_x_users; Type: TABLE DATA; Schema: public; Owner: postgres
+--
+
+COPY public.categories_x_users (user_fk, category_fk) FROM stdin;
+\.
+
+
+--
 -- Data for Name: companies; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
 COPY public.companies (company_id, name) FROM stdin;
-2	test company
+1	test company
 \.
 
 
@@ -199,6 +247,9 @@ COPY public.forms (form_id, company_fk, form_json) FROM stdin;
 --
 
 COPY public.login_credentials (email, password) FROM stdin;
+test1@mail.com	test1
+test2@mail.com	test2
+test3@mail.com	test3
 \.
 
 
@@ -206,7 +257,7 @@ COPY public.login_credentials (email, password) FROM stdin;
 -- Data for Name: messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.messages (message_id, message, ticket_id_fk) FROM stdin;
+COPY public.messages (message_id, message, ticket_id_fk, title, user_fk, time_sent) FROM stdin;
 \.
 
 
@@ -214,7 +265,9 @@ COPY public.messages (message_id, message, ticket_id_fk) FROM stdin;
 -- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tickets (ticket_id, category, subcategory, title, time_posted, time_closed, user_fk, response_email, company_fk) FROM stdin;
+COPY public.tickets (ticket_id, category, subcategory, title, time_posted, time_closed, user_fk, company_fk) FROM stdin;
+3	testing	test	test1	2025-02-13 17:35:02.314029	\N	test1@mail.com	1
+4	testing	test	test2	2025-02-13 17:35:02.314029	\N	test1@mail.com	1
 \.
 
 
@@ -225,7 +278,7 @@ COPY public.tickets (ticket_id, category, subcategory, title, time_posted, time_
 COPY public.users (email, company_fk, verified, role) FROM stdin;
 test1@mail.com	1	f	customer
 test2@mail.com	1	f	admin
-test3@mail.com	1	f	Cservice
+test3@mail.com	1	f	customerService
 \.
 
 
@@ -254,7 +307,23 @@ SELECT pg_catalog.setval('public.messages_message_id_seq', 1, false);
 -- Name: tickets_ticket_id_seq; Type: SEQUENCE SET; Schema: public; Owner: postgres
 --
 
-SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 1, false);
+SELECT pg_catalog.setval('public.tickets_ticket_id_seq', 4, true);
+
+
+--
+-- Name: categories categories_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories
+    ADD CONSTRAINT categories_pk PRIMARY KEY (category);
+
+
+--
+-- Name: categories_x_users categories_x_users_pk; Type: CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories_x_users
+    ADD CONSTRAINT categories_x_users_pk PRIMARY KEY (user_fk, category_fk);
 
 
 --
@@ -314,6 +383,22 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: categories_x_users categories_x_users_categories_category_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories_x_users
+    ADD CONSTRAINT categories_x_users_categories_category_fk FOREIGN KEY (category_fk) REFERENCES public.categories(category);
+
+
+--
+-- Name: categories_x_users categories_x_users_users_email_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.categories_x_users
+    ADD CONSTRAINT categories_x_users_users_email_fk FOREIGN KEY (user_fk) REFERENCES public.users(email);
+
+
+--
 -- Name: forms forms_companies_company_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
 --
 
@@ -335,6 +420,14 @@ ALTER TABLE ONLY public.login_credentials
 
 ALTER TABLE ONLY public.messages
     ADD CONSTRAINT messages_tickets_ticket_id_fk FOREIGN KEY (ticket_id_fk) REFERENCES public.tickets(ticket_id);
+
+
+--
+-- Name: messages messages_users_email_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.messages
+    ADD CONSTRAINT messages_users_email_fk FOREIGN KEY (user_fk) REFERENCES public.users(email);
 
 
 --

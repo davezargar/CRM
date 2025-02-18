@@ -125,7 +125,8 @@ app.MapPost("/api/sendMessage", async (HttpContext context) =>
     {
         return Results.BadRequest("The request body is empty");
     }
-    bool success = await queries.PostMessageTask(requestBody.Title, requestBody.Description);
+    string userId = context.Session.GetString("Email");
+    bool success = await queries.PostMessageTask(requestBody.Title, requestBody.Description, userId);
 
     if (!success)
     {
