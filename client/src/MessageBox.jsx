@@ -57,7 +57,7 @@ function DisplayMailWindow({ onClose }) {
                     headers: {
                         "Content-Type": "application/json",
                     },
-                    body: JSON.stringify({ resolved: isChecked })
+                    body: JSON.stringify({ resolved: isChecked, ticket_id })
                 });
                 if (!response) {
                     throw new Error("Response failed");

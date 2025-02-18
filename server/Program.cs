@@ -161,7 +161,7 @@ app.MapPost("/api/sendMessage", async (HttpContext context) =>
     return Results.Ok(new { message = "Successfully posted the message to database" });
 });
 
-/*
+
 
 app.MapPost("/api/ticketResolved", async (HttpContext context) =>
 {
@@ -170,7 +170,7 @@ app.MapPost("/api/ticketResolved", async (HttpContext context) =>
     {
         return Results.BadRequest("The request body is empty");
     }
-    bool success = await queries.PostTicketStatusTask(requestBody.TicketResolved, requestBody.);
+    bool success = await queries.PostTicketStatusTask(requestBody);
 
     if (!success)
     {
@@ -178,7 +178,7 @@ app.MapPost("/api/ticketResolved", async (HttpContext context) =>
     }
 
     return Results.Ok(new { message = "Successfully posted the ticket status to database" });
-}); */
+}); 
 
 
 app.Run();

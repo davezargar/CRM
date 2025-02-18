@@ -216,17 +216,21 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
             return false;
         }
     }
-/*
-    public async Task<bool> PostTicketStatusTask(bool TicketResolved)
+
+    public async Task<bool> PostTicketStatusTask(NewTicketStatus ticketStatus)
     {
         try
         {
-
+            await using var cmd = _db.CreateCommand("UPDATE tickets set time_closed = CURRENT_TIMESTAMP WHERE ticket_id = $1 AND $2 = true");
+            cmd.Parameters.AddWithValue(ticketStatus.Ticket_id);
+            cmd.Parameters.AddWithValue(ticketStatus.Resolved);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine("Couldn't post message" + ex);
             return false;
         }
-    } */
+    } 
 }
