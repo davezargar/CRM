@@ -149,6 +149,7 @@ app.MapPost("/api/sendMessage", async (HttpContext context) =>
     }
     string userId = context.Session.GetString("Email");
     Console.WriteLine("SESSION EMAIL: " + userId);
+    Console.WriteLine("TICKET ID: " + requestBody.Ticket_id_fk);
     var updatedRequest = requestBody with { User_fk = userId };
     bool success = await queries.PostMessageTask(updatedRequest);
 

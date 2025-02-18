@@ -1,9 +1,11 @@
 import "./style/MessageBox.css";
 import { useEffect, useState, useContext, createContext } from "react";
 
+const TicketContext = createContext();
+
 export default function MessageBox({ ticket_Id }) {
     const [showMailWindow, setShowMailWindow] = useState(false);
-    const TicketContext = createContext();
+
 
     return (
         <TicketContext.Provider value={ticket_Id}>
@@ -29,7 +31,7 @@ function DisplayMailWindow({ onClose }) {
     const [title, setTitle] = useState(() => localStorage.getItem("title") || (""));
     const [description, setDescription] = useState(() => localStorage.getItem("description") || (""));
     const [isChecked, setIsChecked] = useState(false);
-    const ticket_id = useContext(TicketContext)
+    const ticket_id = useContext(TicketContext);
 
     const handleCheckboxChange = (e) => {
         setIsChecked(e.target.checked)
@@ -72,11 +74,13 @@ function DisplayMailWindow({ onClose }) {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ title, description, ticket_id })
+                body: JSON.stringify({ title, description, ticket_id_fk: ticket_id })
+
             });
             if (!response) {
                 throw new Error("Response failed");
             }
+            console.log("Sending ticket_id: ", ticket_id);
             alert("Successfully sent the message to the endpoint");
             localStorage.removeItem("title");
             localStorage.removeItem("description");
