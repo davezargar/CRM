@@ -1,13 +1,17 @@
 import "./style/MessageBox.css";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 
-export default function CustomerServicePanel() {
-    const [showMailWindow, setShowMailWindow] = useState(false)
+export default function MessageBox({ ticket_Id }) {
+    const [showMailWindow, setShowMailWindow] = useState(false);
+    const ticketId = useContext(ticket_Id)
+
     return (
-        <div>
-            {!showMailWindow && <ReplyButtonDisplay onClick={() => setShowMailWindow(true)} />}
-            {showMailWindow && <DisplayMailWindow onClose={() => setShowMailWindow(false)} />}
-        </div>
+        <ThemeContext.Provider value={ticketId}>
+            <div>
+                {!showMailWindow && <ReplyButtonDisplay onClick={() => setShowMailWindow(true)} />}
+                {showMailWindow && <DisplayMailWindow onClose={() => setShowMailWindow(false)} />}
+            </div>
+        </ThemeContext.Provider>
     )
 }
 
