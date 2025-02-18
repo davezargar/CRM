@@ -12,7 +12,8 @@ const NavLinks = {
     ],
     Customer: [
         { name: "Create Ticket", path: "/CreateTicket" },
-        { name: "Your Ticket History", path: "/YourTicketHistory" }
+        { name: "Your Ticket History", path: "/YourTicketHistory" },
+        { name: "account settings", path: "/CustomerServicePanel/accountSettings" }
     ],
     CustomerService: [
         { name: "Active Tickets", path: "/CustomerServicePanel/tickets" },

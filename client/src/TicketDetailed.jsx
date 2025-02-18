@@ -31,7 +31,7 @@ function TicketDetailed(){
         <button onClick={() => SetRefresh(current => !current)}>Refresh</button>
         <ul id={"ticketList"}>
         
-            <li key={Ticket.ticketId}>
+            <li key={"ticketId-" + Ticket.ticketId}>
                 <p className={"ticketId"}>{Ticket.ticketId}</p>
                 <p className={"category"}>{Ticket.category}</p>
                 <p className={"subcategory"}>{Ticket.subcategory}</p>
@@ -41,7 +41,7 @@ function TicketDetailed(){
     </ul>
     <ul id={"messageList"}>
         {Messages.map((Message=>
-            <li key={Message.messageId}>
+            <li key={"messageId-" + Message.messageId}>
                 <p className={"messageId"}>{Message.messageId}</p>
                 <p className={"title"}>{Message.title}</p>
                 <p className={"message"}>{Message.message}</p>

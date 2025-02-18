@@ -2,10 +2,7 @@
 {
     display: grid;
     grid-auto-columns: 1fr 4fr;
-    grid-template-areas: 
-                "header header"
-                "navBar main"
-                "footer footer";
+    grid-template-areas: "navBar main";
 }
 
 #CustomerServicePanelMain
@@ -13,7 +10,3 @@
     grid-area: main;
 }
 
-p
-{
-    grid-area: footer;
-}

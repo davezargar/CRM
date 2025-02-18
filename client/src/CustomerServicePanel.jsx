@@ -3,7 +3,7 @@ import {RoleContext} from "./main.jsx";
 import { Outlet } from "react-router";
 
 
-import NavBar from "./NavBar.jsx";
+import NavBar from "./NavBar.jsx"
 import "./style/CustomerServicePanel.css";
 
 export default CustomerServicePanel;
