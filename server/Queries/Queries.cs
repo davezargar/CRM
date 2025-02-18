@@ -106,12 +106,11 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
 
     try
         {
-        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
+        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Company_fk) VALUES ($1, $2, $3, $4, 1)"); // company is hardcoded until we send it from client
         cmd.Parameters.AddWithValue(ticket.Category.ToString());
         cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
         cmd.Parameters.AddWithValue(ticket.Title.ToString());
         cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
-        cmd.Parameters.AddWithValue(ticket.Company_fk);
         await cmd.ExecuteNonQueryAsync();
         return true;
         }
