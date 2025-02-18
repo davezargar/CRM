@@ -202,10 +202,11 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
     {
         try
         {
-            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, message, User_fk, ticket_id_fk) VALUES ($1, $2, $3, 3)");
+            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, message, User_fk, ticket_id_fk) VALUES ($1, $2, $3, $4)");
             cmd.Parameters.AddWithValue(message.Title.ToString());
             cmd.Parameters.AddWithValue(message.Description.ToString());
             cmd.Parameters.AddWithValue(message.User_fk.ToString());
+            cmd.Parameters.AddWithValue(message.Ticket_id_fk);
             await cmd.ExecuteNonQueryAsync();
             return true;
         }
