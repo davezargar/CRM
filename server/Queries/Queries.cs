@@ -126,7 +126,7 @@ public class Queries
     {
         try
         {
-            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, Description, User_fk) VALUES ($1, $2, $3)");
+            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, message, User_fk, ticket_id_fk) VALUES ($1, $2, $3, 3)");
             cmd.Parameters.AddWithValue(message.Title.ToString());
             cmd.Parameters.AddWithValue(message.Description.ToString());
             cmd.Parameters.AddWithValue(message.User_fk.ToString());
@@ -139,7 +139,7 @@ public class Queries
             return false;
         }
     }
-
+/*
     public async Task<bool> PostTicketStatusTask(bool TicketResolved)
     {
         try
@@ -151,5 +151,5 @@ public class Queries
             Console.WriteLine("Couldn't post message" + ex);
             return false;
         }
-    }
+    } */
 }

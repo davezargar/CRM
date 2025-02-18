@@ -126,7 +126,9 @@ app.MapPost("/api/sendMessage", async (HttpContext context) =>
         return Results.BadRequest("The request body is empty");
     }
     string userId = context.Session.GetString("Email");
-    bool success = await queries.PostMessageTask(requestBody.Title, requestBody.Description, userId);
+    Console.WriteLine("SESSION EMAIL: " + userId);
+    var updatedRequest = requestBody with { User_fk = userId };
+    bool success = await queries.PostMessageTask(updatedRequest);
 
     if (!success)
     {
@@ -135,6 +137,8 @@ app.MapPost("/api/sendMessage", async (HttpContext context) =>
 
     return Results.Ok(new { message = "Successfully posted the message to database" });
 });
+
+/*
 
 app.MapPost("/api/ticketResolved", async (HttpContext context) =>
 {
@@ -151,7 +155,7 @@ app.MapPost("/api/ticketResolved", async (HttpContext context) =>
     }
 
     return Results.Ok(new { message = "Successfully posted the ticket status to database" });
-});
+}); */
 
 
 app.Run();
