@@ -10,4 +10,4 @@ public record MessagesRecord(int MessageId, string Message, int TicketId, string
 
 public record TicketMessagesRecord(TicketRecord TicketRecord, List<MessagesRecord> Messages);
 
-public record NewTicketRecord(int TicketId, string Category, string Subcategory, string Title, int UserFk, int CompanyFk, int MessageId, string Message);
+public record NewTicketRecord(int TicketId, string Category, string Subcategory, string Title, string UserFk, int CompanyFk, int MessageId, string Message);

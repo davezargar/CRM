@@ -103,22 +103,27 @@ public class Queries
 
 public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
 {
+    
+    Console.WriteLine(ticketMessages.Category);
+    Console.WriteLine(ticketMessages.Subcategory);
+    Console.WriteLine(ticketMessages.Title);
+    Console.WriteLine(ticketMessages.UserFk);
+    Console.WriteLine(ticketMessages.Message);
+    Console.WriteLine(ticketMessages.CompanyFk);
+    
     //try
        // {
-            await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category, subcategory, title, user_fk, company_fk)" +
-            " values('$1, $2, $3, $4, 1')" + 
-            "returning ticket_id)" +
-            ")" +
-            "INSERT INTO messages(message, ticket_id_fk, title, user_fk)" +
-                "values ('$1', (SELECT ticket_id FROM ticketIns),'$2, $3');");
-        
-        cmd.Parameters.AddWithValue("@category",ticketMessages.Category.ToString());
-        cmd.Parameters.AddWithValue("@subcategory",ticketMessages.Subcategory.ToString());
-        cmd.Parameters.AddWithValue("@title",ticketMessages.Title.ToString());
-        cmd.Parameters.AddWithValue("@user_fk",ticketMessages.UserFk.ToString());
-        cmd.Parameters.AddWithValue("@company_fk",ticketMessages.CompanyFk);
-        cmd.Parameters.AddWithValue("@message",ticketMessages.Message.ToString());
-        cmd.Parameters.AddWithValue("@ticket_id_fk",ticketMessages.TicketId);
+       await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category, subcategory, title, user_fk, company_fk) " +
+                                               "values($1, $2, $3, $4, $6) returning ticket_id) " +
+                                               "INSERT INTO messages(message, ticket_id_fk, title, user_fk) " +
+                                               "values ($5, (SELECT ticket_id FROM ticketIns),$3, $4)");
+       
+        cmd.Parameters.AddWithValue(ticketMessages.Category);     //$1
+        cmd.Parameters.AddWithValue(ticketMessages.Subcategory);  //$2
+        cmd.Parameters.AddWithValue(ticketMessages.Title);        //$3
+        cmd.Parameters.AddWithValue(ticketMessages.UserFk);       //$4
+        cmd.Parameters.AddWithValue(ticketMessages.Message);      //$5
+        cmd.Parameters.AddWithValue(ticketMessages.CompanyFk);    //$6
         await cmd.ExecuteNonQueryAsync();
         return true;
        // }
