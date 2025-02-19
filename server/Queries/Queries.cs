@@ -190,7 +190,8 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
                 reader.GetString(1),
                 reader.GetInt32(2),
                 reader.GetString(3),
-                reader.GetString(4)
+                reader.GetString(4),
+                reader.GetDateTime(5)
             ));
         }
         return messages;

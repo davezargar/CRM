@@ -46,6 +46,7 @@ function TicketDetailed() {
             <ul id={"messageList"}>
                 {Messages.map((Message =>
                     <li key={Message.messageId}>
+                        <p className={"time_Posted"}>{datetimeFormatter(Message.timePosted)}</p>
                         <p className={"messageId"}>{Message.messageId}</p>
                         <h3>Title:<p className={"title"}>{Message.title}</p></h3>
                         <h4>Message:</h4>
@@ -65,6 +66,7 @@ function MessageList({ Messages }) {
     return <ul id={"messageList"}>
         {Messages.map((Message =>
             <li key={Message.messageId}>
+                <p className={"time_Posted"}>{Message.timePosted} </p>
                 <p className={"messageId"}>{Message.messageId}</p>
                 <p className={"title"}>{Message.title}</p>
                 <p className={"message"}>{Message.message}</p>
