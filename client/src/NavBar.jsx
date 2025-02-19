@@ -1,7 +1,7 @@
 import { useState, use } from 'react'
 import { NavLink } from "react-router";
 import "./style/NavBar.css"
-import {RoleContext} from "./main.jsx";
+import { RoleContext } from "./main.jsx";
 const NavLinks = {
     Admin: [
         { name: "Active Tickets", path: "/ActiveTickets" },
@@ -21,17 +21,19 @@ const NavLinks = {
     ]
 };
 
-function NavBar()
-{
+function NavBar() {
     const role = use(RoleContext);
 
-    
+
     return (<nav>
-        <ul><h1 id='Menu'>Menu</h1>
+        <ul><h1 id='Menu'>Account Email:</h1>
+            <p>{role}</p>
             {NavLinks[role].map((link, index) => (
-                <li key={index}>
-                    <NavLink className="Options" to={link.path}>{link.name}</NavLink>
-                </li>
+                <div className='optionContainer'>
+                    <li key={index}>
+                        <NavLink className="Options" to={link.path}>{link.name}</NavLink>
+                    </li>
+                </div>
             ))}
         </ul>
     </nav>)

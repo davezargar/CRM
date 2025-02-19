@@ -29,7 +29,6 @@ function TicketDetailed() {
         return formattedDate;
     }
     return <div>
-        <p>HELOJ detta en detailed ticket for ticket id: {ticketId} </p>
         <div className="refreshContainer">
             <button className="refreshButton" onClick={() => SetRefresh(current => !current)}>Refresh</button>
         </div>
@@ -49,7 +48,8 @@ function TicketDetailed() {
                     <li key={Message.messageId}>
                         <p className={"messageId"}>{Message.messageId}</p>
                         <h3>Title:<p className={"title"}>{Message.title}</p></h3>
-                        <h4>Description:<p className={"message"}>{Message.message}</p></h4>
+                        <h4>Message:</h4>
+                        <p className={"message"}>{Message.message}</p>
                         <h5>From:<p className={"messageSender"}>{Message.userId}</p></h5>
                     </li>
                 ))}
