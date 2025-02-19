@@ -69,3 +69,17 @@ h5 {
 .message {
     font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
+
+#information {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-top: 0px;
+}
+
+#information li {
+    margin: 0px;
+}
+
+.info p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}

@@ -28,7 +28,24 @@ function TicketDetailed() {
         const formattedDate = date.toLocaleString('en-GB', { timeZoneName: 'short' });
         return formattedDate;
     }
+
+    function checkStatus(Ticket) {
+        if (Ticket.timeClosed == null) {
+            return <p>Status: Ongoing</p>
+        } else {
+            return <p>Status: Resolved</p>
+        }
+    }
+
     return <div>
+        <div className="info">
+            <ul id={"information"}>
+                <li key={Ticket.ticketId}>
+                    <p>From: {Ticket.userFk} </p> <p>{checkStatus(Ticket)}</p>
+                    <p>Created: {datetimeFormatter(Ticket.timePosted)} </p>
+                </li>
+            </ul>
+        </div>
         <div className="refreshContainer">
             <button className="refreshButton" onClick={() => SetRefresh(current => !current)}>Refresh</button>
         </div>
@@ -46,8 +63,7 @@ function TicketDetailed() {
             <ul id={"messageList"}>
                 {Messages.map((Message =>
                     <li key={Message.messageId}>
-                        <p className={"time_Posted"}>{datetimeFormatter(Message.timePosted)}</p>
-                        <p className={"messageId"}>{Message.messageId}</p>
+                        <p className={"time_Posted"}>Time sent: {datetimeFormatter(Message.timePosted)}</p>
                         <h3>Title:<p className={"title"}>{Message.title}</p></h3>
                         <h4>Message:</h4>
                         <p className={"message"}>{Message.message}</p>
