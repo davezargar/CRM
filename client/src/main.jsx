@@ -114,15 +114,17 @@ function LoginForm() {
 
 
     return <form className='formContainer' onSubmit={verifyLogin}>
+        <div className='registerCon'>
+            <p>Don't have an account?</p>
+            <NavLink to="/register">
+                <button type="button">Register here!</button>
+            </NavLink></div>
         <div className="inputCon">
             <label>Email: </label>
             <input type="text" name="email" />
             <label>Password: </label>
             <input type="password" name="password" />
             <input className='submitButton' type="submit" value="Sign in" />
-            <NavLink to="/register">
-                <button type="button">Register</button>
-            </NavLink>
         </div>
     </form>
 }

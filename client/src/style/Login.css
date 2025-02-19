@@ -7,6 +7,24 @@
     width: 100%;
 }
 
+.registerCon {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.registerCon p {
+    margin: 0;
+}
+
+
+.registerCon button {
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .inputCon {
     background-color: rgb(255, 255, 255);
     display: flex;
@@ -43,6 +61,9 @@ label {
     width: 200px;
     margin: 10px 0;
     height: 30px;
+    justify-content: flex-start;
+    display: flex;
+    margin-top: -3px;
 }
 
 .submitButton {
