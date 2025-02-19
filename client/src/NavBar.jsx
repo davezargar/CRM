@@ -17,7 +17,7 @@ const NavLinks = {
     CustomerService: [
         { name: "Active Tickets", path: "/CustomerServicePanel/tickets" },
         { name: "Resolved tickets", path: "/CustomerServicePanel/ResolvedTickets" },
-        { name: "account settings", path: "/CustomerServicePanel/accountSettings" },
+        { name: "Account settings", path: "/CustomerServicePanel/accountSettings" },
     ]
 };
 
@@ -27,7 +27,7 @@ function NavBar() {
 
     return (<nav>
         <ul><h1 id='Menu'>Account Email:</h1>
-            <p>{role}</p>
+            <p className='roleText'>{role}</p>
             {NavLinks[role].map((link, index) => (
                 <div className='optionContainer'>
                     <li key={index}>

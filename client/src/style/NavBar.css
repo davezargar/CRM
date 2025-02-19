@@ -9,9 +9,10 @@ nav {
     font-size: larger;
     text-decoration: none;
     width: 100%;
-    min-height: 100vh;
+    height: auto;
     border-right: 1px solid 10% black;
     box-shadow: 0 0 15px rgb(0, 0, 0);
+    height: 100vh;
 }
 
 nav>ul {
@@ -51,12 +52,27 @@ ul li {
     padding: 10px;
     width: 230px;
     background-color: #EEE4E4;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
 
 .Options:hover {
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.6);
+    background-color: rgb(0, 0, 0, 20%);
 }
 
 #menu {
     position: absolute;
+}
+
+h1,
+p {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.roleText {
+    display: block;
+    width: 250px;
+    text-align: center;
+    border-bottom: 0.5px solid rgb(39, 36, 36);
+    padding-bottom: 5px;
+    margin: 0 auto;
 }
