@@ -101,25 +101,32 @@ public class Queries
         }
     }
 
-public async Task<bool> CreateTicketTask(TicketRequest ticket)
+public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
 {
-
-    try
-        {
-        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
-        cmd.Parameters.AddWithValue(ticket.Category.ToString());
-        cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
-        cmd.Parameters.AddWithValue(ticket.Title.ToString());
-        cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
-        cmd.Parameters.AddWithValue(ticket.Company_fk);
+    //try
+       // {
+            await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category, subcategory, title, user_fk, company_fk)" +
+            " values('$1, $2, $3, $4, 1')" + 
+            "returning ticket_id)" +
+            ")" +
+            "INSERT INTO messages(message, ticket_id_fk, title, user_fk)" +
+                "values ('$1', (SELECT ticket_id FROM ticketIns),'$2, $3');");
+        
+        cmd.Parameters.AddWithValue("@category",ticketMessages.Category.ToString());
+        cmd.Parameters.AddWithValue("@subcategory",ticketMessages.Subcategory.ToString());
+        cmd.Parameters.AddWithValue("@title",ticketMessages.Title.ToString());
+        cmd.Parameters.AddWithValue("@user_fk",ticketMessages.UserFk.ToString());
+        cmd.Parameters.AddWithValue("@company_fk",ticketMessages.CompanyFk);
+        cmd.Parameters.AddWithValue("@message",ticketMessages.Message.ToString());
+        cmd.Parameters.AddWithValue("@ticket_id_fk",ticketMessages.TicketId);
         await cmd.ExecuteNonQueryAsync();
         return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Error creating ticket" + ex);
-            return false;
-        }
+       // }
+       // catch (Exception ex)
+       // {
+       //     Console.WriteLine("Error creating ticket" + ex);
+       //     return false;
+       // }
     }
 
     public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag

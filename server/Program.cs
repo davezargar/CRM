@@ -122,9 +122,12 @@ app.MapGet("/api/test", async (HttpContext context) =>
 
 app.MapPost("/api/CreateTicket", async (HttpContext context) =>
 {
-    var ticketRequest = await context.Request.ReadFromJsonAsync<TicketRequest>();
+    NewTicketRecord ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
 
+    //if (ticketRequest == null)
+    //return Results.BadRequest();
     bool success = await queries.CreateTicketTask(ticketRequest);
+
     return Results.Ok(success);
 });
 
