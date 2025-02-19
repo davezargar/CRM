@@ -196,4 +196,40 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
         return messages;
     }
 
+
+    public async Task<bool> PostMessageTask(SendEmail message)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, message, User_fk, ticket_id_fk) VALUES ($1, $2, $3, $4)");
+            cmd.Parameters.AddWithValue(message.Title.ToString());
+            cmd.Parameters.AddWithValue(message.Description.ToString());
+            cmd.Parameters.AddWithValue(message.User_fk.ToString());
+            cmd.Parameters.AddWithValue(message.Ticket_id_fk);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Couldn't post message" + ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> PostTicketStatusTask(NewTicketStatus ticketStatus)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("UPDATE tickets set time_closed = CURRENT_TIMESTAMP WHERE ticket_id = $1 AND $2 = true");
+            cmd.Parameters.AddWithValue(ticketStatus.Ticket_id);
+            cmd.Parameters.AddWithValue(ticketStatus.Resolved);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Couldn't post message" + ex);
+            return false;
+        }
+    } 
 }

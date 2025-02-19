@@ -18,9 +18,9 @@ import CreateTicket from "./CreateTicket";
 export const RoleContext = createContext({});
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App/>
-  </StrictMode>
+    <StrictMode>
+        <App />
+    </StrictMode>
 )
 
 function App()

@@ -1,0 +1,89 @@
+#replyButton {
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+    background-color: rgb(63, 152, 208);
+    right: 20px;
+}
+
+.replyContainer {
+    display: flex;
+    justify-content: flex-end;
+    align-self: flex-end;
+    margin-top: 596px;
+    margin-right: 29px;
+}
+
+#sendButton {
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+    margin-top: 0;
+    margin-left: 160px;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+.mailContainer {
+    position: absolute;
+    top: 400px;
+    right: 20px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+}
+
+.formRow input {
+    padding: 8px;
+    border: 1px solid #ccc;
+    width: 100%;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.mainContainer {
+    display: flex;
+    position: relative;
+}
+
+.formRow {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.checkboxRow {
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+.formRow textarea {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    font-size: 16px;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.closeButton {
+    width: 40px;
+    height: 20px;
+    cursor: pointer;
+    background-color: white;
+    color: black;
+    align-self: flex-end;
+    margin: 0;
+
+}
+
+label {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 600;
+}
+
+input {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
