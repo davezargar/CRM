@@ -31,9 +31,9 @@ function App()
                 <Route index element={<Index/>}/>
                 <Route path={"/CustomerPanel"} element={<CustomerPanel/>}/>
                 
-                <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel/>}>
-                    <Route path={"/CustomerServicePanel/tickets"} element={<TicketDisplayActive/>}/> {/*Should default to this path dont know how*/}
-                    <Route path={"/CustomerServicePanel/ticket/:ticketId"} element={<TicketDetailed/>}/>
+                <Route path={"/CustomerServicePanel/tickets"} element={<CustomerServicePanel/>}>
+                    <Route index element={<TicketDisplayActive/>}/> {/*Should default to this path dont know how*/}
+                    <Route path={":ticketId"} element={<TicketDetailed/>}/>
                     {/*Route account settings*/}
                 </Route>
                 

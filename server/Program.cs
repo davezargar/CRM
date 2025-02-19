@@ -85,9 +85,9 @@ app.MapDelete("/api/removeCustomer", async (HttpContext context) =>
 
 
 
-app.MapPost("/api/login", async (HttpContext context) =>
+app.MapPost("/api/login", async (LoginRecord requestBody, HttpContext context) =>
 {
-    var requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
+    //LoginRecord requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
     (bool verified, string role) = await queries.VerifyLoginTask(requestBody.Email, requestBody.Password);
     Console.WriteLine(verified);
     if (verified)

@@ -6,35 +6,38 @@ export default TicketDisplayActive
 
 function TicketDisplayActive()
 {
-    const [Refresh, SetRefresh] = useState(false);
+    const [tickets, setTickets] = useState([]);
     
+    useEffect(fetchTickets);
     return <div id={"TicketDisplayActive"}>
-        <button onClick={() => SetRefresh(current => !current)}>Refresh</button>
+        <button onClick={fetchTickets}>Refresh</button>
         <p>ticket display active</p>
-        <TicketList refresh={Refresh}/>
+
+        <ul id={"ticketList"}>
+            {tickets.map(Ticket)}
+        </ul>
     </div>
-}
 
-function TicketList({refresh}) {
-    const [Tickets, SetTickets] = useState([]);
-
-    useEffect(()=>{
+    function fetchTickets() {
         fetch("/api/ticketList")
             .then(response => response.json())
-            .then(data=> {
+            .then(data => {
                 console.log(data);
                 SetTickets(data);
             });
-    }, [refresh]);
-    
-    function datetimeFormatter(datetime){
-        const date = new Date(Date.parse(datetime));
-        const formattedDate = date.toLocaleString('en-GB', { timeZoneName: 'short' });
-        return  formattedDate;
     }
-    
-    return <ul id={"ticketList"}>
-        {Tickets.map((ticket)=><NavLink to={`/CustomerServicePanel/ticket/${ticket.ticketId}`}>
+}
+
+function Ticket(ticket) {
+
+
+    function datetimeFormatter(datetime) {
+        const date = new Date(Date.parse(datetime));
+        const formattedDate = date.toLocaleString('en-GB', {timeZoneName: 'short'});
+        return formattedDate;
+    }
+
+    return <NavLink to={`/CustomerServicePanel/ticket/${ticket.ticketId}`}>
             <li key={ticket.ticketId}>
                 <p className={"ticketId"}>{ticket.ticketId}</p>
                 <p className={"category"}>{ticket.category}</p>
@@ -42,6 +45,5 @@ function TicketList({refresh}) {
                 <p className={"title"}>{ticket.title}</p>
                 <p className={"timeposted"}>{datetimeFormatter(ticket.timePosted)}</p>
             </li>
-        </NavLink>)}
-    </ul>
+    </NavLink>
 }
