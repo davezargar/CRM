@@ -6,12 +6,13 @@
     right: 20px;
 }
 
-.replyContainer {
+.replyContainer,
+.mailContainer {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
     display: flex;
-    justify-content: flex-end;
-    align-self: flex-end;
-    margin-top: 596px;
-    margin-right: 29px;
+    flex-direction: column;
 }
 
 #sendButton {
@@ -24,9 +25,6 @@
 }
 
 .mailContainer {
-    position: absolute;
-    top: 400px;
-    right: 20px;
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 15px;
@@ -41,8 +39,8 @@
 }
 
 .mainContainer {
-    display: flex;
-    position: relative;
+    /* display: flex;
+    position: relative; */
 }
 
 .formRow {
