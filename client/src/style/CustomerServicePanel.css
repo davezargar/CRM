@@ -1,19 +1,61 @@
-﻿#CustomerServicePanel
-{
+﻿#CustomerServicePanel {
     display: grid;
     grid-auto-columns: 1fr 4fr;
-    grid-template-areas: 
-                "header header"
-                "navBar main"
-                "footer footer";
+    grid-template-areas:
+        "header header"
+        "navBar main"
+        "footer footer";
 }
 
-#CustomerServicePanelMain
-{
+#CustomerServicePanelMain {
     grid-area: main;
 }
 
-p
-{
+p {
     grid-area: footer;
+}
+
+.messageContainer {
+    height: auto;
+}
+
+#messageList {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    gap: 30px;
+}
+
+#messageList p {
+    margin: 0;
+}
+
+#messageList li {
+    border-radius: 4px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    list-style-type: none;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+h3,
+h4,
+h5 {
+    display: flex;
+    flex-direction: row;
+}
+
+.refreshButton {
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.refreshContainer {
+    display: flex;
+    justify-content: flex-end;
 }

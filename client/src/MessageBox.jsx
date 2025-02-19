@@ -113,7 +113,7 @@ function DisplayMailWindow({ onClose }) {
 
             <div className="checkboxRow">
                 <input type="checkbox" checked={isChecked} onChange={handleCheckboxChange} id="checkResolveTickets" name="resolveTickets" value="check"></input>
-                <label htmlFor="sendButton">Resolve Ticket</label>
+                <label>Resolve Ticket</label>
                 <button type="submit" id="sendButton">Send</button>
             </div>
 

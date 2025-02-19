@@ -30,7 +30,9 @@ function TicketDetailed() {
     }
     return <div>
         <p>HELOJ detta en detailed ticket for ticket id: {ticketId} </p>
-        <button onClick={() => SetRefresh(current => !current)}>Refresh</button>
+        <div className="refreshContainer">
+            <button className="refreshButton" onClick={() => SetRefresh(current => !current)}>Refresh</button>
+        </div>
         <ul id={"ticketList"}>
 
             <li key={Ticket.ticketId}>
@@ -41,16 +43,18 @@ function TicketDetailed() {
                 <p className={"timeposted"}>{datetimeFormatter(Ticket.timePosted)}</p>
             </li>
         </ul>
-        <ul id={"messageList"}>
-            {Messages.map((Message =>
-                <li key={Message.messageId}>
-                    <p className={"messageId"}>{Message.messageId}</p>
-                    <p className={"title"}>{Message.title}</p>
-                    <p className={"message"}>{Message.message}</p>
-                    <p className={"messageSender"}>{Message.userId}</p>
-                </li>
-            ))}
-        </ul>
+        <div className="messageContainer">
+            <ul id={"messageList"}>
+                {Messages.map((Message =>
+                    <li key={Message.messageId}>
+                        <p className={"messageId"}>{Message.messageId}</p>
+                        <h3>Title:<p className={"title"}>{Message.title}</p></h3>
+                        <h4>Description:<p className={"message"}>{Message.message}</p></h4>
+                        <h5>From:<p className={"messageSender"}>{Message.userId}</p></h5>
+                    </li>
+                ))}
+            </ul>
+        </div>
         <MessageBox ticket_Id={ticketId}></MessageBox>
     </div>
 }
