@@ -74,10 +74,16 @@ h5 {
     list-style-type: none;
     padding-left: 20px;
     margin-top: 0px;
+    margin-bottom: 0px;
 }
 
 #information li {
     margin: 0px;
+}
+
+.info {
+    position: absolute;
+    top: -5px;
 }
 
 .info p {
