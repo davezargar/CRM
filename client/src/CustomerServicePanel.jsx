@@ -13,7 +13,6 @@ function CustomerServicePanel()
     return <div id="CustomerServicePanel">
             <RoleContext.Provider value={"CustomerService"}>
                 <NavBar/>
-                <p>hi customer service :) also footer</p>
                 <div id={"CustomerServicePanelMain"}>
                     <Outlet/> {/*child routes will be rendered here??*/}
                 </div>

@@ -8,5 +8,6 @@
 #CustomerServicePanelMain
 {
     grid-area: main;
+    padding-left: 10px;
 }
 
