@@ -101,16 +101,22 @@ public class Queries
         }
     }
 
-public async Task<bool> CreateTicketTask(TicketRequest ticket)
+public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
 {
 
     try
         {
-        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Company_fk) VALUES ($1, $2, $3, $4, 1)"); // company is hardcoded until we send it from client
-        cmd.Parameters.AddWithValue(ticket.Category.ToString());
-        cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
-        cmd.Parameters.AddWithValue(ticket.Title.ToString());
-        cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
+       await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category, subcategory, title, user_fk, company_fk) " +
+                                               "values($1, $2, $3, $4, $6) returning ticket_id) " +
+                                               "INSERT INTO messages(message, ticket_id_fk, title, user_fk) " +
+                                               "values ($5, (SELECT ticket_id FROM ticketIns),$3, $4)");
+       
+        cmd.Parameters.AddWithValue(ticketMessages.Category);     //$1
+        cmd.Parameters.AddWithValue(ticketMessages.Subcategory);  //$2
+        cmd.Parameters.AddWithValue(ticketMessages.Title);        //$3
+        cmd.Parameters.AddWithValue(ticketMessages.UserFk);       //$4
+        cmd.Parameters.AddWithValue(ticketMessages.Message);      //$5
+        cmd.Parameters.AddWithValue(ticketMessages.CompanyFk);    //$6
         await cmd.ExecuteNonQueryAsync();
         return true;
         }
