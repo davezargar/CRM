@@ -106,12 +106,11 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
 
     try
         {
-        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Response_email, Company_fk) VALUES ($1, $2, $3, $4, $5, $6)");
+        await using var cmd = _db.CreateCommand("INSERT INTO tickets (Category, Subcategory, Title, User_fk, Company_fk) VALUES ($1, $2, $3, $4, 1)"); // company is hardcoded until we send it from client
         cmd.Parameters.AddWithValue(ticket.Category.ToString());
         cmd.Parameters.AddWithValue(ticket.Subcategory.ToString());
         cmd.Parameters.AddWithValue(ticket.Title.ToString());
         cmd.Parameters.AddWithValue(ticket.User_fk.ToString());
-        cmd.Parameters.AddWithValue(ticket.Company_fk);
         await cmd.ExecuteNonQueryAsync();
         return true;
         }
@@ -191,10 +190,47 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
                 reader.GetString(1),
                 reader.GetInt32(2),
                 reader.GetString(3),
-                reader.GetString(4)
+                reader.GetString(4),
+                reader.GetDateTime(5)
             ));
         }
         return messages;
     }
 
+
+    public async Task<bool> PostMessageTask(SendEmail message)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, message, User_fk, ticket_id_fk) VALUES ($1, $2, $3, $4)");
+            cmd.Parameters.AddWithValue(message.Title.ToString());
+            cmd.Parameters.AddWithValue(message.Description.ToString());
+            cmd.Parameters.AddWithValue(message.User_fk.ToString());
+            cmd.Parameters.AddWithValue(message.Ticket_id_fk);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Couldn't post message" + ex);
+            return false;
+        }
+    }
+
+    public async Task<bool> PostTicketStatusTask(NewTicketStatus ticketStatus)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("UPDATE tickets set time_closed = CURRENT_TIMESTAMP WHERE ticket_id = $1 AND $2 = true");
+            cmd.Parameters.AddWithValue(ticketStatus.Ticket_id);
+            cmd.Parameters.AddWithValue(ticketStatus.Resolved);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Couldn't post message" + ex);
+            return false;
+        }
+    } 
 }

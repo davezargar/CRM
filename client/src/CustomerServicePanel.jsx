@@ -1,5 +1,5 @@
 import { useState, use, createContext } from 'react';
-import {RoleContext} from "./main.jsx";
+import { RoleContext } from "./main.jsx";
 import { Outlet } from "react-router";
 
 
@@ -8,8 +8,7 @@ import "./style/CustomerServicePanel.css";
 
 export default CustomerServicePanel;
 
-function CustomerServicePanel()
-{
+function CustomerServicePanel() {
     return <div id="CustomerServicePanel">
             <RoleContext.Provider value={"CustomerService"}>
                 <NavBar/>
@@ -18,5 +17,5 @@ function CustomerServicePanel()
                 </div>
             </RoleContext.Provider>
     </div>
-    
+
 }
