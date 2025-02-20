@@ -233,4 +233,24 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
             return false;
         }
     } 
+    
+    public async Task<bool> CreateAccountTask(AccountRequest account)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("INSERT INTO login_credentials (email, password) VALUES ($1, $2)");
+            cmd.Parameters.AddWithValue(account.email);
+            cmd.Parameters.AddWithValue(account.password);
+        
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error creating account: " + ex);
+            return false;
+        }
+    }
+
+    
 }

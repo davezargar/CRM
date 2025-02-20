@@ -181,5 +181,14 @@ app.MapPost("/api/ticketResolved", async (HttpContext context) =>
 }); 
 
 
+app.MapPost("/api/CreateAccount", async (HttpContext context) =>
+{
+    var accountRequest = await context.Request.ReadFromJsonAsync<AccountRequest>();
+
+    bool success = await queries.CreateAccountTask(accountRequest);
+    return Results.Ok(success);
+});
+
+
 app.Run();
 
