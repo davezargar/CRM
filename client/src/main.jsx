@@ -134,11 +134,20 @@ function RegisterForm() {
     }
 
     return (
-        <form onSubmit={handleRegister}>
-            <label>email: <input type="text" name="email" /></label>
-            <label>password: <input type="password" name="password" /></label>
-            <input type="submit" value="Register" />
-        </form>
+        <form className='formContainer' onSubmit={handleRegister}>
+            <div className='registerCon'>
+                <p>Already have an account?</p>
+                <NavLink to="/register">
+                    <button type="button">Login here!</button>
+                </NavLink></div>
+            <div className='inputCon'>
+                <label>email: </label>
+                <input type="text" name="email" />
+                <label>password: </label>
+                <input type="password" name="password" />
+                <input className='submitButton' type="submit" value="Register" />
+            </div>
+        </form >
     );
 }
 
