@@ -1,19 +1,91 @@
-﻿#CustomerServicePanel
-{
+﻿#CustomerServicePanel {
     display: grid;
     grid-auto-columns: 1fr 4fr;
-    grid-template-areas: 
-                "header header"
-                "navBar main"
-                "footer footer";
+    grid-template-areas:
+        "header header"
+        "navBar main"
+        "footer footer";
 }
 
-#CustomerServicePanelMain
-{
+#CustomerServicePanelMain {
     grid-area: main;
 }
 
-p
-{
+p {
     grid-area: footer;
+}
+
+.messageContainer {
+    height: auto;
+}
+
+#messageList {
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    gap: 30px;
+}
+
+#messageList p {
+    margin: 0;
+}
+
+#messageList li {
+    border-radius: 4px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    list-style-type: none;
+    padding-left: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    background-color: white;
+}
+
+h3,
+h4,
+h5 {
+    display: flex;
+    flex-direction: row;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.refreshButton {
+    width: 120px;
+    height: 40px;
+    cursor: pointer;
+}
+
+.refreshContainer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+#CustomerServicePanelMain {
+    background-color: rgb(116, 189, 116);
+}
+
+.message {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+
+#information {
+    list-style-type: none;
+    padding-left: 20px;
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
+#information li {
+    margin: 0px;
+}
+
+.info {
+    position: absolute;
+    top: -5px;
+}
+
+.info p {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
 }
