@@ -12,7 +12,7 @@
 
 .listOfEmails {
     list-style-type: none;
-    max-width: 400px;
+    max-width: 500px;
     margin: 0 auto;
     padding: 0;
 }
@@ -23,11 +23,45 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+}
+
+.listOfEmails li:hover {
+    transform: translateY(-5px);
+    background-color: #e0e0e0;
 }
 
 .removeButtonAdmin {
-    width: 100px;
-    height: 40px;
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    margin-right: 10px;
+}
+
+.removeButtonAdmin:hover {
+    background-color: #c0392b;
+}
+
+.listOfEmails li span {
+    font-weight: bold;
+    color: #555;
+}
+
+.removeContainer h1 {
+    justify-content: center;
     display: flex;
-    margin: 0px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
 }
