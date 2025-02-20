@@ -82,17 +82,17 @@ public class Queries
         {
             await using var loginCmd = _db.CreateCommand("DELETE FROM login_credentials WHERE email = $1");
             loginCmd.Parameters.AddWithValue(email);
-            int loginRowsAffected = await loginCmd.ExecuteNonQueryAsync();   
+            int loginRowsAffected = await loginCmd.ExecuteNonQueryAsync();
 
             await using var cmd = _db.CreateCommand("DELETE FROM users WHERE email = $1");
             cmd.Parameters.AddWithValue(email);
             int usersRowsAffected = await cmd.ExecuteNonQueryAsync();
 
-            
+
 
             bool success = (usersRowsAffected > 0 || loginRowsAffected > 0) ? true : false;
             return success;
-            
+
         }
         catch (Exception ex)
         {
@@ -101,24 +101,24 @@ public class Queries
         }
     }
 
-public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
-{
+    public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
+    {
 
-    try
+        try
         {
-       await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category, subcategory, title, user_fk, company_fk) " +
-                                               "values($1, $2, $3, $4, $6) returning ticket_id) " +
-                                               "INSERT INTO messages(message, ticket_id_fk, title, user_fk) " +
-                                               "values ($5, (SELECT ticket_id FROM ticketIns),$3, $4)");
-       
-        cmd.Parameters.AddWithValue(ticketMessages.Category);     //$1
-        cmd.Parameters.AddWithValue(ticketMessages.Subcategory);  //$2
-        cmd.Parameters.AddWithValue(ticketMessages.Title);        //$3
-        cmd.Parameters.AddWithValue(ticketMessages.UserFk);       //$4
-        cmd.Parameters.AddWithValue(ticketMessages.Message);      //$5
-        cmd.Parameters.AddWithValue(ticketMessages.CompanyFk);    //$6
-        await cmd.ExecuteNonQueryAsync();
-        return true;
+            await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category, subcategory, title, user_fk, company_fk) " +
+                                                    "values($1, $2, $3, $4, $6) returning ticket_id) " +
+                                                    "INSERT INTO messages(message, ticket_id_fk, title, user_fk) " +
+                                                    "values ($5, (SELECT ticket_id FROM ticketIns),$3, $4)");
+
+            cmd.Parameters.AddWithValue(ticketMessages.Category);     //$1
+            cmd.Parameters.AddWithValue(ticketMessages.Subcategory);  //$2
+            cmd.Parameters.AddWithValue(ticketMessages.Title);        //$3
+            cmd.Parameters.AddWithValue(ticketMessages.UserFk);       //$4
+            cmd.Parameters.AddWithValue(ticketMessages.Message);      //$5
+            cmd.Parameters.AddWithValue(ticketMessages.CompanyFk);    //$6
+            await cmd.ExecuteNonQueryAsync();
+            return true;
         }
         catch (Exception ex)
         {
@@ -140,8 +140,8 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
         {
             tickets.Add(
                 new(
-                    reader.GetInt32(0), 
-                    reader.GetString(1), 
+                    reader.GetInt32(0),
+                    reader.GetString(1),
                     reader.GetString(2),
                     reader.GetString(3),
                     reader.GetDateTime(4),
@@ -150,7 +150,7 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
                     reader.GetInt32(7)
                 )
             );
-            
+
         }
 
         return tickets;
@@ -169,8 +169,8 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
         while (await reader.ReadAsync())
         {
             ticket = new(
-                    reader.GetInt32(0), 
-                    reader.GetString(1), 
+                    reader.GetInt32(0),
+                    reader.GetString(1),
                     reader.GetString(2),
                     reader.GetString(3),
                     reader.GetDateTime(4),
@@ -186,12 +186,12 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
     public async Task<List<MessagesRecord>> GetTicketMessages(int id)
     {
         List<MessagesRecord> messages = new List<MessagesRecord>();
-        await using var cmd =_db.CreateCommand("SELECT * FROM messages WHERE ticket_id_fk = $1");
+        await using var cmd = _db.CreateCommand("SELECT message_id, message, ticket_id_fk, title, user_fk, time_sent FROM messages WHERE ticket_id_fk = $1");
         cmd.Parameters.AddWithValue(id);
         using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            messages.Add( new(
+            messages.Add(new(
                 reader.GetInt32(0),
                 reader.GetString(1),
                 reader.GetInt32(2),
@@ -238,5 +238,18 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
             Console.WriteLine("Couldn't post message" + ex);
             return false;
         }
-    } 
+    }
+
+    public async Task<List<GetCustomerSupportEmail>> GetCustomerSupportWorkers()
+    {
+        List<GetCustomerSupportEmail> customerSupportEmail = new();
+        await using var cmd = _db.CreateCommand("SELECT email FROM users WHERE role = 'customerService'");
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            customerSupportEmail.Add(new GetCustomerSupportEmail(reader.GetString(0)));
+        }
+        return customerSupportEmail;
+    }
 }

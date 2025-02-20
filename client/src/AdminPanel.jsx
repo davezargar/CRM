@@ -78,6 +78,22 @@ export function RemoveCustomer() {
             console.error(error);
             alert("Couldn't add custom service worker");
         }
+        try {
+            const response2 = await fetch("/api/getCustomerSupport", {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }); if (!response2.ok) {
+                throw new Error("Something went wrong getting the workers")
+            }
+            const data = await response2.json();
+            console.log(data)
+
+        } catch (error) {
+            console.error(error);
+            alert("Couldn't find custom service worker");
+        }
     }
 
     return (
