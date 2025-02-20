@@ -185,7 +185,7 @@ app.MapPost("/api/ticketResolved", async (HttpContext context) =>
     return Results.Ok(new { message = "Successfully posted the ticket status to database" });
 });
 
-app.MapGet("/api/getCustomerSupport", async (HttpContext context) =>
+app.MapGet("/api/getCustomerSupport", async () =>
 {
     try
     {
