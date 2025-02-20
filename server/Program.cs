@@ -1,3 +1,4 @@
+using System.Security.AccessControl;
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
@@ -188,8 +189,9 @@ app.MapGet("/api/getCustomerSupport", async (HttpContext context) =>
 {
     try
     {
-        string? customerSupportEmails = context.Session.GetString("Email");
-        if (!customerSupportEmails.Any())
+        var customerSupportEmails = await queries.GetCustomerSupportWorkers();
+
+        if (customerSupportEmails == null)
         {
             return Results.NotFound("no customerWorker users found");
         }
