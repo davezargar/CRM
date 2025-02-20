@@ -48,12 +48,12 @@ function TicketTable({refresh, tickets, setTickets}) {
         <table>
             <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>Category</th>
-                    <th>Subcategory</th>
-                    <th>Title</th>
-                    <th>Time Posted</th>
-                    <th>Status</th>
+                    <th className={"ticket-id"}>ID</th>
+                    <th className={"category"}>Category</th>
+                    <th className={"subcategory"}>Subcategory</th>
+                    <th className={"title"}>Title</th>
+                    <th className={"time-posted"}>Time Posted</th>
+                    <th className={"ticket-status"}>Status</th>
                 </tr>
             </thead>
             <tbody>
@@ -62,8 +62,8 @@ function TicketTable({refresh, tickets, setTickets}) {
                     <td className={"category"}>{ticket.category}</td>
                     <td className={"subcategory"}>{ticket.subcategory}</td>
                     <td className={"title"}>{ticket.title}</td>
-                    <td className={"timePosted"}>{datetimeFormatter(ticket.timePosted)}</td>
-                    <td className={"ticketStatus"}>Active</td>
+                    <td className={"time-posted"}>{datetimeFormatter(ticket.timePosted)}</td>
+                    <td className={"ticket-status"}>Active</td>
                 </tr>)}
             </tbody>
         </table>

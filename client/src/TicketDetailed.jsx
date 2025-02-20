@@ -37,7 +37,7 @@ function TicketDetailed() {
         }
     }
 
-    return <div>
+    return <div id={ticket-detailed}>
         <div className="info">
             <ul id={"information"}>
                 <li key={Ticket.ticketId}>
