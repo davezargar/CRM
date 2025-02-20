@@ -18,7 +18,7 @@
 }
 
 .listOfEmails li {
-    background-color: grey;
+    background-color: rgb(215, 207, 207);
     color: black;
     display: flex;
     flex-direction: row;
@@ -63,5 +63,6 @@
 .removeContainer h1 {
     justify-content: center;
     display: flex;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
 }

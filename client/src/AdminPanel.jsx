@@ -108,6 +108,7 @@ export function RemoveCustomer() {
 
     return (
         <div className="removeContainer">
+            <NavBar></NavBar>
             <h1>Custom Support Workers</h1>
             <ul className="listOfEmails">
                 {emails.map((emailItem) => (
