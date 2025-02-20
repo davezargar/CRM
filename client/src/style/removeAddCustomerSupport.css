@@ -3,7 +3,7 @@
     flex-direction: column;
 }
 
-button {
+.buttonContainer>button {
     align-items: center;
     justify-content: space-between;
     border-radius: 30px;

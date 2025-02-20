@@ -11,8 +11,9 @@ const NavLinks = {
         { name: "Customer supp direct", path: "/CustomerSuppDirect" }
     ],
     Customer: [
-        { name: "Create Ticket", path: "/CreateTicket" },
-        { name: "Your Ticket History", path: "/YourTicketHistory" }
+        { name: "Create Ticket", path: "/CustomerPanel/CreateTicket" },
+        { name: "Your Ticket History", path: "/CustomerPanel/TicketHistory" },
+        { name: "account settings", path: "/CustomerPanel/accountSettings" }
     ],
     CustomerService: [
         { name: "Active Tickets", path: "/CustomerServicePanel/tickets" },
@@ -25,19 +26,20 @@ function NavBar() {
     const role = use(RoleContext);
 
 
-    return (
-        <nav>
-            <ul><h1 id='Menu'>Account Email:</h1>
-                <p className='roleText'>{role}</p>
-                {NavLinks[role].map((link, index) => (
-                    <div className='optionContainer'>
-                        <li key={index}>
-                            <NavLink className="Options" to={link.path}>{link.name}</NavLink>
-                        </li>
-                    </div>
-                ))}
-            </ul>
-        </nav>
+    return (<div id={"nav-container"}>
+            <nav>
+                <ul><h1 id='Menu'>Account Email:</h1>
+                    <p className='roleText'>{role}</p>
+                    {NavLinks[role].map((link, index) => (
+                        <div className='optionContainer'>
+                            <li key={index}>
+                                <NavLink className="Options" to={link.path}>{link.name}</NavLink>
+                            </li>
+                        </div>
+                    ))}
+                </ul>
+            </nav>
+        </div>
     )
 }
 

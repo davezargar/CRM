@@ -186,7 +186,7 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
     public async Task<List<MessagesRecord>> GetTicketMessages(int id)
     {
         List<MessagesRecord> messages = new List<MessagesRecord>();
-        await using var cmd =_db.CreateCommand("SELECT * FROM messages WHERE ticket_id_fk = $1");
+        await using var cmd =_db.CreateCommand("SELECT message_id, message, ticket_id_fk, title, user_fk, time_sent FROM messages WHERE ticket_id_fk = $1");
         cmd.Parameters.AddWithValue(id);
         using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())

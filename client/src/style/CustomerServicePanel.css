@@ -1,19 +1,16 @@
 ﻿#CustomerServicePanel {
     display: grid;
-    grid-auto-columns: 1fr 4fr;
-    grid-template-areas:
-        "header header"
-        "navBar main"
-        "footer footer";
+    grid-auto-columns: 1fr 5fr;
+    grid-template-areas: "navBar main";
 }
 
 #CustomerServicePanelMain {
     grid-area: main;
+    padding-left: 10px;
+    width: 100%;
 }
 
-p {
-    grid-area: footer;
-}
+
 
 .messageContainer {
     height: auto;
@@ -51,6 +48,7 @@ h5 {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
+
 .refreshButton {
     width: 120px;
     height: 40px;
@@ -62,7 +60,7 @@ h5 {
     justify-content: flex-end;
 }
 
-#CustomerServicePanelMain {
+#ticket-detailed {
     background-color: rgb(116, 189, 116);
 }
 
