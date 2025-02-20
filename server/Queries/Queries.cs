@@ -111,8 +111,8 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
     Console.WriteLine(ticketMessages.Message);
     Console.WriteLine(ticketMessages.CompanyFk);
     
-    //try
-       // {
+    try
+        {
        await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category, subcategory, title, user_fk, company_fk) " +
                                                "values($1, $2, $3, $4, $6) returning ticket_id) " +
                                                "INSERT INTO messages(message, ticket_id_fk, title, user_fk) " +
@@ -126,12 +126,12 @@ public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
         cmd.Parameters.AddWithValue(ticketMessages.CompanyFk);    //$6
         await cmd.ExecuteNonQueryAsync();
         return true;
-       // }
-       // catch (Exception ex)
-       // {
-       //     Console.WriteLine("Error creating ticket" + ex);
-       //     return false;
-       // }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error creating ticket" + ex);
+            return false;
+        }
     }
 
     public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag
