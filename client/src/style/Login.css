@@ -1,0 +1,73 @@
+.formContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100%;
+}
+
+.registerCon {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.registerCon p {
+    margin: 0;
+}
+
+
+.registerCon button {
+    background-color: white;
+    color: black;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.inputCon {
+    background-color: rgb(255, 255, 255);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    border: 1px solid #ccc;
+    border-radius: 15px;
+}
+
+.formContainer input[name="email"] {
+    margin-bottom: 35px;
+}
+
+.formContainer input[name="password"] {
+    margin-bottom: 35px;
+}
+
+label {
+    display: flex;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.formContainer input {
+    width: 350px;
+    margin-top: 7px;
+    height: 50px;
+    border-radius: 15px;
+}
+
+.formContainer button {
+    width: 200px;
+    margin: 10px 0;
+    height: 30px;
+    justify-content: flex-start;
+    display: flex;
+    margin-top: -3px;
+}
+
+.submitButton {
+    background-color: black;
+    color: white;
+    cursor: pointer;
+}

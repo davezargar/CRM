@@ -143,6 +143,46 @@ app.MapGet("/api/ticket/{ticketId:int}", async (HttpContext context, int ticketI
     TicketMessagesRecord ticketMessages = new(ticket, messages);
     return Results.Ok(ticketMessages);
 });
+app.MapPost("/api/sendMessage", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<SendEmail>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+    string userId = context.Session.GetString("Email");
+    Console.WriteLine("SESSION EMAIL: " + userId);
+    Console.WriteLine("TICKET ID: " + requestBody.Ticket_id_fk);
+    var updatedRequest = requestBody with { User_fk = userId };
+    bool success = await queries.PostMessageTask(updatedRequest);
+
+    if (!success)
+    {
+        Results.Problem("Couldn't process the Sql Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the message to database" });
+});
+
+
+
+app.MapPost("/api/ticketResolved", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+    bool success = await queries.PostTicketStatusTask(requestBody);
+
+    if (!success)
+    {
+        Results.Problem("Couldn't process the Sql Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the ticket status to database" });
+}); 
+
 
 app.Run();
 
