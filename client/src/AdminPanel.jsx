@@ -85,8 +85,7 @@ export function RemoveCustomer() {
     }, []);
 
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const handleSubmit = async (emailToRemove) => {
 
         try {
             const response = await fetch("/api/removeCustomer", {
@@ -94,12 +93,13 @@ export function RemoveCustomer() {
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email: emailToRemove }),
             });
             if (!response.ok) {
                 throw new Error("Something went wrong with adding worker");
             }
             alert("Customer Support Worker Removed!");
+            setEmails((previousMail) => previousMail.filter((item) => item.email !== emailToRemove));
         } catch (error) {
             console.error(error);
             alert("Couldn't add custom service worker");
@@ -107,12 +107,25 @@ export function RemoveCustomer() {
     }
 
     return (
+        <div>
+            <h1>Custom Support Workers</h1>
+            <ul className="listOfEmails">
+                {emails.map((emailItem) => (
+                    <li key={emailItem.email}>
+                        {emailItem.email}
+                        <button className="removeButtonAdmin" onClick={() => handleSubmit(emailItem.email)}>Remove</button>
+                    </li>
+                ))}
+            </ul>
+        </div>
+
+        /*
         <form onSubmit={handleSubmit}>
             <NavLink to="/removeCustomer"><label>Email: <input type="text" name="email" required value={email}
                 onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
             <button type="submit">Remove Customer Support Worker</button>
             <NavBar />
-        </form>
+        </form> */
     )
 }
 

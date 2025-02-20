@@ -9,3 +9,25 @@
 .buttonContainer {
     grid-area: main;
 }
+
+.listOfEmails {
+    list-style-type: none;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0;
+}
+
+.listOfEmails li {
+    background-color: grey;
+    color: black;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.removeButtonAdmin {
+    width: 100px;
+    height: 40px;
+    display: flex;
+    margin: 0px;
+}
