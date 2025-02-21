@@ -60,9 +60,12 @@ export function AddWorker() {
 
     return (
         <form className="form-Container" onSubmit={handleSubmit}>
-            <label>Email: <input type="email" name="email" required value={email}
-                onChange={(e) => setEmail(e.target.value)} /></label>
-            <button type="submit">Add Customer Support Worker</button>
+            <div className="form-Item">
+                <label>Email: </label>
+                <input type="email" name="email" required value={email}
+                    onChange={(e) => setEmail(e.target.value)} />
+                <button type="submit">Add Customer Support Worker</button>
+            </div>
         </form>
     )
 }
