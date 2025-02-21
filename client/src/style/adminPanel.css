@@ -8,6 +8,14 @@
     grid-area: main;
 }
 
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
 .buttonContainer button {
     cursor: pointer;
 }
@@ -15,6 +23,39 @@
 .addCustomerForm {
     display: flex;
     justify-content: center;
+}
+
+.form-Container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+.form-Item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    max-width: 300px;
+}
+
+.form-Container input {
+    width: 350px;
+    margin-top: 7px;
+    height: 50px;
+    border-radius: 15px;
+}
+
+.form-Container button {
+    background-color: black;
+    color: white;
+    cursor: pointer;
+    width: 360px;
+    height: 60px;
+    border-radius: 15px;
+    margin-top: 30px;
 }
 
 
