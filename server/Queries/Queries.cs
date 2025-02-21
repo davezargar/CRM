@@ -234,7 +234,7 @@ public async Task<bool> CreateTicketTask(TicketRequest ticket)
         }
     } 
     
-    public async Task<bool> CreateAccountTask(string email, string password, int companyId)
+    public async Task<bool> CustomersTask(string email, string password, int companyId)
     {
         try
         {

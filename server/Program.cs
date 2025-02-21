@@ -181,16 +181,16 @@ app.MapPost("/api/ticketResolved", async (HttpContext context) =>
 }); 
 
 
-app.MapPost("/api/CreateAccount", async (HttpContext context) =>
+app.MapPost("/api/Customers", async (HttpContext context) =>
 {
-    var accountRequest = await context.Request.ReadFromJsonAsync<AccountRequest>();
+    var accountRequest = await context.Request.ReadFromJsonAsync<CustomerRequest>();
 
     if (accountRequest == null)
     {
         return Results.BadRequest("The request body is empty");
     }
 
-    bool success = await queries.CreateAccountTask(accountRequest.Email, accountRequest.Password, 1);
+    bool success = await queries.CustomersTask(accountRequest.Email, accountRequest.Password, 1);
 
     if (!success)
     {
