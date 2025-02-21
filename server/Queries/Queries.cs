@@ -252,4 +252,38 @@ public class Queries
         }
         return customerSupportEmail;
     }
+    
+    
+    public async Task<bool> CustomersTask(string email, string password, int companyId)
+    {
+        try
+        {
+            if (!IsValidEmail(email))
+            {
+                Console.WriteLine("Invalid email format.");
+                return false;
+            }
+
+            
+            await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_fk, verified, role) VALUES ($1, $2, $3, $4)");
+            cmd.Parameters.AddWithValue(email);
+            cmd.Parameters.AddWithValue(companyId);
+            cmd.Parameters.AddWithValue(false);
+            cmd.Parameters.AddWithValue("customer");
+            await cmd.ExecuteNonQueryAsync();
+
+            // Maybe not smart to save password as plain text (*v*)
+            await using var loginCmd = _db.CreateCommand("INSERT INTO login_credentials (email, password) VALUES ($1, $2)");
+            loginCmd.Parameters.AddWithValue(email);
+            loginCmd.Parameters.AddWithValue(password);
+            await loginCmd.ExecuteNonQueryAsync();
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error creating account: " + ex);
+            return false;
+        }
+    }
 }
