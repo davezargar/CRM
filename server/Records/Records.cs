@@ -1,4 +1,6 @@
-﻿namespace server.Records;
+﻿using Microsoft.AspNetCore.Components.Web;
+
+namespace server.Records;
 
 public record LoginRecord(string Email, string Password);
 
@@ -8,4 +10,6 @@ public record MessagesRecord(int MessageId, string Message, int TicketId, string
 
 public record TicketMessagesRecord(TicketRecord TicketRecord, List<MessagesRecord> Messages);
 
-public record TicketRequest(string Category, string Subcategory, string Title, string User_fk, int Company_fk);
+public record NewTicketRecord(int TicketId, string Category, string Subcategory, string Title, string UserFk, int CompanyFk, int MessageId, string Message);
+
+public record GetCustomerSupportEmail(string Email);

@@ -1,3 +1,8 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
 .formContainer {
     display: flex;
     flex-direction: column;
@@ -23,7 +28,9 @@
     color: black;
     cursor: pointer;
     text-decoration: underline;
+    border: none;
 }
+
 
 .inputCon {
     background-color: rgb(255, 255, 255);
