@@ -37,7 +37,7 @@ function TicketDetailed() {
         }
     }
 
-    return <div>
+    return <div id={ticket-detailed}>
         <div className="info">
             <ul id={"information"}>
                 <li key={Ticket.ticketId}>
@@ -78,7 +78,7 @@ function TicketDetailed() {
 
 function MessageList({ Messages }) {
 
-
+    
     return <ul id={"messageList"}>
         {Messages.map((Message =>
             <li key={Message.messageId}>
