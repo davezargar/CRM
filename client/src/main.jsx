@@ -16,6 +16,7 @@ import CustomerPanel from "./CustomerPanel";
 import CreateTicket from "./CreateTicket";
 
 import "./style/Login.css";
+import CreateAccount from "./CreateAccount.jsx";
 
 export const RoleContext = createContext({});
 
@@ -49,6 +50,7 @@ function App() {
                 <Route path="/DefaultPage" element={<DefaultPage />} />
                 <Route path="/ActiveTickets" element={<ActiveTickets />} />
                 <Route path="/register" element={<RegisterForm />} />
+                <Route path="/Customers" element={<CreateAccount />} />
             </Routes>
         </BrowserRouter>
     </RoleContext.Provider>
@@ -119,7 +121,7 @@ function LoginForm() {
     return <form className='formContainer' onSubmit={verifyLogin}>
         <div className='registerCon'>
             <p>Don't have an account?</p>
-            <NavLink to="/register">
+            <NavLink to="/Customers">
                 <button type="button">Register here!</button>
             </NavLink></div>
         <div className="inputCon">

@@ -208,5 +208,24 @@ app.MapGet("/api/getCustomerSupport", async () =>
 });
 
 
+app.MapPost("/api/Customers", async (HttpContext context) =>
+{
+    var accountRequest = await context.Request.ReadFromJsonAsync<CustomerRequest>();
+
+    if (accountRequest == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+
+    bool success = await queries.CustomersTask(accountRequest.Email, accountRequest.Password, 1);
+
+    if (!success)
+    {
+        return Results.Problem("Couldn't process the SQL Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the account to database" });
+});
+
 app.Run();
 
