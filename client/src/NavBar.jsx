@@ -4,11 +4,9 @@ import "./style/NavBar.css"
 import { RoleContext } from "./main.jsx";
 const NavLinks = {
     Admin: [
-        { name: "Active Tickets", path: "/ActiveTickets" },
-        { name: "Edit/Redirect Ticket", path: "/Edit/RedirectTicket" },
-        { name: "Resolved tickets", path: "/ResolvedTickets" },
-        { name: "Add/Remove Customer", path: "/Add/RemoveCustomer" },
-        { name: "Customer supp direct", path: "/CustomerSuppDirect" }
+        { name: "Manage workers", path: "./" },
+        { name: "Add worker", path: "./addCustomer" },
+        { name: "Remove worker", path: "/removeCustomer" }
     ],
     Customer: [
         { name: "Create Ticket", path: "/CustomerPanel/CreateTicket" },

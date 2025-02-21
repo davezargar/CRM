@@ -46,7 +46,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
-app.MapPost("/api/addCustomer", async (HttpContext context) =>
+app.MapPost("/api/workers", async (HttpContext context) =>
 {
     var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
     if (requestBody == null)
@@ -66,9 +66,8 @@ app.MapPost("/api/addCustomer", async (HttpContext context) =>
     return Results.Ok(new { message = "Valid mail" });
 });
 
-app.MapDelete("/api/removeCustomer", async (HttpContext context) =>
+app.MapDelete("/api/workers", async (HttpContext context) =>
 {
-    Console.WriteLine("HEEEEEEEEEEEEEEEEEJ");
     var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
     if (requestBody == null)
     {
@@ -85,107 +84,7 @@ app.MapDelete("/api/removeCustomer", async (HttpContext context) =>
     return Results.Ok(new { message = "Successfully removed wroker" });
 });
 
-
-
-app.MapPost("/api/login", async (HttpContext context) =>
-{
-    var requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
-    (bool verified, string role) = await queries.VerifyLoginTask(requestBody.Email, requestBody.Password);
-    Console.WriteLine(verified);
-    if (verified)
-    { 
-        context.Session.SetString("Authenticated", "True");// add data to a session
-        context.Session.SetString("Email", requestBody.Email);
-        context.Session.SetString("Role", role);
-        return Results.Ok(role);
-    }
-    else
-    {
-        return TypedResults.Forbid();
-    }
-});
-
-app.MapGet("/api/ticketList", async (HttpContext context) =>
-{
-    string? requesterEmail = context.Session.GetString("Email");
-    
-    if (String.IsNullOrEmpty(requesterEmail) || context.Session.GetString("Role") == "customer") 
-        return Results.Unauthorized();
-
-    List<TicketRecord> tickets = await queries.GetTicketsAll(requesterEmail);
-
-    return Results.Ok(tickets);
-});
-
-app.MapGet("/api/test", async (HttpContext context) =>
-{
-    return Results.Ok(context.Session.GetString("Authenticated"));
-});
-
-app.MapPost("/api/CreateTicket", async (HttpContext context) =>
-{
-    NewTicketRecord ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
-
-    //if (ticketRequest == null)
-    //return Results.BadRequest();
-    bool success = await queries.CreateTicketTask(ticketRequest);
-
-    return Results.Ok(success);
-});
-
-app.MapGet("/api/ticket/{ticketId:int}", async (HttpContext context, int ticketId) =>
-{
-    string? requesterEmail = context.Session.GetString("Email");
-    
-    if (String.IsNullOrEmpty(requesterEmail)) 
-        return Results.Unauthorized();
-
-    TicketRecord ticket = await queries.GetTicket(requesterEmail, ticketId);
-    List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
-    TicketMessagesRecord ticketMessages = new(ticket, messages);
-    return Results.Ok(ticketMessages);
-});
-app.MapPost("/api/sendMessage", async (HttpContext context) =>
-{
-    var requestBody = await context.Request.ReadFromJsonAsync<SendEmail>();
-    if (requestBody == null)
-    {
-        return Results.BadRequest("The request body is empty");
-    }
-    string userId = context.Session.GetString("Email");
-    Console.WriteLine("SESSION EMAIL: " + userId);
-    Console.WriteLine("TICKET ID: " + requestBody.Ticket_id_fk);
-    var updatedRequest = requestBody with { User_fk = userId };
-    bool success = await queries.PostMessageTask(updatedRequest);
-
-    if (!success)
-    {
-        Results.Problem("Couldn't process the Sql Query");
-    }
-
-    return Results.Ok(new { message = "Successfully posted the message to database" });
-});
-
-
-
-app.MapPost("/api/ticketResolved", async (HttpContext context) =>
-{
-    var requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
-    if (requestBody == null)
-    {
-        return Results.BadRequest("The request body is empty");
-    }
-    bool success = await queries.PostTicketStatusTask(requestBody);
-
-    if (!success)
-    {
-        Results.Problem("Couldn't process the Sql Query");
-    }
-
-    return Results.Ok(new { message = "Successfully posted the ticket status to database" });
-});
-
-app.MapGet("/api/getCustomerSupport", async () =>
+app.MapGet("/api/workers", async () =>
 {
     try
     {
@@ -207,6 +106,97 @@ app.MapGet("/api/getCustomerSupport", async () =>
     
 });
 
+app.MapPost("/api/login", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
+    (bool verified, string role) = await queries.VerifyLoginTask(requestBody.Email, requestBody.Password);
+    Console.WriteLine(verified);
+    if (verified)
+    { 
+        context.Session.SetString("Authenticated", "True");// add data to a session
+        context.Session.SetString("Email", requestBody.Email);
+        context.Session.SetString("Role", role);
+        return Results.Ok(role);
+    }
+    else
+    {
+        return TypedResults.Forbid();
+    }
+});
+
+app.MapGet("/api/tickets", async (HttpContext context) =>
+{
+    string? requesterEmail = context.Session.GetString("Email");
+    
+    if (String.IsNullOrEmpty(requesterEmail) || context.Session.GetString("Role") == "customer") 
+        return Results.Unauthorized();
+
+    List<TicketRecord> tickets = await queries.GetTicketsAll(requesterEmail);
+
+    return Results.Ok(tickets);
+});
+
+
+app.MapPost("/api/tickets", async (HttpContext context) =>
+{
+    NewTicketRecord ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
+
+    //if (ticketRequest == null)
+    //return Results.BadRequest();
+    bool success = await queries.CreateTicketTask(ticketRequest);
+
+    return Results.Ok(success);
+});
+
+app.MapGet("/api/tickets/{ticketId:int}", async (HttpContext context, int ticketId) =>
+{
+    string? requesterEmail = context.Session.GetString("Email");
+    
+    if (String.IsNullOrEmpty(requesterEmail)) 
+        return Results.Unauthorized();
+
+    TicketRecord ticket = await queries.GetTicket(requesterEmail, ticketId);
+    List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
+    TicketMessagesRecord ticketMessages = new(ticket, messages);
+    return Results.Ok(ticketMessages);
+});
+
+app.MapPut("/api/tickets", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+    bool success = await queries.PostTicketStatusTask(requestBody);
+
+    if (!success)
+    {
+        Results.Problem("Couldn't process the Sql Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the ticket status to database" });
+});
+
+app.MapPost("/api/messages", async (HttpContext context) =>
+{
+    var requestBody = await context.Request.ReadFromJsonAsync<SendEmail>();
+    if (requestBody == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+    string userId = context.Session.GetString("Email");
+    Console.WriteLine("SESSION EMAIL: " + userId);
+    Console.WriteLine("TICKET ID: " + requestBody.Ticket_id_fk);
+    var updatedRequest = requestBody with { User_fk = userId };
+    bool success = await queries.PostMessageTask(updatedRequest);
+
+    if (!success)
+    {
+        Results.Problem("Couldn't process the Sql Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the message to database" });
+});
 
 app.Run();
-

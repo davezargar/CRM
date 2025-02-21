@@ -14,7 +14,7 @@ function TicketDetailed() {
     const [Messages, SetMessages] = useState([]);
 
     useEffect(() => {
-        fetch(`/api/ticket/${ticketId}`)
+        fetch(`/api/tickets/${ticketId}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -37,7 +37,7 @@ function TicketDetailed() {
         }
     }
 
-    return <div id={ticket-detailed}>
+    return <div id={"ticket-detailed"}>
         <div className="info">
             <ul id={"information"}>
                 <li key={Ticket.ticketId}>

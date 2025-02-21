@@ -52,8 +52,8 @@ function DisplayMailWindow({ onClose }) {
 
         try {
             if (isChecked == true) {
-                const response = await fetch("/api/ticketResolved", {
-                    method: "POST",
+                const response = await fetch("/api/tickets", {
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -69,7 +69,7 @@ function DisplayMailWindow({ onClose }) {
                 setDescription("");
             }
 
-            const response = await fetch("/api/sendMessage", {
+            const response = await fetch("/api/messages", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

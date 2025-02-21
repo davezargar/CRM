@@ -2,15 +2,14 @@ import { StrictMode, useState, createContext, use, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate } from "react-router";
 
-import DefaultPage from "./DefaultPage";
 import ActiveTickets from './ActiveTickets';
 
 import CustomerServicePanel from "./CustomerServicePanel";
 import TicketDisplayActive from "./TicketDisplayActive.jsx";
 import TicketDetailed from "./TicketDetailed.jsx";
 
-import { AddRemoveCustomerSupport, AdminPanel } from './adminPanel';
-import { AddCustomer, RemoveCustomer } from './adminPanel';
+import { AddRemoveWorkers, AdminPanel } from './adminPanel';
+import { AddWorker, RemoveWorker } from './adminPanel';
 
 import CustomerPanel from "./CustomerPanel";
 import CreateTicket from "./CreateTicket";
@@ -39,14 +38,13 @@ function App() {
                 </Route>
 
                 <Route path='/adminPanel' element={<AdminPanel/>} >
-                    <Route index element={<AddRemoveCustomerSupport/>}/>
-                    <Route path='addCustomer' element={<AddCustomer />}/>
-                    <Route path='removeCustomer' element={<RemoveCustomer />} />
+                    <Route index element={<AddRemoveWorkers/>}/>
+                    <Route path='addCustomer' element={<AddWorker/>}/>
+                    <Route path='removeCustomer' element={<RemoveWorker/>} />
                 </Route>
                 
 
                 <Route path="/CreateTicket" element={<CreateTicket />} />
-                <Route path="/DefaultPage" element={<DefaultPage />} />
                 <Route path="/ActiveTickets" element={<ActiveTickets />} />
                 <Route path="/register" element={<RegisterForm />} />
             </Routes>
@@ -57,25 +55,7 @@ function App() {
 function Index() {
     return <div>
         <LoginForm />
-        <QuickNav />
     </div>
-}
-
-function QuickNav() {
-    function test() {
-        fetch("/api/test")
-            .then(response => response.json())
-            .then(data => alert(data));
-    }
-    /*
-        return <div id={"QuickNav"}>
-            <NavLink to="/DefaultPage"><button>Defualt page</button></NavLink>
-            <NavLink to="/CustomerPanel"><button>CustomerPanel</button></NavLink>
-            <NavLink to="/AdminPanel"><button>AdminPanel</button></NavLink>
-            <NavLink to="/CustomerServicePanel/tickets"><button>CustomerServicePanel</button></NavLink>
-            <NavLink to="/CreateTicket"><button type="button">Create Ticket</button></NavLink>
-            <button onClick={test}>test auth</button>
-        </div> */
 }
 
 function LoginForm() {

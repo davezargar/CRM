@@ -24,7 +24,7 @@ function TicketTable({refresh, tickets, setTickets}) {
     const navigate = useNavigate();
 
     useEffect(()=>{
-        fetch("/api/ticketList")
+        fetch("/api/tickets")
             .then(response => response.json())
             .then(data=> {
                 console.log(data);

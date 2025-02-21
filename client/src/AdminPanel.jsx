@@ -20,29 +20,28 @@ export function AdminPanel() {
 }
 
 
-export function AddRemoveCustomerSupport() {
+export function AddRemoveWorkers() {
     const navigate = useNavigate();
 
     return (
         <div className="sec">
             <div className="buttonContainer">
-                <button onClick={() => navigate('/addCustomer')}>Add Customer Support</button>
-                <button onClick={() => navigate('/removeCustomer')}>Remove Customer Support</button>
+                <button onClick={() => navigate('./addCustomer')}>Add Customer Support</button>
+                <button onClick={() => navigate('./removeCustomer')}>Remove Customer Support</button>
             </div>
-            <NavBar />
         </div>
     )
 
 }
 
-export function AddCustomer() {
+export function AddWorker() {
     const [email, setEmail] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const response = await fetch("/api/addCustomer", {
+            const response = await fetch("/api/workers", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -61,23 +60,22 @@ export function AddCustomer() {
 
     return (
         <form className="form-Container" onSubmit={handleSubmit}>
-            <NavLink to="/addCustomer"><label>Email: <input type="email" name="email" required value={email}
-                onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
+            <label>Email: <input type="email" name="email" required value={email}
+                onChange={(e) => setEmail(e.target.value)} /></label>
             <button type="submit">Add Customer Support Worker</button>
-            <NavBar />
         </form>
     )
 }
 
 
-export function RemoveCustomer() {
+export function RemoveWorker() {
     const [email, setEmail] = useState("");
     const [emails, setEmails] = useState([]);
 
     useEffect(() => {
         async function fetchEmails() {
             try {
-                const response2 = await fetch("/api/getCustomerSupport", {
+                const response2 = await fetch("/api/workers", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -101,7 +99,7 @@ export function RemoveCustomer() {
     const handleSubmit = async (emailToRemove) => {
 
         try {
-            const response = await fetch("/api/removeCustomer", {
+            const response = await fetch("/api/workers", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",
@@ -121,7 +119,6 @@ export function RemoveCustomer() {
 
     return (
         <div className="removeContainer">
-            <NavBar></NavBar>
             <h1>Custom Support Workers</h1>
             <ul className="listOfEmails">
                 {emails.map((emailItem) => (

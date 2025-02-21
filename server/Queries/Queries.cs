@@ -243,7 +243,7 @@ public class Queries
     public async Task<List<GetCustomerSupportEmail>> GetCustomerSupportWorkers()
     {
         List<GetCustomerSupportEmail> customerSupportEmail = new();
-        await using var cmd = _db.CreateCommand("SELECT email FROM users WHERE role = 'customerService'");
+        await using var cmd = _db.CreateCommand("SELECT email FROM users WHERE role = 'customerService' OR role = 'customerSupport'");
         using var reader = await cmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
