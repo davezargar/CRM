@@ -1,15 +1,17 @@
-import { useState} from "react"
-import "./style/Login.css"
+import { useState } from "react";
+import "./style/Login.css";
 
 function CreateAccount() {
     const [formData, setFormData] = useState({
         email: "",
         password: "",
+        company_fk: 1, // Example company ID
     });
 
     const handleChange = (e) => {
         setFormData({
-            ...formData, [e.target.name]: e.target.value,
+            ...formData,
+            [e.target.name]: e.target.value,
         });
     };
 
@@ -39,13 +41,13 @@ function CreateAccount() {
     return (
         <div id="createAccount">
             <h2>Register</h2>
-            
+
             <form id="accountForm" onSubmit={handleSubmit}>
                 <h3>Email</h3>
-                <input type="email" id="Email" value={formData.Email} onChange={handleChange}/>
+                <input type="email" name="email" value={formData.email} onChange={handleChange} />
 
                 <h3>Password</h3>
-                <input type="password" id="Password" value={formData.Password} onChange={handleChange}/>
+                <input type="password" name="password" value={formData.password} onChange={handleChange} />
 
                 <br/>
                 <button type="submit">Create Account</button>
@@ -53,4 +55,5 @@ function CreateAccount() {
         </div>
     );
 }
-    export default CreateAccount;
+
+export default CreateAccount;

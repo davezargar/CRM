@@ -1,5 +1,9 @@
 ﻿namespace server.Records;
 
-public record AccountRequest(string email, string password);
+public class AccountRequest
+{
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+}
 
-public record UserRequest(string email, string password);
+

@@ -118,7 +118,7 @@ function LoginForm() {
     return <form className='formContainer' onSubmit={verifyLogin}>
         <div className='registerCon'>
             <p>Don't have an account?</p>
-            <NavLink to="/CreateAccount">Create Account
+            <NavLink to="/CreateAccount">
                 <button type="button">Register here!</button>
             </NavLink></div>
         <div className="inputCon">

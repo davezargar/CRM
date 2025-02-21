@@ -185,10 +185,20 @@ app.MapPost("/api/CreateAccount", async (HttpContext context) =>
 {
     var accountRequest = await context.Request.ReadFromJsonAsync<AccountRequest>();
 
-    bool success = await queries.CreateAccountTask(accountRequest);
-    return Results.Ok(success);
-});
+    if (accountRequest == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
 
+    bool success = await queries.CreateAccountTask(accountRequest.Email, accountRequest.Password, 1);
+
+    if (!success)
+    {
+        return Results.Problem("Couldn't process the SQL Query");
+    }
+
+    return Results.Ok(new { message = "Successfully posted the account to database" });
+});
 
 app.Run();
 
