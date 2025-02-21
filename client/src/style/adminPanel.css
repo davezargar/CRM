@@ -10,6 +10,16 @@
     grid-area: main;
 }
 
+.buttonContainer button {
+    cursor: pointer;
+}
+
+.addCustomerForm {
+    display: flex;
+    justify-content: center;
+}
+
+
 .listOfEmails {
     list-style-type: none;
     max-width: 500px;

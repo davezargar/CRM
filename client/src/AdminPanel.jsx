@@ -47,7 +47,7 @@ export function AddCustomer() {
     }
 
     return (
-        <form onSubmit={handleSubmit}>
+        <form className="form-Container" onSubmit={handleSubmit}>
             <NavLink to="/addCustomer"><label>Email: <input type="email" name="email" required value={email}
                 onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
             <button type="submit">Add Customer Support Worker</button>
