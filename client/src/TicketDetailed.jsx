@@ -14,7 +14,7 @@ function TicketDetailed() {
     const [Messages, SetMessages] = useState([]);
 
     useEffect(() => {
-        fetch(`/api/ticket/${ticketId}`)
+        fetch(`/api/tickets/${ticketId}`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -41,7 +41,7 @@ function TicketDetailed() {
         <div className="info">
             <ul id={"information"}>
                 <li key={Ticket.ticketId}>
-                    <p>From: {Ticket.userFk} </p> <p>{checkStatus(Ticket)} </p>
+                    <p>From: {Ticket.userFk} </p> {checkStatus(Ticket)}
                     <p>Created: {datetimeFormatter(Ticket.timePosted)} </p>
                 </li>
             </ul>
@@ -50,7 +50,6 @@ function TicketDetailed() {
             <button className="refreshButton" onClick={() => SetRefresh(current => !current)}>Refresh</button>
         </div>
         <ul id={"ticketList"}>
-
             <li key={Ticket.ticketId}>
                 <p className={"ticketId"}>{Ticket.ticketId}</p>
                 <p className={"category"}>{Ticket.category}</p>

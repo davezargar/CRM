@@ -24,7 +24,7 @@ function TicketTable({refresh, tickets, setTickets}) {
     const navigate = useNavigate();
 
     useEffect(()=>{
-        fetch("/api/ticketList")
+        fetch("/api/tickets")
             .then(response => response.json())
             .then(data=> {
                 console.log(data);
@@ -41,7 +41,7 @@ function TicketTable({refresh, tickets, setTickets}) {
     function navigateToTicket(e)
     {
         let id = e.currentTarget.children[0].innerText;
-        navigate("/CustomerServicePanel/ticket/" + id);
+        navigate("./" + id);
     }
     
     return <div id={"ticketTableContainer"}>

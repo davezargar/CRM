@@ -10,38 +10,38 @@ import { RoleContext } from "./main.jsx";
 export function AdminPanel() {
     return <div id="admin-panel">
         <RoleContext.Provider value={"Admin"}>
-            <NavBar />
+            <NavBar/>
 
             <div id={"admin-panel-main"}>
-                <Outlet /> {/*child routes will be rendered here??*/}
+                <Outlet/> {/*child routes will be rendered here??*/}
             </div>
         </RoleContext.Provider>
     </div>
 }
 
 
-export function AddRemoveCustomerSupport() {
+export function AddRemoveWorkers() {
     const navigate = useNavigate();
 
     return (
         <div className="sec">
             <div className="buttonContainer">
-                <button onClick={() => navigate('/adminPanel/addCustomer')}>Add Customer Support</button>
-                <button onClick={() => navigate('/adminPanel/removeCustomer')}>Remove Customer Support</button>
+                <button onClick={() => navigate('./add-worker')}>Add Customer Support</button>
+                <button onClick={() => navigate('./remove-worker')}>Remove Customer Support</button>
             </div>
         </div>
     )
 
 }
 
-export function AddCustomer() {
+export function AddWorker() {
     const [email, setEmail] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         try {
-            const response = await fetch("/api/addCustomer", {
+            const response = await fetch("/api/workers", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -71,14 +71,14 @@ export function AddCustomer() {
 }
 
 
-export function RemoveCustomer() {
+export function RemoveWorker() {
     const [email, setEmail] = useState("");
     const [emails, setEmails] = useState([]);
 
     useEffect(() => {
         async function fetchEmails() {
             try {
-                const response2 = await fetch("/api/getCustomerSupport", {
+                const response2 = await fetch("/api/workers", {
                     method: "GET",
                     headers: {
                         "Content-Type": "application/json",
@@ -102,7 +102,7 @@ export function RemoveCustomer() {
     const handleSubmit = async (emailToRemove) => {
 
         try {
-            const response = await fetch("/api/removeCustomer", {
+            const response = await fetch("/api/workers", {
                 method: "DELETE",
                 headers: {
                     "Content-Type": "application/json",

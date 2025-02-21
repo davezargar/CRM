@@ -28,7 +28,7 @@ function CreateTicket() {
         e.preventDefault();
 
         try {
-            const response = await fetch("/api/CreateTicket", {
+            const response = await fetch("/api/tickets", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

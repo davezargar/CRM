@@ -4,21 +4,19 @@ import "./style/NavBar.css"
 import { RoleContext } from "./main.jsx";
 const NavLinks = {
     Admin: [
-        { name: "Active Tickets", path: "/ActiveTickets" },
-        { name: "Edit/Redirect Ticket", path: "/Edit/RedirectTicket" },
-        { name: "Resolved tickets", path: "/ResolvedTickets" },
-        { name: "Add/Remove Customer", path: "/Add/RemoveCustomer" },
-        { name: "Customer supp direct", path: "/CustomerSuppDirect" }
+        { name: "Manage workers", path: "./" },
+        { name: "Add worker", path: "./add-worker" },
+        { name: "Remove worker", path: "/remove-worker" }
     ],
     Customer: [
-        { name: "Create Ticket", path: "/CustomerPanel/CreateTicket" },
-        { name: "Your Ticket History", path: "/CustomerPanel/TicketHistory" },
-        { name: "account settings", path: "/CustomerPanel/accountSettings" }
+        { name: "Create Ticket", path: "/customer-panel/create-ticket" },
+        { name: "Your Ticket History", path: "/customer-panel/ticket-history" },
+        { name: "account settings", path: "/customer-panel/account-settings" }
     ],
     CustomerService: [
-        { name: "Active Tickets", path: "/CustomerServicePanel/tickets" },
-        { name: "Resolved tickets", path: "/CustomerServicePanel/ResolvedTickets" },
-        { name: "Account settings", path: "/CustomerServicePanel/accountSettings" },
+        { name: "Active Tickets", path: "/customer-service-panel/tickets" },
+        { name: "Resolved tickets", path: "/customer-service-panel/resolved-tickets" },
+        { name: "Account settings", path: "/customer-service-panel/account-settings" },
     ]
 };
 
@@ -32,7 +30,7 @@ function NavBar() {
                     <p className='roleText'>{role}</p>
                     {NavLinks[role].map((link, index) => (
                         <div className='optionContainer'>
-                            <li key={index}>
+                            <li key={("navkey- " + index)}>
                                 <NavLink className="Options" to={link.path}>{link.name}</NavLink>
                             </li>
                         </div>
