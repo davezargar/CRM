@@ -10,10 +10,10 @@ import { RoleContext } from "./main.jsx";
 export function AdminPanel() {
     return <div id="admin-panel">
         <RoleContext.Provider value={"Admin"}>
-            <NavBar/>
+            <NavBar />
 
             <div id={"admin-panel-main"}>
-                <Outlet/> {/*child routes will be rendered here??*/}
+                <Outlet /> {/*child routes will be rendered here??*/}
             </div>
         </RoleContext.Provider>
     </div>
@@ -26,10 +26,9 @@ export function AddRemoveCustomerSupport() {
     return (
         <div className="sec">
             <div className="buttonContainer">
-                <button onClick={() => navigate('/addCustomer')}>Add Customer Support</button>
-                <button onClick={() => navigate('/removeCustomer')}>Remove Customer Support</button>
+                <button onClick={() => navigate('/adminPanel/addCustomer')}>Add Customer Support</button>
+                <button onClick={() => navigate('/adminPanel/removeCustomer')}>Remove Customer Support</button>
             </div>
-            <NavBar />
         </div>
     )
 
@@ -61,10 +60,12 @@ export function AddCustomer() {
 
     return (
         <form className="form-Container" onSubmit={handleSubmit}>
-            <NavLink to="/addCustomer"><label>Email: <input type="email" name="email" required value={email}
-                onChange={(e) => setEmail(e.target.value)} /></label></NavLink>
-            <button type="submit">Add Customer Support Worker</button>
-            <NavBar />
+            <div className="form-Item">
+                <label>Email: </label>
+                <input type="email" name="email" required value={email}
+                    onChange={(e) => setEmail(e.target.value)} />
+                <button type="submit">Add Customer Support Worker</button>
+            </div>
         </form>
     )
 }
@@ -121,7 +122,6 @@ export function RemoveCustomer() {
 
     return (
         <div className="removeContainer">
-            <NavBar></NavBar>
             <h1>Custom Support Workers</h1>
             <ul className="listOfEmails">
                 {emails.map((emailItem) => (
