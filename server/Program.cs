@@ -1,4 +1,6 @@
+using System.Security.AccessControl;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 using server;
 using server.Queries;
@@ -181,7 +183,29 @@ app.MapPost("/api/ticketResolved", async (HttpContext context) =>
     }
 
     return Results.Ok(new { message = "Successfully posted the ticket status to database" });
-}); 
+});
+
+app.MapGet("/api/getCustomerSupport", async () =>
+{
+    try
+    {
+        var customerSupportEmails = await queries.GetCustomerSupportWorkers();
+
+        if (customerSupportEmails == null)
+        {
+            return Results.NotFound("no customerWorker users found");
+        }
+        return Results.Ok(customerSupportEmails);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error: {ex.Message}");
+
+        return Results.Problem("internal error", statusCode: 500);
+    }
+    
+    
+});
 
 
 app.Run();
