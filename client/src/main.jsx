@@ -137,7 +137,7 @@ function RegisterForm() {
         <form className='formContainer' onSubmit={handleRegister}>
             <div className='registerCon'>
                 <p>Already have an account?</p>
-                <NavLink to="/LoginForm">
+                <NavLink to="/">
                     <button type="button">Login here!</button>
                 </NavLink></div>
             <div className='inputCon'>
