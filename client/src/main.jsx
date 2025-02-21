@@ -2,8 +2,6 @@ import { StrictMode, useState, createContext, use, useEffect } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Routes, Route, NavLink, useNavigate } from "react-router";
 
-import ActiveTickets from './ActiveTickets';
-
 import CustomerServicePanel from "./CustomerServicePanel";
 import TicketDisplayActive from "./TicketDisplayActive.jsx";
 import TicketDetailed from "./TicketDetailed.jsx";
@@ -29,23 +27,22 @@ function App() {
         <BrowserRouter>
             <Routes>
                 <Route index element={<Index />} />
-                <Route path={"/CustomerPanel"} element={<CustomerPanel />} />
+                <Route path={"/customer-panel"} element={<CustomerPanel />} />
 
-                <Route path={"/CustomerServicePanel"} element={<CustomerServicePanel />}>
-                    <Route path={"/CustomerServicePanel/tickets"} element={<TicketDisplayActive />} /> {/*Should default to this path dont know how*/}
-                    <Route path={"/CustomerServicePanel/ticket/:ticketId"} element={<TicketDetailed />} />
+                <Route path={"/customer-service-panel"} element={<CustomerServicePanel />}>
+                    <Route path={"/customer-service-panel/tickets"} element={<TicketDisplayActive />} /> {/*Should default to this path dont know how*/}
+                    <Route path={"/customer-service-panel/tickets/:ticketId"} element={<TicketDetailed />} />
                     {/*Route account settings*/}
                 </Route>
 
-                <Route path='/adminPanel' element={<AdminPanel/>} >
+                <Route path='/admin-panel' element={<AdminPanel/>} >
                     <Route index element={<AddRemoveWorkers/>}/>
-                    <Route path='addCustomer' element={<AddWorker/>}/>
-                    <Route path='removeCustomer' element={<RemoveWorker/>} />
+                    <Route path='add-worker' element={<AddWorker/>}/>
+                    <Route path='remove-worker' element={<RemoveWorker/>} />
                 </Route>
                 
 
-                <Route path="/CreateTicket" element={<CreateTicket />} />
-                <Route path="/ActiveTickets" element={<ActiveTickets />} />
+                <Route path="/create-ticket" element={<CreateTicket />} />
                 <Route path="/register" element={<RegisterForm />} />
             </Routes>
         </BrowserRouter>
@@ -83,13 +80,13 @@ function LoginForm() {
                 console.log(data);
                 switch (data) {
                     case "customer":
-                        navigate("/customerPanel");
+                        navigate("/customer-panel");
                         break;
                     case "admin":
-                        navigate("/adminPanel");
+                        navigate("/admin-panel");
                         break;
                     case "customerService":
-                        navigate("/CustomerServicePanel/tickets");
+                        navigate("/customer-service-panel/tickets");
                         break;
                 }
             })

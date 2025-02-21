@@ -26,8 +26,8 @@ export function AddRemoveWorkers() {
     return (
         <div className="sec">
             <div className="buttonContainer">
-                <button onClick={() => navigate('./addCustomer')}>Add Customer Support</button>
-                <button onClick={() => navigate('./removeCustomer')}>Remove Customer Support</button>
+                <button onClick={() => navigate('./add-worker')}>Add Customer Support</button>
+                <button onClick={() => navigate('./remove-worker')}>Remove Customer Support</button>
             </div>
         </div>
     )
