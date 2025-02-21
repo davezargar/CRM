@@ -1,12 +1,10 @@
-.sec {
+#admin-panel {
     display: grid;
-    grid-template-areas:
-        "header header"
-        "navBar main"
-        "footer footer";
+    grid-auto-columns: 1fr 4fr;
+    grid-template-areas: "navBar main";
 }
 
-.buttonContainer {
+#admin-panel-main {
     grid-area: main;
 }
 

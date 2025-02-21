@@ -1,10 +1,23 @@
-import { NavLink, useNavigate } from "react-router";
+import { NavLink, useNavigate, Outlet } from "react-router";
 import NavBar from "./NavBar";
 import "./style/removeAddCustomerSupport.css";
 import { useEffect, useState } from "react";
 import "./style/adminPanel.css";
+import { RoleContext } from "./main.jsx";
 
 
+
+export function AdminPanel() {
+    return <div id="admin-panel">
+        <RoleContext.Provider value={"Admin"}>
+            <NavBar/>
+
+            <div id={"admin-panel-main"}>
+                <Outlet/> {/*child routes will be rendered here??*/}
+            </div>
+        </RoleContext.Provider>
+    </div>
+}
 
 
 export function AddRemoveCustomerSupport() {

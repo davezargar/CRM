@@ -9,7 +9,7 @@ import CustomerServicePanel from "./CustomerServicePanel";
 import TicketDisplayActive from "./TicketDisplayActive.jsx";
 import TicketDetailed from "./TicketDetailed.jsx";
 
-import { AddRemoveCustomerSupport } from './adminPanel';
+import { AddRemoveCustomerSupport, AdminPanel } from './adminPanel';
 import { AddCustomer, RemoveCustomer } from './adminPanel';
 
 import CustomerPanel from "./CustomerPanel";
@@ -38,9 +38,12 @@ function App() {
                     {/*Route account settings*/}
                 </Route>
 
-                <Route path='/adminPanel' element={<AddRemoveCustomerSupport />} />
-                <Route path='/addCustomer' element={<AddCustomer />} />
-                <Route path='/removeCustomer' element={<RemoveCustomer />} />
+                <Route path='/adminPanel' element={<AdminPanel/>} >
+                    <Route index element={<AddRemoveCustomerSupport/>}/>
+                    <Route path='addCustomer' element={<AddCustomer />}/>
+                    <Route path='removeCustomer' element={<RemoveCustomer />} />
+                </Route>
+                
 
                 <Route path="/CreateTicket" element={<CreateTicket />} />
                 <Route path="/DefaultPage" element={<DefaultPage />} />
@@ -103,7 +106,7 @@ function LoginForm() {
                         navigate("/customerPanel");
                         break;
                     case "admin":
-                        navigate("/AdminPanel");
+                        navigate("/adminPanel");
                         break;
                     case "customerService":
                         navigate("/CustomerServicePanel/tickets");
