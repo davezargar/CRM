@@ -45,7 +45,7 @@ function App() {
 
                 <Route path="/create-ticket" element={<CreateTicket />} />
                 <Route path="/register" element={<RegisterForm />} />
-                <Route path="/Customers" element={<CreateAccount />} />
+                <Route path="/customers" element={<CreateAccount />} />
             </Routes>
         </BrowserRouter>
     </RoleContext.Provider>
@@ -98,7 +98,7 @@ function LoginForm() {
     return <form className='formContainer' onSubmit={verifyLogin}>
         <div className='registerCon'>
             <p>Don't have an account?</p>
-            <NavLink to="/Customers">
+            <NavLink to="/customers">
                 <button type="button">Register here!</button>
             </NavLink></div>
         <div className="inputCon">
