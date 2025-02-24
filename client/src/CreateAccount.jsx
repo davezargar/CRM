@@ -19,7 +19,7 @@ function CreateAccount() {
         e.preventDefault();
 
         try {
-            const response = await fetch("/api/CreateAccount", {
+            const response = await fetch("/api/customers", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
