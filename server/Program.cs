@@ -46,6 +46,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
+ #region Routes
 app.MapPost("/api/workers", async (HttpContext context) =>
 {
     var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
@@ -217,5 +218,6 @@ app.MapPost("/api/customers", async (HttpContext context) =>
 
     return Results.Ok(new { message = "Successfully posted the account to database" });
 });
+#endregion
 
 app.Run();
