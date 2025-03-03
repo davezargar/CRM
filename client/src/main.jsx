@@ -87,7 +87,7 @@ function LoginForm() {
                     case "admin":
                         navigate("/admin-panel");
                         break;
-                    case "customerService":
+                    case "support":
                         navigate("/customer-service-panel/tickets");
                         break;
                 }

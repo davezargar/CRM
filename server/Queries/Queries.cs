@@ -121,9 +121,9 @@ public class Queries
         List<TicketRecord> tickets = new List<TicketRecord>();
         await using var cmd =
             _db.CreateCommand(
-                "SELECT id,  title, status, categories.name, subcategories.name, posted, closed, users.email, tickets.company_id, elevated FROM tickets " +
-                "INNER JOIN categories ON ticket.category_id = categories.id" +
-                "INNER JOIN subcategories ON ticket.subcategory_id = subcategories.id" +
+                "SELECT tickets.id, title, status, categories.name, subcategories.name, posted, closed, users.email, tickets.company_id, elevated FROM tickets " +
+                "INNER JOIN categories ON tickets.category_id = categories.id " +
+                "INNER JOIN subcategories ON tickets.subcategory_id = subcategories.id " +
                 "INNER JOIN users ON tickets.company_id = users.company_id WHERE email = $1");
         cmd.Parameters.AddWithValue(email);
         using var reader = await cmd.ExecuteReaderAsync();
@@ -154,7 +154,9 @@ public class Queries
         TicketRecord ticket;
         await using var cmd =
             _db.CreateCommand(
-                "SELECT id, title, status, category_id, subcategory_id, posted, closed, users.email, elevated tickets.company_id FROM tickets " +
+                "SELECT tickets.id, title, status, categories.name, subcategories.name, posted, closed, users.email,  tickets.company_id, elevated FROM tickets " +
+                "INNER JOIN categories ON categories.id = tickets.category_id " +
+                "INNER JOIN subcategories ON subcategories.id = tickets.subcategory_id " +
                 "INNER JOIN users ON tickets.company_id = users.company_id WHERE tickets.id = $1 AND email = $2");
         cmd.Parameters.AddWithValue(id);
         cmd.Parameters.AddWithValue(email);
@@ -181,8 +183,8 @@ public class Queries
     public async Task<List<MessagesRecord>> GetTicketMessages(int id)
     {
         List<MessagesRecord> messages = new List<MessagesRecord>();
-        await using var cmd = _db.CreateCommand("SELECT id, message, ticket_id, title, users.email, time_sent FROM messages " +
-                                                "INNER JOIN users ON users.id = tickets.user_id WHERE ticket_id = $1");
+        await using var cmd = _db.CreateCommand("SELECT messages.id, message, ticket_id, title, users.email, sent FROM messages " +
+                                                "INNER JOIN users ON users.id = messages.user_id WHERE ticket_id = $1");
         cmd.Parameters.AddWithValue(id);
         using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
