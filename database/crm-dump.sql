@@ -20,6 +20,7 @@ ALTER TABLE IF EXISTS ONLY public.users DROP CONSTRAINT IF EXISTS users_companie
 ALTER TABLE IF EXISTS ONLY public.tickets DROP CONSTRAINT IF EXISTS tickets_users_id_fk;
 ALTER TABLE IF EXISTS ONLY public.tickets DROP CONSTRAINT IF EXISTS tickets_subcategories_id_fk;
 ALTER TABLE IF EXISTS ONLY public.tickets DROP CONSTRAINT IF EXISTS tickets_companies_id_fk;
+ALTER TABLE IF EXISTS ONLY public.tickets DROP CONSTRAINT IF EXISTS tickets_categories_id_fk;
 ALTER TABLE IF EXISTS ONLY public.subcategories DROP CONSTRAINT IF EXISTS subcategories_categories_id_fk;
 ALTER TABLE IF EXISTS ONLY public.messages DROP CONSTRAINT IF EXISTS messages_users_id_fk;
 ALTER TABLE IF EXISTS ONLY public.messages DROP CONSTRAINT IF EXISTS messages_tickets_id_fk;
@@ -184,7 +185,8 @@ CREATE TABLE public.messages (
     title text,
     message text NOT NULL,
     ticket_id integer NOT NULL,
-    user_id integer NOT NULL
+    user_id integer NOT NULL,
+    sent timestamp without time zone DEFAULT CURRENT_TIMESTAMP NOT NULL
 );
 
 
@@ -270,7 +272,8 @@ CREATE TABLE public.tickets (
     closed timestamp without time zone,
     user_id integer NOT NULL,
     company_id integer NOT NULL,
-    elevated boolean DEFAULT false NOT NULL
+    elevated boolean DEFAULT false NOT NULL,
+    category_id integer NOT NULL
 );
 
 
@@ -367,9 +370,9 @@ COPY public.feedback (id, rating, comment, written, "from", target, ticket_id) F
 -- Data for Name: messages; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.messages (id, title, message, ticket_id, user_id) FROM stdin;
-1	messagetitle1	text	1	8
-2	messagetitle2	text	2	7
+COPY public.messages (id, title, message, ticket_id, user_id, sent) FROM stdin;
+1	messagetitle1	text	1	8	2025-03-03 11:31:37.699736
+2	messagetitle2	text	2	7	2025-03-03 11:31:37.699736
 \.
 
 
@@ -401,9 +404,9 @@ COPY public.ticket_access_links (id, access_link) FROM stdin;
 -- Data for Name: tickets; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.tickets (id, title, status, subcategory_id, posted, closed, user_id, company_id, elevated) FROM stdin;
-1	test1	pending	2	2025-03-03 10:46:41.665726	\N	8	1	f
-2	test2	pending	8	2025-03-03 10:46:41.665726	\N	7	4	f
+COPY public.tickets (id, title, status, subcategory_id, posted, closed, user_id, company_id, elevated, category_id) FROM stdin;
+1	test1	pending	2	2025-03-03 10:46:41.665726	\N	8	1	f	1
+2	test2	pending	8	2025-03-03 10:46:41.665726	\N	7	4	f	1
 \.
 
 
@@ -605,6 +608,14 @@ ALTER TABLE ONLY public.messages
 
 ALTER TABLE ONLY public.subcategories
     ADD CONSTRAINT subcategories_categories_id_fk FOREIGN KEY (main_category_id) REFERENCES public.categories(id);
+
+
+--
+-- Name: tickets tickets_categories_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: postgres
+--
+
+ALTER TABLE ONLY public.tickets
+    ADD CONSTRAINT tickets_categories_id_fk FOREIGN KEY (category_id) REFERENCES public.categories(id);
 
 
 --
