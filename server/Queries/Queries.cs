@@ -97,11 +97,11 @@ public class Queries
         try
         {
             await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(categories_id, subcategory_id, title, user_id, company_id) " +
-                                                    "values($1, $2, $3, (SELECT id FROM users WHERE email = $4), $6) returning id) " +
+                                                    "values((SELECT id FROM categories WHERE name = $1), (SELECT id FROM subcategories WHERE name = $2), $3, (SELECT id FROM users WHERE email = $4), $6) returning id) " +
                                                     "INSERT INTO messages(title, message, ticket_id, user_id) " +
                                                     "values ($3, $5, (SELECT ticket_id FROM ticketIns), (SELECT id FROM users WHERE email = $4))");
-            cmd.Parameters.AddWithValue(ticketMessages.Category);     //$1
-            cmd.Parameters.AddWithValue(ticketMessages.Subcategory);  //$2
+            cmd.Parameters.AddWithValue(ticketMessages.CategoryName);     //$1
+            cmd.Parameters.AddWithValue(ticketMessages.SubcategoryName);  //$2
             cmd.Parameters.AddWithValue(ticketMessages.Title);        //$3
             cmd.Parameters.AddWithValue(ticketMessages.UserEmail);    //$4
             cmd.Parameters.AddWithValue(ticketMessages.Message);      //$5
