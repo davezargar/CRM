@@ -53,7 +53,7 @@ public class Queries
                 return false;  // Stop and return false if email is invalid
             }
             string defaultPassword = "password123";
-            await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_id, role, password) VALUES ($1, $2, $3, $4)");
+            await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_id, role, password) VALUES ($1, $2, $3::role, $4)");
             cmd.Parameters.AddWithValue(email);
             cmd.Parameters.AddWithValue(companyId);
             cmd.Parameters.AddWithValue("support");
@@ -96,10 +96,10 @@ public class Queries
 
         try
         {
-            await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(categories_id, subcategory_id, title, user_id, company_id) " +
-                                                    "values((SELECT id FROM categories WHERE name = $1), (SELECT id FROM subcategories WHERE name = $2), $3, (SELECT id FROM users WHERE email = $4), $6) returning id) " +
+            await using var cmd = _db.CreateCommand("WITH ticketIns AS (INSERT INTO tickets(category_id, subcategory_id, title, user_id, company_id) " +
+                                                    "values((SELECT id FROM categories WHERE name = $1 AND company_id = $6), (SELECT id FROM subcategories WHERE name = $2 AND main_category_id = (SELECT id FROM categories WHERE name = $1 AND company_id = $6)), $3, (SELECT id FROM users WHERE email = $4 AND company_id = $6), $6) returning id) " +
                                                     "INSERT INTO messages(title, message, ticket_id, user_id) " +
-                                                    "values ($3, $5, (SELECT ticket_id FROM ticketIns), (SELECT id FROM users WHERE email = $4))");
+                                                    "values ($3, $5, (SELECT id FROM ticketIns), (SELECT id FROM users WHERE email = $4 AND company_id = $6))");
             cmd.Parameters.AddWithValue(ticketMessages.CategoryName);     //$1
             cmd.Parameters.AddWithValue(ticketMessages.SubcategoryName);  //$2
             cmd.Parameters.AddWithValue(ticketMessages.Title);        //$3
