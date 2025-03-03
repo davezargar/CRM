@@ -4,7 +4,7 @@ namespace server.Records;
 
 public record LoginRecord(string Email, string Password);
 
-public record TicketRecord(int TicketId, string Category, string Subcategory, string Title, DateTime TimePosted, DateTime? TimeClosed, string UserFk,int CompanyFk );
+public record TicketRecord(int TicketId, string Title, string Status, string Category, string Subcategory,  DateTime TimePosted, DateTime? TimeClosed, int UserFk,int CompanyFk, bool Elevated);
 
 public record MessagesRecord(int MessageId, string Message, int TicketId, string Title, string UserId, DateTime TimePosted);
 

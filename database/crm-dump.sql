@@ -300,7 +300,8 @@ CREATE TABLE public.users (
     role public.role DEFAULT 'customer'::public.role NOT NULL,
     email text NOT NULL,
     verified boolean DEFAULT false NOT NULL,
-    password text
+    password text,
+    active boolean DEFAULT true NOT NULL
 );
 
 
@@ -410,15 +411,15 @@ COPY public.tickets (id, title, status, subcategory_id, posted, closed, user_id,
 -- Data for Name: users; Type: TABLE DATA; Schema: public; Owner: postgres
 --
 
-COPY public.users (id, company_id, role, email, verified, password) FROM stdin;
-1	1	admin	ikeaadmin@gmail.com	f	123
-2	2	admin	doofenshmirtzadmin@gmail.com	f	123
-3	3	admin	angaadmin@gmail.com	f	123
-4	4	admin	micromjukkantadmin@gmail.com	f	123
-5	1	support	ikeasupport@gmail.com	f	123
-6	4	support	micromjuksupport@gmail.com	f	123
-7	4	customer	test@gmail.com	f	123
-8	1	customer	test@gmail.com	f	123
+COPY public.users (id, company_id, role, email, verified, password, active) FROM stdin;
+1	1	admin	ikeaadmin@gmail.com	f	123	t
+2	2	admin	doofenshmirtzadmin@gmail.com	f	123	t
+3	3	admin	angaadmin@gmail.com	f	123	t
+4	4	admin	micromjukkantadmin@gmail.com	f	123	t
+5	1	support	ikeasupport@gmail.com	f	123	t
+6	4	support	micromjuksupport@gmail.com	f	123	t
+7	4	customer	test@gmail.com	f	123	t
+8	1	customer	test@gmail.com	f	123	t
 \.
 
 
