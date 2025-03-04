@@ -242,8 +242,23 @@ app.MapPost("/api/messages", async (HttpContext context) =>
     string userId = context.Session.GetString("Email");
     Console.WriteLine("SESSION EMAIL: " + userId);
     Console.WriteLine("TICKET ID: " + requestBody.Ticket_id_fk);
-    var updatedRequest = requestBody with { UserEmail = userId };
-    bool success = await queries.PostMessageTask(updatedRequest);
+
+
+    byte[] key = new byte[16];
+    byte[] iv = new byte[16];
+
+    using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+    {
+    rng.GetBytes(key);
+    rng.GetBytes(iv);
+    }
+
+    byte[] encryptedDescriptionBytes = Encrypt(requestBody.Description, key, iv);
+    string encryptedDescription = Convert.ToBase64String(encryptedDescriptionBytes);
+
+    var updatedRequest = requestBody with { UserEmail = userId, Description = encryptedDescription };
+
+    bool success = await queries.PostMessageTask(updatedRequest, key, iv);
 
     if (!success)
     {

@@ -202,15 +202,17 @@ public class Queries
     }
 
 
-    public async Task<bool> PostMessageTask(SendEmail message)
+    public async Task<bool> PostMessageTask(SendEmail message, byte[] key, byte[] iv)
     {
         try
         {
-            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, message, user_id, ticket_id) VALUES ($1, $2, (SELECT id FROM users where email = $3), $4)");
+            await using var cmd = _db.CreateCommand("INSERT INTO messages (Title, message, user_id, ticket_id, encryption_key, encryption_iv) VALUES ($1, $2, (SELECT id FROM users where email = $3), $4, $5, $6)");
             cmd.Parameters.AddWithValue(message.Title.ToString());
             cmd.Parameters.AddWithValue(message.Description.ToString());
             cmd.Parameters.AddWithValue(message.UserEmail);
             cmd.Parameters.AddWithValue(message.Ticket_id_fk);
+            cmd.Parameters.AddWithValue(Convert.ToBase64String(key));
+            cmd.Parameters.AddWithValue(Convert.ToBase64String(iv));
             await cmd.ExecuteNonQueryAsync();
             return true;
         }
