@@ -1,5 +1,6 @@
 using System.Security.AccessControl;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 using server;
@@ -31,6 +32,14 @@ var app = builder.Build();
 
 app.UseSession(); // where the session middleware is run, ordering is important, must be before middleware using it
 
+byte[] key = new byte[16];
+byte[] iv = new byte[16];
+
+using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+{
+    rng.GetBytes(key);
+    rng.GetBytes(iv);
+}
 
 app.Use(async (context, next) =>
 {
@@ -45,6 +54,50 @@ app.Use(async (context, next) =>
     }
     await next();
 });
+
+static byte[] Encrypt(string simpletext, byte[] key, byte[] iv)
+{
+    byte[] cipheredtext;
+    using (Aes aes = Aes.Create())
+    {
+        ICryptoTransform encryptor = aes.CreateEncryptor(key, iv);
+
+        using (MemoryStream memoryStream = new MemoryStream())
+        {
+            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write))
+            {
+                using (StreamWriter streamWriter = new StreamWriter(cryptoStream))
+                {
+                    streamWriter.Write(simpletext);
+                }
+
+                cipheredtext = memoryStream.ToArray();
+            }
+        }
+    }
+    return cipheredtext;
+}
+
+static string Decrypt(byte[] cipheredtext, byte[] key, byte[] iv)
+{
+    string simpletext = String.Empty;
+    using (Aes aes = Aes.Create())
+    {
+        ICryptoTransform decryptor = aes.CreateDecryptor(key, iv);
+
+        using (MemoryStream memoryStream = new MemoryStream(cipheredtext))
+        {
+            using (CryptoStream cryptoStream = new CryptoStream(memoryStream, decryptor, CryptoStreamMode.Read))
+            {
+                using (StreamReader streamReader = new StreamReader(cryptoStream))
+                {
+                    simpletext = streamReader.ReadToEnd();
+                }
+            }
+        }
+    }
+    return simpletext;
+}
 
 #region Routes
 app.MapPost("/api/workers", async (HttpContext context) =>
