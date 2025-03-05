@@ -4,6 +4,7 @@ using server.Records;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using System.ComponentModel.Design;
+using System.Data;
 
 
 namespace server.Queries;
@@ -277,5 +278,44 @@ public class Queries
             Console.WriteLine("Error creating account: " + ex);
             return false;
         }
+    }
+
+    public async Task<List<CategoryRecord>> GetCategories(int companyId)
+    {
+        List<CategoryPairs> categoryPairs = new List<CategoryPairs>();
+        List<CategoryRecord> categories = new List<CategoryRecord>();
+        
+        await using var cmd = _db.CreateCommand("SELECT categories.name, subcategories.name FROM categories " +
+                                                "INNER JOIN subcategories ON categories.id = subcategories.main_category_id WHERE company_id = $1");
+        cmd.Parameters.AddWithValue(companyId);
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            categoryPairs.Add(new CategoryPairs (
+                reader.GetString(0),
+                reader.GetString(1)
+             ));
+        }
+        
+        List<string> buffer = new List<string>(); 
+        string categoryPrevious = categoryPairs[0].MainCategory;
+        foreach (var categoryPair in categoryPairs)
+        {
+            if (categoryPair.MainCategory == categoryPrevious)
+            {
+                buffer.Add(categoryPair.Subcategory);
+                categoryPrevious = categoryPair.MainCategory;
+                continue;
+            }
+            
+            categories.Add(new CategoryRecord(categoryPrevious, new List<string>(buffer)));
+            categoryPrevious = categoryPair.MainCategory;
+            buffer.Clear();
+            buffer.Add(categoryPair.Subcategory);
+        }
+        categories.Add(new CategoryRecord(categoryPrevious, buffer));
+
+        return categories;
     }
 }
