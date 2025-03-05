@@ -183,19 +183,35 @@ public class Queries
     public async Task<List<MessagesRecord>> GetTicketMessages(int id)
     {
         List<MessagesRecord> messages = new List<MessagesRecord>();
-        await using var cmd = _db.CreateCommand("SELECT messages.id, message, ticket_id, title, users.email, sent FROM messages " +
+        await using var cmd = _db.CreateCommand("SELECT messages.id, message, ticket_id, title, users.email, sent, encryption_key, encryption_iv FROM messages " +
                                                 "INNER JOIN users ON users.id = messages.user_id WHERE ticket_id = $1");
         cmd.Parameters.AddWithValue(id);
         using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            messages.Add(new(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetInt32(2),
-                reader.GetString(3),
-                reader.GetString(4),
-                reader.GetDateTime(5)
+            int messageId = reader.GetInt32(0);
+            string encryptedMessage = reader.GetString(1);
+            int ticketId = reader.GetInt32(2);
+            string title = reader.GetString(3);
+            string email = reader.GetString(4);
+            DateTime sentTime = reader.GetDateTime(5);
+            string encryptionKey = reader.GetString(6);
+            string encryptionIv = reader.GetString(7);
+
+            byte[] key = Convert.FromBase64String(encryptionKey);
+            byte[] iv = Convert.FromBase64String(encryptionIv);
+
+            byte[] encryptedBytes = Convert.FromBase64String(encryptedMessage);
+
+            string decryptedMessage = EncryptionSolver.Decrypt(encryptedBytes, key, iv);
+
+            messages.Add(new MessagesRecord(
+                messageId,
+                decryptedMessage,
+                ticketId,
+                title,
+                email,
+                sentTime
             ));
         }
         return messages;
