@@ -278,4 +278,9 @@ public class Queries
             return false;
         }
     }
+    
+    public async Task<List<CategoryRecord>> GetCategories()
+    {
+        
+    }
 }

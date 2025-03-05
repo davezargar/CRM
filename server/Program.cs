@@ -200,6 +200,31 @@ app.MapPost("/api/messages", async (HttpContext context) =>
     return Results.Ok(new { message = "Successfully posted the message to database" });
 });
 
+app.MapGet("/api/categories", async () =>
+{
+    var categories = await queries.GetCategories();
+    return Results.Ok(categories);
+});
+
+app.MapGet("/api/assign-tickets", async () =>
+{
+    var assignments = await queries.GetAssignedCategories();
+    return Results.Ok(assignments);
+});
+
+app.MapPost("/api/assign-tickets", async (HttpContext context) =>
+{
+    var assignments = await context.Request.ReadFromJsonAsync<Dictionary<string, List<int>>>();
+
+    if (assignments == null || assignments.Count == 0)
+    {
+        return Results.BadRequest("The request body is empty or invalid.");
+    }
+
+    bool success = await queries.AssignCategoriesToWorkers(assignments);
+    return success ? Results.Ok(new { message = "Assignments saved!" }) : Results.Problem("Failed to assign tickets.");
+});
+
 app.MapPost("/api/customers", async (HttpContext context) =>
 {
     var accountRequest = await context.Request.ReadFromJsonAsync<CustomerRequest>();
@@ -218,6 +243,8 @@ app.MapPost("/api/customers", async (HttpContext context) =>
 
     return Results.Ok(new { message = "Successfully posted the account to database" });
 });
+
+
 
 #endregion
 

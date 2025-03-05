@@ -4,51 +4,54 @@ import "./style/assignTickets.css";
 export function AssignTickets() {
     const [workers, setWorkers] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [assignments, setAssignments] = useState([]);
-    
+    const [assignments, setAssignments] = useState({});
+
     useEffect(() => {
-        async function fetchData(){
-            try{
-                const workers = await fetch("/api/workers");
-                const categories = await fetch("/api/categories");
-                
-                if (!workersResponse.ok || !categoriesResponse.ok) {
-                    
-                    throw new Error("failed to fetch data");
+        async function fetchData() {
+            try 
+            {
+                const workersResponse = await fetch("/api/workers");
+                const categoriesResponse = await fetch("/api/categories");
+
+                if (!workersResponse.ok || !categoriesResponse.ok) 
+                {
+                    throw new Error("Failed to fetch data");
                 }
-                
+
                 const workersData = await workersResponse.json();
                 const categoriesData = await categoriesResponse.json();
-                
+
                 setWorkers(workersData);
                 setCategories(categoriesData);
                 setAssignments(workersData.reduce((acc, worker) => ({ ...acc, [worker.email]: [] }), {}));
-            } catch (error) {
+            } catch (error) 
+            {
                 console.error(error);
             }
         }
         fetchData();
     }, []);
-    
-    const handleDragStart = (event, category) => {
-        event.dataTransfer.setData("category", category);
+
+    const handleDragStart = (event, categoryId) => 
+    {
+        event.dataTransfer.setData("categoryId", categoryId);
     };
-    
-    const handleDragEnd = (event, workerEmail) => {
+
+    const handleDrop = (event, workerEmail) => 
+    {
         event.preventDefault();
-        const category = event.target.dataTransfer.getData("category");
+        const categoryId = parseInt(event.dataTransfer.getData("category"));
         setAssignments((prev) => ({
             ...prev,
-            [workerEmail]: 
-                [...new Set([...prev[workerEmail], category])],
+            [workerEmail]: [...new Set([...prev[workerEmail], category])], // Avoid duplicates
         }));
     };
-    
-    const handDragOver = (event) => 
+
+    const handleDragOver = (event) => 
     {
         event.preventDefault();
     };
-    
+
     const handleSaveAssignments = async () => 
     {
         try 
@@ -58,9 +61,49 @@ export function AssignTickets() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(assignments),
             });
-            if (!response.ok) throw new Error("Failed to add save assignments");
-            alert("assignments added successfully.");
-            } catch (error) {
+            if (!response.ok) throw new Error("Failed to save assignments");
+            alert("Assignments saved!");
+        } catch (error) {
             console.error(error);
         }
-    }
+    };
+
+    return (
+        <div className="assign-tickets-container">
+            <h1>Assign Tickets</h1>
+            <div className="categories">
+                {categories.map((category) => (
+                    <div
+                        key={category.id}
+                        className="category"
+                        draggable
+                        onDragStart={(event) => handleDragStart(event, category.name)}
+                    >
+                        {category.name}
+                    </div>
+                ))}
+            </div>
+            <div className="workers">
+                {workers.map((worker) => (
+                    <div
+                        key={worker.email}
+                        className="worker"
+                        onDrop={(event) => handleDrop(event, worker.email)}
+                        onDragOver={handleDragOver}
+                    >
+                        <h3>{worker.email}</h3>
+                        <div className="assigned-categories">
+                            {assignments[worker.email]?.map((cat, idx) => (
+                                <span key={idx} className="assigned-category">{cat}</span>
+                            ))}
+                        </div>
+                    </div>
+                ))}
+            </div>
+            <button onClick={handleSaveAssignments}>Save Assignments</button>
+        </div>
+    );
+}
+
+        
+                    
