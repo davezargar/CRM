@@ -14,6 +14,22 @@ public class PasswordHasher
         return (hashedPassword, salt);
     }
 
+    public static bool VerifyHashedPassword(string password, string salt, string hashedPassword)
+    {
+        byte[] saltBytes = Convert.FromBase64String(salt);
+        byte[] computedHashBytes = KeyDerivation.Pbkdf2(
+            password: password,
+            salt: saltBytes,
+            prf: KeyDerivationPrf.HMACSHA256,
+            iterationCount: 100000,
+            numBytesRequested: 256 / 8
+        );
+
+        string computedHash = Convert.ToBase64String(computedHashBytes);
+
+        return computedHash == hashedPassword;
+    }
+
     private static string PBKDF2Hash(string password, byte[] saltBytes)
     {
         return Convert.ToBase64String(KeyDerivation.Pbkdf2(
