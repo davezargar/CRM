@@ -42,7 +42,7 @@ public class Queries
         var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";  // En vanlig e-postformatregex
         return Regex.IsMatch(email, emailRegex);
     }
-    public async Task<bool> AddCustomerTask(string email, int companyId)
+    public async Task<bool> AddCustomerTask(string email, int companyId, string defaultPassword, string salt)
     {
 
         try
@@ -52,12 +52,12 @@ public class Queries
                 Console.WriteLine("Invalid email format.");
                 return false;  // Stop and return false if email is invalid
             }
-            string defaultPassword = "password123";
-            await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_id, role, password) VALUES ($1, $2, $3::role, $4)");
+            await using var cmd = _db.CreateCommand("INSERT INTO users (email, company_id, role, password, salt) VALUES ($1, $2, $3::role, $4, $5)");
             cmd.Parameters.AddWithValue(email);
             cmd.Parameters.AddWithValue(companyId);
             cmd.Parameters.AddWithValue("support");
             cmd.Parameters.AddWithValue(defaultPassword);
+            cmd.Parameters.AddWithValue(salt);
             await cmd.ExecuteNonQueryAsync();
             
             return true;

@@ -69,8 +69,12 @@ app.MapPost("/api/workers", async (HttpContext context) =>
     }
     Console.WriteLine($"received email: {requestBody.Email}");
     int companyId = requestBody.CompanyId ?? 1;
+    string defaultPassWord = "hej123";
+    var (hashedPassword, salt) = PasswordHasher.HashPassword(defaultPassWord);
+    Console.WriteLine($"hashed password: {hashedPassword}");
+    Console.WriteLine($"Salt: {salt}");
 
-    bool success = await queries.AddCustomerTask(requestBody.Email, companyId);
+    bool success = await queries.AddCustomerTask(requestBody.Email, companyId, hashedPassword, salt);
 
     if (!success)
     {
