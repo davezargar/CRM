@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.Diagnostics;
 using server;
 using server.Queries;
 using server.Records;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,8 @@ using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
     rng.GetBytes(iv);
 }
 
+
+
 app.Use(async (context, next) =>
 {
     if (context.Session.GetString("Authenticated") == null) //if the value in the session is null then it did not exist before this request
@@ -75,6 +79,7 @@ app.MapPost("/api/workers", async (HttpContext context) =>
 
     return Results.Ok(new { message = "Valid mail" });
 });
+
 
 app.MapDelete("/api/workers", async (HttpContext context) =>
 {
@@ -242,6 +247,7 @@ app.MapPost("/api/customers", async (HttpContext context) =>
 
     return Results.Ok(new { message = "Successfully posted the account to database" });
 });
+
 
 #endregion
 
