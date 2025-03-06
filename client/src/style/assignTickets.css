@@ -1,0 +1,41 @@
+﻿.assign-tickets-container {
+    text-align: center;
+    padding: 20px;
+}
+
+.categories {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.category {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: grab;
+    user-select: none;
+}
+
+.worker {
+    border: 2px dashed #333;
+    padding: 20px;
+    margin: 10px;
+    background-color: #f9f9f9;
+    min-height: 100px;
+}
+
+.assigned-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.assigned-category {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+}

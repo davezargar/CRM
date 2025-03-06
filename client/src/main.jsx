@@ -8,6 +8,7 @@ import TicketDetailed from "./TicketDetailed.jsx";
 
 import { AddRemoveWorkers, AdminPanel } from './adminPanel';
 import { AddWorker, RemoveWorker } from './adminPanel';
+import { AssignTickets} from "./AssignTickets.jsx";
 
 import CustomerPanel from "./CustomerPanel";
 import CreateTicket from "./CreateTicket";
@@ -40,6 +41,7 @@ function App() {
                     <Route index element={<AddRemoveWorkers/>}/>
                     <Route path='add-worker' element={<AddWorker/>}/>
                     <Route path='remove-worker' element={<RemoveWorker/>} />
+                    <Route path='assign-tickets' element={<AssignTickets/>} />
                 </Route>
                 
 
