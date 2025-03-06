@@ -296,6 +296,13 @@ app.MapPost(
     }
 );
 
+app.MapGet("/api/categories/{companyId:int}", async (HttpContext context, int companyId) =>
+{
+    List<CategoryRecord> categories = new List<CategoryRecord>( await queries.GetCategories(companyId));
+
+    return Results.Ok(categories);
+});
+
 #endregion
 
 app.Run();
