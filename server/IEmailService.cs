@@ -1,15 +1,16 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using MimeKit;
+using server.Config;
 
 namespace server.Services;
 
-public interface IEmailServer
+public interface IEmailService
 {
     Task SendEmailAsync(string to, string subject, string body);
 }
 
-public class EmailService : IEmailServer
+public class EmailService : IEmailService
 {
     private readonly EmailSettings _settings;
 
