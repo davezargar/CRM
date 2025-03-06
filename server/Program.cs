@@ -36,7 +36,7 @@ app.Use(async (context, next) =>
 {
     if (context.Session.GetString("Authenticated") == null) //if the value in the session is null then it did not exist before this request
     {
-        if (context.Request.Path.Value != "/api/login")  //denies requests without authenticated session to enpoints other than login
+        if (context.Request.Path.Value != "/api/login" || context.Request.Path.Value != "/api/categories")  //denies requests without authenticated session to enpoints other than login
         {
             Console.WriteLine("unauthorized request");
             //context.Response.StatusCode = 401;
@@ -217,6 +217,13 @@ app.MapPost("/api/customers", async (HttpContext context) =>
     }
 
     return Results.Ok(new { message = "Successfully posted the account to database" });
+});
+
+app.MapGet("/api/categories/{companyId:int}", async (HttpContext context, int companyId) =>
+{
+    List<CategoryRecord> categories = new List<CategoryRecord>( await queries.GetCategories(companyId));
+
+    return Results.Ok(categories);
 });
 
 #endregion

@@ -13,3 +13,7 @@ public record TicketMessagesRecord(TicketRecord TicketRecord, List<MessagesRecor
 public record NewTicketRecord(int TicketId, string CategoryName, string SubcategoryName, string Title, string UserEmail, int CompanyFk, int MessageId, string Message);
 
 public record GetCustomerSupportEmail(string Email);
+
+public record CategoryPairs(string MainCategory, string Subcategory);
+public record CategoryRecord(string MainCategory, List<string> Subcategories);
+
