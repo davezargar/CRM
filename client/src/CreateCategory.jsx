@@ -12,7 +12,7 @@ export function CreateCategory({ onCategoryAdded }) {
         try {
             console.log("Sending request to API with:", categoryName, "Company ID:", companyId); //for debugging 
 
-            const response = await fetch("/api/categories", {
+            const response = await fetch("/api/ticket-categories", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name: categoryName, companyId: parseInt(companyId) }),

@@ -298,17 +298,17 @@ public class Queries
         }
     }
 
-    public async Task<List<CategoryRecord>> GetCategories()
+    public async Task<List<TicketCategoryRecord>> GetTicketCategories()
     {
-        List<CategoryRecord> categories = new();
-        await using var cmd = _db.CreateCommand("SELECT id, name FROM categories");
+        List<TicketCategoryRecord> ticketCategories = new();
+        await using var cmd = _db.CreateCommand("SELECT id, name, company_id FROM categories");
         using var reader = await cmd.ExecuteReaderAsync();
     
         while (await reader.ReadAsync())
         {
-            categories.Add(new CategoryRecord(reader.GetInt32(0), reader.GetString(1)));
+            ticketCategories.Add(new TicketCategoryRecord(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2)));
         }
-        return categories;
+        return ticketCategories;
     }
 
     public async Task<Dictionary<string, List<int>>> GetAssignedCategories()
@@ -392,8 +392,6 @@ public class Queries
             cmd.Parameters.AddWithValue(name);
             cmd.Parameters.AddWithValue(companyId);
             await cmd.ExecuteNonQueryAsync();
-
-            Console.WriteLine($"Category '{name}' inserted for company ID {companyId} successfully.");
             return true;
         }
         catch (Exception ex)

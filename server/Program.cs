@@ -200,17 +200,17 @@ app.MapPost("/api/messages", async (HttpContext context) =>
     return Results.Ok(new { message = "Successfully posted the message to database" });
 });
 
-app.MapGet("/api/categories", async () =>
+app.MapGet("/api/ticket-categories", async () =>
 {
-    var categories = await queries.GetCategories();
+    var categories = await queries.GetTicketCategories();
     return Results.Ok(categories);
 });
 
-app.MapPost("/api/categories", async (HttpContext context) =>
+app.MapPost("/api/ticket-categories", async (HttpContext context) =>
 {
     try
     {
-        var requestBody = await context.Request.ReadFromJsonAsync<CategoryRequest>();
+        var requestBody = await context.Request.ReadFromJsonAsync<TicketCategoryRequest>();
 
         if (requestBody == null || string.IsNullOrWhiteSpace(requestBody.Name))
         {

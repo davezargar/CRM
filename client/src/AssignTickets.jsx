@@ -4,7 +4,7 @@ import { CreateCategory} from "./CreateCategory.jsx";
 
 export function AssignTickets() {
     const [workers, setWorkers] = useState([]);
-    const [categories, setCategories] = useState([]);
+    const [ticketCategories, setTicketCategories] = useState([]);
     const [assignments, setAssignments] = useState({});
     const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -12,7 +12,7 @@ export function AssignTickets() {
         async function fetchData() {
             try {
                 const workersResponse = await fetch("/api/workers");
-                const categoriesResponse = await fetch("/api/categories");
+                const categoriesResponse = await fetch("/api/ticket-categories");
                 const assignmentsResponse = await fetch("/api/assign-tickets");
 
                 if (!workersResponse.ok || !categoriesResponse.ok || !assignmentsResponse.ok) {
@@ -20,11 +20,11 @@ export function AssignTickets() {
                 }
 
                 const workersData = await workersResponse.json();
-                const categoriesData = await categoriesResponse.json();
+                const ticketCategoriesData = await categoriesResponse.json();
                 const assignmentsData = await assignmentsResponse.json();
 
                 setWorkers(workersData);
-                setCategories(categoriesData);
+                setTicketCategories(ticketCategoriesData);
                 setAssignments(assignmentsData);
             } catch (error) {
                 console.error(error);
@@ -82,7 +82,7 @@ export function AssignTickets() {
             <CreateCategory onCategoryAdded={() => window.location.reload()} />
             <div className="categories">
                 <h2>Drag Categories:</h2>
-                {categories.map((category) => (
+                {ticketCategories.map((category) => (
                     <div
                         key={category.id}
                         className="category"
@@ -114,7 +114,7 @@ export function AssignTickets() {
                                     }`}
                                     onClick={() => handleCategoryClick(worker.email, categoryId)}
                                 >
-                                    {categories.find((cat) => cat.id === categoryId)?.name}
+                                    {ticketCategories.find((cat) => cat.id === categoryId)?.name}
                                 </span>
                             ))}
                         </div>
