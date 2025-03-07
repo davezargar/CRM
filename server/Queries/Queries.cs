@@ -351,4 +351,108 @@ public class Queries
 
         return categories;
     }
+
+    public async Task<List<TicketCategoryRecord>> GetTicketCategories()
+    {
+        List<TicketCategoryRecord> ticketCategories = new();
+        await using var cmd = _db.CreateCommand("SELECT id, name, company_id FROM categories");
+        using var reader = await cmd.ExecuteReaderAsync();
+    
+        while (await reader.ReadAsync())
+        {
+            ticketCategories.Add(new TicketCategoryRecord(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2)));
+        }
+        return ticketCategories;
+    }
+
+    public async Task<Dictionary<string, List<int>>> GetAssignedCategories()
+    {
+        Dictionary<string, List<int>> assignments = new();
+        await using var cmd =
+            _db.CreateCommand(
+                "SELECT u.email, ac.category_id FROM assigned_categories ac JOIN users u ON ac.user_id = u.id");
+        using var reader = await cmd.ExecuteReaderAsync();
+
+        while (await reader.ReadAsync())
+        {
+            string email = reader.GetString(0);
+            int categoryId = reader.GetInt32(1);
+
+            if (!assignments.ContainsKey(email))
+                assignments.Add(email, new List<int>());
+
+            assignments[email].Add(categoryId);
+        }
+
+        return assignments;
+    }
+
+    public async Task<bool> AssignCategoriesToWorkers(Dictionary<string, List<int>> assignments)
+    {
+        try
+        {
+            await using var connection = await _db.OpenConnectionAsync(); 
+            await using var transaction = await connection.BeginTransactionAsync(); 
+
+            foreach (var entry in assignments)
+            {
+                string workerEmail = entry.Key;
+                List<int> categoryIds = entry.Value;
+
+                
+                await using var getUserCmd = connection.CreateCommand();
+                getUserCmd.CommandText = "SELECT id FROM users WHERE email = $1";
+                getUserCmd.Parameters.AddWithValue(workerEmail);
+                await using var reader = await getUserCmd.ExecuteReaderAsync();
+
+                if (!reader.Read())
+                    continue;
+
+                int userId = reader.GetInt32(0);
+                await reader.CloseAsync();
+
+                
+                await using var deleteCmd = connection.CreateCommand();
+                deleteCmd.CommandText = "DELETE FROM assigned_categories WHERE user_id = $1";
+                deleteCmd.Parameters.AddWithValue(userId);
+                await deleteCmd.ExecuteNonQueryAsync();
+
+                
+                foreach (var categoryId in categoryIds)
+                {
+                    await using var insertCmd = connection.CreateCommand();
+                    insertCmd.CommandText = "INSERT INTO assigned_categories (user_id, category_id) VALUES ($1, $2)";
+                    insertCmd.Parameters.AddWithValue(userId);
+                    insertCmd.Parameters.AddWithValue(categoryId);
+                    await insertCmd.ExecuteNonQueryAsync();
+                }
+            }
+
+            await transaction.CommitAsync(); 
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error assigning tickets: " + ex);
+            return false;
+        }
+    }
+    
+    public async Task<bool> CreateCategory(string name, int companyId)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("INSERT INTO categories (name, company_id) VALUES ($1, $2)");
+            cmd.Parameters.AddWithValue(name);
+            cmd.Parameters.AddWithValue(companyId);
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error creating category: " + ex);
+            return false;
+        }
+    }
+
 }
