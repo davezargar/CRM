@@ -79,6 +79,7 @@ export function AssignTickets() {
     return (
         <div className="assign-tickets-container">
             <h1>Assign Tickets</h1>
+            <CreateCategory onCategoryAdded={() => window.location.reload()} />
             <div className="categories">
                 <h2>Drag Categories:</h2>
                 {categories.map((category) => (
