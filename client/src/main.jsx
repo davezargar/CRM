@@ -9,6 +9,7 @@ import TicketDetailed from "./TicketDetailed.jsx";
 import { AddRemoveWorkers, AdminPanel } from './adminPanel';
 import { AddWorker, RemoveWorker } from './adminPanel';
 
+import CustomerTicket from "./CustomerTicket";
 import CustomerPanel from "./CustomerPanel";
 import { CreateTicket, CreateIkeaTicket, CreateMikromjukTicket} from "./CreateTicket";
 
@@ -29,7 +30,7 @@ function App() {
             <Routes>
                 <Route index element={<Index />} />
                 <Route path={"/customer-panel"} element={<CustomerPanel />} />
-
+                <Route path={"/customer-panel/tickets/:ticketId"} element={<CustomerTicket />}/>
                 <Route path={"/customer-service-panel"} element={<CustomerServicePanel />}>
                     <Route path={"/customer-service-panel/tickets"} element={<TicketDisplayActive />} /> {/*Should default to this path dont know how*/}
                     <Route path={"/customer-service-panel/tickets/:ticketId"} element={<TicketDetailed />} />
