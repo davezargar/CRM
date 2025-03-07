@@ -22,6 +22,7 @@ function TicketDisplayActive()
 
 function TicketTable({refresh, tickets, setTickets}) {
     const navigate = useNavigate();
+    const [sortId, setSortId] = useState("desc");
 
     useEffect(()=>{
         fetch("/api/tickets")
@@ -43,12 +44,24 @@ function TicketTable({refresh, tickets, setTickets}) {
         let id = e.currentTarget.children[0].innerText;
         navigate("./" + id);
     }
+
+    function sortById()
+    {
+        const sortedTickets = [...tickets].sort((a, b) =>
+        sortId === "desc" ? a.ticketId - b.ticketId : b.ticketId - a.ticketId
+    );
+        setTickets(sortedTickets);
+        setSortId(sortId === "desc" ? "asc" : "desc");
+    
+    }
     
     return <div id={"ticketTableContainer"}>
         <table>
             <thead>
                 <tr>
-                    <th className={"ticket-id"}>ID</th>
+                    <th>
+                        <button className={"ticket-id"} onClick={sortById}>{sortId === "desc" ? "ID↑" : "ID↓"}</button>
+                    </th>
                     <th className={"category"}>Category</th>
                     <th className={"subcategory"}>Subcategory</th>
                     <th className={"title"}>Title</th>

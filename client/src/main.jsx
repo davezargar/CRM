@@ -10,8 +10,9 @@ import { AddRemoveWorkers, AdminPanel } from './adminPanel';
 import { AddWorker, RemoveWorker } from './adminPanel';
 import { AssignTickets} from "./AssignTickets.jsx";
 
+import CustomerTicket from "./CustomerTicket";
 import CustomerPanel from "./CustomerPanel";
-import CreateTicket from "./CreateTicket";
+import { CreateTicket, CreateIkeaTicket, CreateMikromjukTicket} from "./CreateTicket";
 
 import "./style/Login.css";
 import CreateAccount from "./CreateAccount.jsx";
@@ -30,7 +31,7 @@ function App() {
             <Routes>
                 <Route index element={<Index />} />
                 <Route path={"/customer-panel"} element={<CustomerPanel />} />
-
+                <Route path={"/customer-panel/tickets/:ticketId"} element={<CustomerTicket />}/>
                 <Route path={"/customer-service-panel"} element={<CustomerServicePanel />}>
                     <Route path={"/customer-service-panel/tickets"} element={<TicketDisplayActive />} /> {/*Should default to this path dont know how*/}
                     <Route path={"/customer-service-panel/tickets/:ticketId"} element={<TicketDetailed />} />
@@ -45,7 +46,10 @@ function App() {
                 </Route>
                 
 
-                <Route path="/create-ticket" element={<CreateTicket />} />
+                <Route path="/create-ticket">
+                    <Route path={"ikea-form"} element={<CreateIkeaTicket/>}/>
+                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket/>}/>
+                </Route>
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/customers" element={<CreateAccount />} />
             </Routes>
@@ -56,8 +60,18 @@ function App() {
 function Index() {
     return <div>
         <LoginForm />
+        <TicketForms />
     </div>
 }
+
+function TicketForms(){
+    
+    return <div id={"ticket-forms-nav"}>
+        <NavLink to={"/create-ticket/ikea-form"}><button type="button">ikea form</button>></NavLink>
+        <NavLink to={"/create-ticket/mikromjuk-form"}><button type="button">mikromjuk form</button>></NavLink>
+    </div>
+}
+
 
 function LoginForm() {
     const navigate = useNavigate();
