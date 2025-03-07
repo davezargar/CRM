@@ -383,4 +383,24 @@ public class Queries
             return false;
         }
     }
+    
+    public async Task<bool> CreateCategory(string name, int companyId)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand("INSERT INTO categories (name, company_id) VALUES ($1, $2)");
+            cmd.Parameters.AddWithValue(name);
+            cmd.Parameters.AddWithValue(companyId);
+            await cmd.ExecuteNonQueryAsync();
+
+            Console.WriteLine($"Category '{name}' inserted for company ID {companyId} successfully.");
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error creating category: " + ex);
+            return false;
+        }
+    }
+
 }

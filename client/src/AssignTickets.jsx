@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import "./style/assignTickets.css";
+import { CreateCategory} from "./CreateCategory.jsx";
 
 export function AssignTickets() {
     const [workers, setWorkers] = useState([]);
     const [categories, setCategories] = useState([]);
     const [assignments, setAssignments] = useState({});
+    const [selectedCategory, setSelectedCategory] = useState(null);
 
     useEffect(() => {
         async function fetchData() {
@@ -20,10 +22,6 @@ export function AssignTickets() {
                 const workersData = await workersResponse.json();
                 const categoriesData = await categoriesResponse.json();
                 const assignmentsData = await assignmentsResponse.json();
-
-                console.log("Workers:", workersData);
-                console.log("Categories:", categoriesData);
-                console.log("Assignments:", assignmentsData);
 
                 setWorkers(workersData);
                 setCategories(categoriesData);
@@ -44,11 +42,25 @@ export function AssignTickets() {
         const categoryId = parseInt(event.dataTransfer.getData("categoryId"));
         setAssignments((prev) => ({
             ...prev,
-            [workerEmail]: [...new Set([...prev[workerEmail] || [], categoryId])], // Avoid duplicates
+            [workerEmail]: [...new Set([...(prev[workerEmail] || []), categoryId])],
         }));
     };
 
     const handleDragOver = (event) => event.preventDefault();
+
+    const handleCategoryClick = (workerEmail, categoryId) => {
+        if (selectedCategory?.workerEmail === workerEmail && selectedCategory?.categoryId === categoryId) {
+            
+            setAssignments((prev) => ({
+                ...prev,
+                [workerEmail]: prev[workerEmail].filter((id) => id !== categoryId),
+            }));
+            setSelectedCategory(null);
+        } else {
+            
+            setSelectedCategory({ workerEmail, categoryId });
+        }
+    };
 
     const handleSaveAssignments = async () => {
         try {
@@ -92,7 +104,15 @@ export function AssignTickets() {
                         <h3>{worker.email}</h3>
                         <div className="assigned-categories">
                             {(assignments[worker.email] || []).map((categoryId, idx) => (
-                                <span key={idx} className="assigned-category">
+                                <span
+                                    key={idx}
+                                    className={`assigned-category ${
+                                        selectedCategory?.workerEmail === worker.email && selectedCategory?.categoryId === categoryId
+                                            ? "selected"
+                                            : ""
+                                    }`}
+                                    onClick={() => handleCategoryClick(worker.email, categoryId)}
+                                >
                                     {categories.find((cat) => cat.id === categoryId)?.name}
                                 </span>
                             ))}

@@ -206,6 +206,37 @@ app.MapGet("/api/categories", async () =>
     return Results.Ok(categories);
 });
 
+app.MapPost("/api/categories", async (HttpContext context) =>
+{
+    try
+    {
+        var requestBody = await context.Request.ReadFromJsonAsync<CategoryRequest>();
+
+        if (requestBody == null || string.IsNullOrWhiteSpace(requestBody.Name))
+        {
+            return Results.BadRequest("Category name cannot be empty.");
+        }
+
+        Console.WriteLine($"Received category '{requestBody.Name}' for company ID {requestBody.CompanyId}"); // for debugging
+
+        bool success = await queries.CreateCategory(requestBody.Name, requestBody.CompanyId);
+
+        if (!success)
+        {
+            Console.WriteLine("Failed to insert category into DB.");
+            return Results.Problem("Failed to add category.");
+        }
+
+        Console.WriteLine("Category successfully added!");
+        return Results.Ok(new { message = "Category added!" });
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in /api/categories: {ex.Message}");
+        return Results.Problem("Internal server error.");
+    }
+});
+
 app.MapGet("/api/assign-tickets", async () =>
 {
     var assignments = await queries.GetAssignedCategories();
@@ -224,6 +255,7 @@ app.MapPost("/api/assign-tickets", async (HttpContext context) =>
     bool success = await queries.AssignCategoriesToWorkers(assignments);
     return success ? Results.Ok(new { message = "Assignments saved!" }) : Results.Problem("Failed to assign tickets.");
 });
+
 
 app.MapPost("/api/customers", async (HttpContext context) =>
 {
