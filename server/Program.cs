@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Diagnostics;
 using server;
+using server.Classes;
+using server.Config;
 using server.Queries;
 using server.Records;
+using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +30,19 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+
+var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>();
+
+if (emailSettings != null)
+{
+    builder.Services.AddSingleton(emailSettings);
+}
+else
+{
+    throw new InvalidOperationException("Email settings are not right");
+}
+
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
@@ -58,6 +74,26 @@ app.Use(
 );
 
 #region Routes
+
+app.MapPost("/api/email", SendEmail);
+
+static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
+{
+    Console.WriteLine("Send email is called... Sending email now");
+
+    await email.SendEmailAsync(request.To, request.Subject, request.Body);
+
+    Console.WriteLine(
+        "Email sent to: "
+            + request.To
+            + " with subject: "
+            + request.Subject
+            + " and body: "
+            + request.Body
+    );
+    return Results.Ok(new { message = "Email sent." });
+}
+
 app.MapPost(
     "/api/workers",
     async (HttpContext context) =>
@@ -296,12 +332,17 @@ app.MapPost(
     }
 );
 
-app.MapGet("/api/categories/{companyId:int}", async (HttpContext context, int companyId) =>
-{
-    List<CategoryRecord> categories = new List<CategoryRecord>( await queries.GetCategories(companyId));
+app.MapGet(
+    "/api/categories/{companyId:int}",
+    async (HttpContext context, int companyId) =>
+    {
+        List<CategoryRecord> categories = new List<CategoryRecord>(
+            await queries.GetCategories(companyId)
+        );
 
-    return Results.Ok(categories);
-});
+        return Results.Ok(categories);
+    }
+);
 
 #endregion
 
