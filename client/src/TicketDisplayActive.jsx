@@ -45,7 +45,7 @@ function TicketTable({refresh, tickets, setTickets}) {
         navigate("./" + id);
     }
 
-    function sortById()
+    function sortById() //Sorterar bara id eftersom att datum ändå blir sorterat med id.
     {
         const sortedTickets = [...tickets].sort((a, b) =>
         sortId === "desc" ? a.ticketId - b.ticketId : b.ticketId - a.ticketId

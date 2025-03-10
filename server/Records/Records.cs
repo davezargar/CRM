@@ -17,3 +17,4 @@ public record GetCustomerSupportEmail(string Email);
 public record CategoryPairs(string MainCategory, string Subcategory);
 public record CategoryRecord(string MainCategory, List<string> Subcategories);
 
+public record FeedbackRecord(int Id, int TicketId, int Rating, string Review);

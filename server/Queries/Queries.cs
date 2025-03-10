@@ -253,6 +253,23 @@ public class Queries
         }
     }
 
+    public async Task<bool> PostFeedbackTask(FeedbackRecord feedback)
+    {
+        try
+        {
+            await using var cmd = _db.CreateCommand(
+                "INSERT INTO feedback (rating, comment, written, from, target, ticket_id) VALUES ($1, $2, $3, (SELECT id FROM users WHERE email = $4)"
+            ); // QUERY NOT DONE YET NEED SLEEP
+            await cmd.ExecuteNonQueryAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Couldn't post feedback" + ex);
+            return false;
+        }
+    }
+
     public async Task<bool> PostTicketStatusTask(NewTicketStatus ticketStatus)
     {
         try

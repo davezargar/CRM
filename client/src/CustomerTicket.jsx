@@ -12,6 +12,7 @@ function CustomerTicket() {
     const [Refresh, SetRefresh] = useState(false);
 
     const [Messages, SetMessages] = useState([]);
+    const [FeedbackForm, setFeedbackForm] = useState(false);
 
     useEffect(() => {
         fetch(`/api/tickets/${ticketId}`)
@@ -37,6 +38,31 @@ function CustomerTicket() {
         }
     }
 
+    function handleSubmitFeedback(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const feedbackData = {
+            rating: formData.get("rating"),
+            comment: formData.get("comment"),
+            ticketId
+        };
+
+        fetch("/api/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(feedbackData)
+        })
+        .then(response => {
+            if (!response.ok) throw new Error("Failed to submit feedback");
+            alert("Thank you for your feedback!");
+            setFeedbackForm(false);
+        })
+        .catch(error => {
+            console.error(error);
+            alert("Could not submit feedback");
+        });
+    }
+
     return <div id={"ticket-detailed"}>
         <div className="info">
             <ul id={"information"}>
@@ -58,6 +84,41 @@ function CustomerTicket() {
                 <p className={"timeposted"}>{datetimeFormatter(Ticket.timePosted)}</p>
             </li>
         </ul>
+
+        {Ticket.timeClosed && (
+            <div className="feedbackContainer">
+                <button className="feedbackBtn" onClick={() => setFeedbackForm(true)}>Give Feedback</button>
+            </div>
+        )}
+
+        {showFeedbackPopup && (
+            <div className="popup">
+                <div className="popup-content">
+                    <h3>Provide Feedback</h3>
+                    <form onSubmit={handleSubmitFeedback}>
+                        <label>
+                            Rating:
+                            <select name="rating" required>
+                                <option value="5">★★★★★</option>
+                                <option value="4">★★★★☆</option>
+                                <option value="3">★★★☆☆</option>
+                                <option value="2">★★☆☆☆</option>
+                                <option value="1">★☆☆☆☆</option>
+                            </select>
+                        </label>
+
+                        <label>
+                            Comments:
+                            <textarea name="comment" rows="4" required></textarea>
+                        </label>
+
+                        <button type="submit">Submit Feedback</button>
+                        <button type="button" onClick={() => setFeedbackForm(false)}>Cancel</button>
+                    </form>
+                </div>
+            </div>
+        )}
+
         <div className="messageContainer">
             <ul id={"messageList"}>
                 {Messages.map((Message =>
@@ -71,13 +132,13 @@ function CustomerTicket() {
                 ))}
             </ul>
         </div>
-        <MessageBox ticket_Id={1}></MessageBox>
+        <MessageBox ticket_Id={ticketId}></MessageBox>
     </div>
 }
 
 function MessageList({ Messages }) {
 
-    
+
     return <ul id={"messageList"}>
         {Messages.map((Message =>
             <li key={Message.messageId}>

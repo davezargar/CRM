@@ -270,6 +270,18 @@ app.MapPost(
     }
 );
 
+app.MapPost(
+    "/api/feedback",
+    async (HttpContext context) =>
+    {
+            var requestBody = await context.Request.ReadFromJsonAsync<FeedbackRecord>();
+            if (requestBody == null)
+    {
+        return Results.BadRequest("Invalid feedback data");
+    }
+    return Results.Ok(new { message = "Feedback submitted successfully" });
+    });
+
 app.MapGet("/api/ticket-categories", async () =>
 {
     var categories = await queries.GetTicketCategories();
