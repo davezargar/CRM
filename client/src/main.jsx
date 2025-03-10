@@ -10,10 +10,11 @@ import { AddRemoveWorkers, AdminPanel } from './adminPanel';
 import { AddWorker, RemoveWorker } from './adminPanel';
 
 import CustomerPanel from "./CustomerPanel";
-import { CreateTicket, CreateIkeaTicket, CreateMikromjukTicket} from "./CreateTicket";
+import CreateTicket from "./CreateTicket";
 
 import "./style/Login.css";
 import CreateAccount from "./CreateAccount.jsx";
+import ChangePassword from './ChangePassword.jsx';
 
 export const RoleContext = createContext({});
 
@@ -36,19 +37,17 @@ function App() {
                     {/*Route account settings*/}
                 </Route>
 
-                <Route path='/admin-panel' element={<AdminPanel/>} >
-                    <Route index element={<AddRemoveWorkers/>}/>
-                    <Route path='add-worker' element={<AddWorker/>}/>
-                    <Route path='remove-worker' element={<RemoveWorker/>} />
+                <Route path='/admin-panel' element={<AdminPanel />} >
+                    <Route index element={<AddRemoveWorkers />} />
+                    <Route path='add-worker' element={<AddWorker />} />
+                    <Route path='remove-worker' element={<RemoveWorker />} />
+                    <Route path='change-password' element={<ChangePassword />} />
                 </Route>
-                
 
-                <Route path="/create-ticket">
-                    <Route path={"ikea-form"} element={<CreateIkeaTicket/>}/>
-                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket/>}/>
-                </Route>
+
+                <Route path="/create-ticket" element={<CreateTicket />} />
                 <Route path="/register" element={<RegisterForm />} />
-                <Route path="/customers" element={<CreateAccount />} />
+                <Route path="/Customers" element={<CreateAccount />} />
             </Routes>
         </BrowserRouter>
     </RoleContext.Provider>
@@ -57,18 +56,8 @@ function App() {
 function Index() {
     return <div>
         <LoginForm />
-        <TicketForms />
     </div>
 }
-
-function TicketForms(){
-    
-    return <div id={"ticket-forms-nav"}>
-        <NavLink to={"/create-ticket/ikea-form"}><button type="button">ikea form</button>></NavLink>
-        <NavLink to={"/create-ticket/mikromjuk-form"}><button type="button">mikromjuk form</button>></NavLink>
-    </div>
-}
-
 
 function LoginForm() {
     const navigate = useNavigate();
@@ -100,7 +89,7 @@ function LoginForm() {
                     case "admin":
                         navigate("/admin-panel");
                         break;
-                    case "support":
+                    case "customerService":
                         navigate("/customer-service-panel/tickets");
                         break;
                 }
@@ -111,7 +100,7 @@ function LoginForm() {
     return <form className='formContainer' onSubmit={verifyLogin}>
         <div className='registerCon'>
             <p>Don't have an account?</p>
-            <NavLink to="/customers">
+            <NavLink to="/Customers">
                 <button type="button">Register here!</button>
             </NavLink></div>
         <div className="inputCon">
