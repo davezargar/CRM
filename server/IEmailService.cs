@@ -20,11 +20,12 @@ public class EmailService : IEmailService
     {
         var email = new MimeMessage
         {
-            From = { MailboxAddress.Parse(_settings.FromEmail) },
-            To = { MailboxAddress.Parse(to) },
             Subject = subject,
             Body = new TextPart("html") { Text = body },
         };
+
+        email.From.Add(MailboxAddress.Parse(_settings.FromEmail));
+        email.To.Add(MailboxAddress.Parse(to));
 
         using var smtp = new SmtpClient();
 

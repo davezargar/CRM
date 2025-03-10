@@ -75,6 +75,8 @@ app.Use(
 
 #region Routes
 
+
+
 app.MapPost("/api/email", SendEmail);
 
 static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
@@ -96,7 +98,7 @@ static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
 
 app.MapPost(
     "/api/workers",
-    async (HttpContext context) =>
+    async (HttpContext context, IEmailService email) =>
     {
         var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
         if (requestBody == null)
@@ -121,6 +123,14 @@ app.MapPost(
         {
             Results.Problem("Failed to add worker");
         }
+
+        var emailRequest = new EmailRequest(
+            requestBody.Email,
+            "Change Password",
+            $"Hello, {requestBody.Email}, \n\nYour account have registered. \nYour default password is {defaultPassWord}.\nPlease press the link to change password"
+        );
+
+        await email.SendEmailAsync(emailRequest.To, emailRequest.Subject, emailRequest.Body);
 
         return Results.Ok(new { message = "Valid mail" });
     }
