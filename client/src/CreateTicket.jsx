@@ -97,7 +97,7 @@ export function CreateTicket() {
     );
 }
 */
-export function CreateIkeaTicket(){
+export function CreateIkeaTicket() {
     const [formData, setFormData] = useState({
         CategoryName: "",
         SubcategoryName: "",
@@ -107,16 +107,16 @@ export function CreateIkeaTicket(){
         CompanyFk: 1, //set company for current form
     });
 
-    
-    
-    function getCategories(){
-        
+
+
+    function getCategories() {
+
     }
-    
+
     const [categories, setCategories] = useState([]);
     const [subcategories, setSubcategories] = useState([]);
 
-    useEffect(()=>{
+    useEffect(() => {
         fetch(`/api/categories/${formData.CompanyFk}`)
             .then(response => response.json())
             .then(data => {
@@ -126,22 +126,20 @@ export function CreateIkeaTicket(){
                 setCategories(data);
             });
     }, []);
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
     };
 
-    
-    useEffect(()=>{
-        for(let i = 0; i < categories.length; i++)
-        {
-            if(categories[i].mainCategory === formData.CategoryName)
-            {
+
+    useEffect(() => {
+        for (let i = 0; i < categories.length; i++) {
+            if (categories[i].mainCategory === formData.CategoryName) {
                 setSubcategories(categories[i].subcategories);
             }
         }
     }, [formData]);
-    
+
 
     const handleChange = (e) => {
         const { id, value } = e.target;
@@ -156,7 +154,7 @@ export function CreateIkeaTicket(){
             <h1>Create Ticket</h1>
             <form id="formId" onSubmit={handleSubmit}>
                 <h3>Category (temp data)</h3>
-                
+
                 <select required id="CategoryName" value={formData.CategoryName} onChange={handleChange}>
                     {categories.map((category =>
                         <option key={category.mainCategory} value={category.mainCategory}>{category.mainCategory}</option>
@@ -234,7 +232,7 @@ export function CreateMikromjukTicket() {
 
 
     const handleChange = (e) => {
-        const {id, value} = e.target;
+        const { id, value } = e.target;
         setFormData((prevData) => ({
             ...prevData,
             [id]: value,
@@ -249,11 +247,11 @@ export function CreateMikromjukTicket() {
 
                 <select required id="CategoryName" value={formData.CategoryName} onChange={handleChange}>
                     {categories.map((category =>
-                            <option key={category.mainCategory}
-                                    value={category.mainCategory}>{category.mainCategory}</option>
+                        <option key={category.mainCategory}
+                            value={category.mainCategory}>{category.mainCategory}</option>
                     ))}
                 </select>
-                <br/>
+                <br />
                 <h3>Subcategory (temp data)</h3>
                 <select required id="SubcategoryName" value={formData.SubcategoryName} onChange={handleChange}>
                     {subcategories.map((sub) => (
@@ -263,7 +261,7 @@ export function CreateMikromjukTicket() {
                     ))}
                 </select>
                 <h3>Title</h3>
-                <input type="text" id="Title" value={formData.Title} onChange={handleChange}/>
+                <input type="text" id="Title" value={formData.Title} onChange={handleChange} />
                 <h3>Message</h3>
                 <textarea
                     id="Message"
@@ -273,8 +271,8 @@ export function CreateMikromjukTicket() {
                     onChange={handleChange}
                 ></textarea>
                 <h3>Enter email:</h3>
-                <input type="text" id="UserEmail" value={formData.UserEmail} onChange={handleChange}/>
-                <br/>
+                <input type="text" id="UserEmail" value={formData.UserEmail} onChange={handleChange} />
+                <br />
                 <button type="submit">Create Ticket</button>
             </form>
         </div>

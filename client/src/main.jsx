@@ -10,7 +10,7 @@ import { AddRemoveWorkers, AdminPanel } from './adminPanel';
 import { AddWorker, RemoveWorker } from './adminPanel';
 
 import CustomerPanel from "./CustomerPanel";
-import CreateTicket from "./CreateTicket";
+/* import CreateTicket from "./CreateTicket"; */
 
 import "./style/Login.css";
 import CreateAccount from "./CreateAccount.jsx";
@@ -45,7 +45,7 @@ function App() {
                 </Route>
 
 
-                <Route path="/create-ticket" element={<CreateTicket />} />
+                {/*<Route path="/create-ticket" element={<CreateTicket />} />*/}
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/Customers" element={<CreateAccount />} />
             </Routes>
