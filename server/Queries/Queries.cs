@@ -1,12 +1,11 @@
 using System.ComponentModel.Design;
+using System.ComponentModel.Design;
+using System.Data;
 using System.Linq.Expressions;
 using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using Npgsql;
 using server.Records;
-using System.ComponentModel.Design;
-using System.Data;
-
 
 namespace server.Queries;
 
@@ -17,6 +16,49 @@ public class Queries
     public Queries(NpgsqlDataSource db)
     {
         _db = db;
+    }
+
+    public async Task<bool> StoreResetToken(string email, string token)
+    {
+        try
+        {
+            await using var getUserIdCmd = _db.CreateCommand(
+                "SELECT id from users WHERE email = $1"
+            );
+            getUserIdCmd.Parameters.AddWithValue(email);
+            Console.WriteLine(email);
+            Console.WriteLine(token);
+
+            object? result = await getUserIdCmd.ExecuteScalarAsync();
+            if (result is null)
+            {
+                return false;
+            }
+
+            int userId = (int)result;
+
+            Console.WriteLine(userId);
+
+            if (userId == 0 || string.IsNullOrEmpty(token))
+            {
+                Console.WriteLine("Invalid userId or token");
+                return false;
+            }
+
+            await using var cmd = _db.CreateCommand(
+                "INSERT INTO reset_tokens (user_id, token) VALUES ($1, $2)"
+            );
+            cmd.Parameters.AddWithValue(userId);
+            cmd.Parameters.AddWithValue(token);
+
+            int rowsAffected = await cmd.ExecuteNonQueryAsync();
+            return rowsAffected > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in StoreResetToken: {ex.Message}");
+            return false;
+        }
     }
 
     public async Task<(bool, string)> VerifyLoginTask(string email, string password)
@@ -317,21 +359,20 @@ public class Queries
     {
         List<CategoryPairs> categoryPairs = new List<CategoryPairs>();
         List<CategoryRecord> categories = new List<CategoryRecord>();
-        
-        await using var cmd = _db.CreateCommand("SELECT categories.name, subcategories.name FROM categories " +
-                                                "INNER JOIN subcategories ON categories.id = subcategories.main_category_id WHERE company_id = $1");
+
+        await using var cmd = _db.CreateCommand(
+            "SELECT categories.name, subcategories.name FROM categories "
+                + "INNER JOIN subcategories ON categories.id = subcategories.main_category_id WHERE company_id = $1"
+        );
         cmd.Parameters.AddWithValue(companyId);
         using var reader = await cmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
-            categoryPairs.Add(new CategoryPairs (
-                reader.GetString(0),
-                reader.GetString(1)
-             ));
+            categoryPairs.Add(new CategoryPairs(reader.GetString(0), reader.GetString(1)));
         }
-        
-        List<string> buffer = new List<string>(); 
+
+        List<string> buffer = new List<string>();
         string categoryPrevious = categoryPairs[0].MainCategory;
         foreach (var categoryPair in categoryPairs)
         {
@@ -341,7 +382,7 @@ public class Queries
                 categoryPrevious = categoryPair.MainCategory;
                 continue;
             }
-            
+
             categories.Add(new CategoryRecord(categoryPrevious, new List<string>(buffer)));
             categoryPrevious = categoryPair.MainCategory;
             buffer.Clear();

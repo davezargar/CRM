@@ -124,10 +124,21 @@ app.MapPost(
             Results.Problem("Failed to add worker");
         }
 
+        string token = Guid.NewGuid().ToString();
+
+        bool successToken = await queries.StoreResetToken(requestBody.Email, token);
+
+        if (!successToken)
+        {
+            Results.Problem("Failed to store reset token");
+        }
+
+        string resetLink = $"http://localhost:5174/admin-panel/change-password/{token}";
+
         var emailRequest = new EmailRequest(
             requestBody.Email,
             "Change Password",
-            $"Hello, {requestBody.Email}, \n\nYour account have registered. \nYour default password is {defaultPassWord}.\nPlease press the link to change password"
+            $"Hello, {requestBody.Email}, \n\nYour account have registered. \nYour default password is {defaultPassWord}.\nPlease press the link to change password. \n{resetLink}"
         );
 
         await email.SendEmailAsync(emailRequest.To, emailRequest.Subject, emailRequest.Body);
