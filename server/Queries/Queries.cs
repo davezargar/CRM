@@ -6,6 +6,7 @@ using Npgsql;
 using server.Records;
 using System.ComponentModel.Design;
 using System.Data;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 
 
 namespace server.Queries;
@@ -107,30 +108,59 @@ public class Queries
         }
     }
 
-    public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
+    public async Task<int> CreateTicketTask(NewTicketRecord ticketMessages)
     {
         try
         {
-            await using var cmd = _db.CreateCommand(
-                "WITH ticketIns AS (INSERT INTO tickets(category_id, subcategory_id, title, user_id, company_id) "
-                    + "values((SELECT id FROM categories WHERE name = $1 AND company_id = $6), (SELECT id FROM subcategories WHERE name = $2 AND main_category_id = (SELECT id FROM categories WHERE name = $1 AND company_id = $6)), $3, (SELECT id FROM users WHERE email = $4 AND company_id = $6), $6) returning id) "
-                    + "INSERT INTO messages(title, message, ticket_id, user_id) "
-                    + "values ($3, $5, (SELECT id FROM ticketIns), (SELECT id FROM users WHERE email = $4 AND company_id = $6))"
-            );
-            cmd.Parameters.AddWithValue(ticketMessages.CategoryName); //$1
-            cmd.Parameters.AddWithValue(ticketMessages.SubcategoryName); //$2
-            cmd.Parameters.AddWithValue(ticketMessages.Title); //$3
-            cmd.Parameters.AddWithValue(ticketMessages.UserEmail); //$4
-            cmd.Parameters.AddWithValue(ticketMessages.Message); //$5
-            cmd.Parameters.AddWithValue(ticketMessages.CompanyFk); //$6
-            await cmd.ExecuteNonQueryAsync();
-            return true;
+            Console.WriteLine("running insert now!");
+            await using var cmd1 = _db.CreateCommand(
+                "INSERT INTO tickets(category_id, subcategory_id, title, user_id, company_id) " +
+                "values((SELECT id FROM categories WHERE name = $1 AND company_id = $5), (SELECT id FROM subcategories WHERE name = $2 AND " +
+                "main_category_id = (SELECT id FROM categories WHERE name = $1 AND company_id = $5)), $3, (SELECT id FROM users WHERE email = $4 AND " +
+                "company_id = $5), $5) RETURNING id");
+            cmd1.Parameters.AddWithValue(ticketMessages.CategoryName); //$1
+            cmd1.Parameters.AddWithValue(ticketMessages.SubcategoryName); //$2
+            cmd1.Parameters.AddWithValue(ticketMessages.Title); //$3
+            cmd1.Parameters.AddWithValue(ticketMessages.UserEmail); //$4
+            cmd1.Parameters.AddWithValue(ticketMessages.CompanyFk); //$5
+            int ticketid =  (int?) await cmd1.ExecuteScalarAsync() ?? -1;
+            
+            Console.WriteLine("generated ticket, id: " + ticketid.ToString());
+
+            if (ticketid == -1)
+                return ticketid;
+
+            await using var cmd2 = _db.CreateCommand(
+                "INSERT INTO messages(title, message, ticket_id, user_id) " +
+                "values ($1, $4, $5, (SELECT id FROM users WHERE email = $2 AND company_id = $3))");
+            cmd2.Parameters.AddWithValue(ticketMessages.Title);     //$1
+            cmd2.Parameters.AddWithValue(ticketMessages.UserEmail); //$2
+            cmd2.Parameters.AddWithValue(ticketMessages.CompanyFk); //$3
+            cmd2.Parameters.AddWithValue(ticketMessages.Message);   //$4
+            cmd2.Parameters.AddWithValue(ticketid);                 //$5
+            int rows = await cmd2.ExecuteNonQueryAsync();
+            if (rows <= 0)
+                return -1;
+            return ticketid;
+                
+            
+            
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error creating ticket" + ex);
-            return false;
+            return -1;
         }
+    }
+
+    public async Task<bool> InsertTicketLink(int id, string token)
+    {
+        await using var cmd = _db.CreateCommand("INSERT INTO ticket_access_links (ticket_id, access_link) " +
+            "VALUES ($1, $2)");
+        cmd.Parameters.AddWithValue(id);
+        cmd.Parameters.AddWithValue(token);
+
+        return (await cmd.ExecuteNonQueryAsync() > 0);
     }
 
     public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag

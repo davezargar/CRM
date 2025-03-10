@@ -178,13 +178,29 @@ app.MapPost(
     "/api/tickets",
     async (HttpContext context) =>
     {
-        NewTicketRecord ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
+        static string GenerateUniqueTicketLink()
+        {
 
+            using var rng = RandomNumberGenerator.Create();
+            var bytes = new byte[20];
+            rng.GetBytes(bytes);
+            return Convert.ToBase64String(bytes).TrimEnd('=');
+        }
         //if (ticketRequest == null)
         //return Results.BadRequest();
-        bool success = await queries.CreateTicketTask(ticketRequest);
-
-        return Results.Ok(success);
+        NewTicketRecord? ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
+        if (ticketRequest is null)
+            return Results.BadRequest();
+        
+        int ticketId = await queries.CreateTicketTask(ticketRequest);
+        string token = GenerateUniqueTicketLink();
+        while (!await queries.InsertTicketLink(ticketId, token))
+        {
+            token = GenerateUniqueTicketLink();
+        } 
+        
+        Console.WriteLine("http://localhost:5173/tickets/" + ticketId + "&token=" + token);
+        return Results.Ok();
     }
 );
 
