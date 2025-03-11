@@ -1,5 +1,6 @@
 using System.Security.AccessControl;
 using System.Security.Cryptography;
+using System.Text.Json;
 using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -190,6 +191,15 @@ app.MapGet(
         }
     }
 );
+
+app.MapPut("/api/workers", async (HttpContext context) =>
+{
+    var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+
+    var json = JsonSerializer.Deserialize<JsonElement>(requestBody);
+    var password = json.GetProperty("password").GetString();
+    var token = json.GetProperty("token").GetString();
+})
 
 app.MapPost(
     "/api/login",

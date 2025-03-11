@@ -5,6 +5,7 @@ export default ChangePassword;
 function ChangePassword() {
     const [checkPassword, setCheckPassword] = useState("");
     const [password, setPassword] = useState("");
+    const token = new URLSearchParams(window.location.search).get('token');
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -16,14 +17,13 @@ function ChangePassword() {
             return;
         }
 
-
         try {
-            const response = await fetch("", {
-                method: "POST",
+            const response = await fetch("/api/workers", {
+                method: "PUT",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify({ password }),
+                body: JSON.stringify({ password, token }),
             });
             if (!response.ok) {
                 throw new Error("Something went wrong with updating password");
