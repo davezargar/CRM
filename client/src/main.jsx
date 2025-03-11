@@ -45,7 +45,8 @@ function App() {
                     <Route path='assign-tickets' element={<AssignTickets/>} />
                 </Route>
                 
-
+                <Route path={"/tickets/:ticketId/:token?"} element={<TicketDetailed />} />
+                
                 <Route path="/create-ticket">
                     <Route path={"ikea-form"} element={<CreateIkeaTicket/>}/>
                     <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket/>}/>
