@@ -133,12 +133,12 @@ app.MapPost(
             Results.Problem("Failed to store reset token");
         }
 
-        string resetLink = $"http://localhost:5174/admin-panel/change-password/{token}";
+        string resetLink = $"http://localhost:5174/admin-panel/change-password/?token={token}";
 
         var emailRequest = new EmailRequest(
             requestBody.Email,
             "Change Password",
-            $"Hello, {requestBody.Email}, \n\nYour account have registered. \nYour default password is {defaultPassWord}.\nPlease press the link to change password. \n{resetLink}"
+            $"Hello, {requestBody.Email}, \n\nYour account have registered. \nYour default password is {defaultPassWord}.\nPlease press the link to change password: \n<a href='{resetLink}'>Change Password</a>"
         );
 
         await email.SendEmailAsync(emailRequest.To, emailRequest.Subject, emailRequest.Body);
