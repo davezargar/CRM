@@ -192,14 +192,32 @@ app.MapGet(
     }
 );
 
-app.MapPut("/api/workers", async (HttpContext context) =>
-{
-    var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
+app.MapPut(
+    "/api/workers",
+    async (HttpContext context) =>
+    {
+        var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
 
-    var json = JsonSerializer.Deserialize<JsonElement>(requestBody);
-    var password = json.GetProperty("password").GetString();
-    var token = json.GetProperty("token").GetString();
-})
+        var json = JsonSerializer.Deserialize<JsonElement>(requestBody);
+        var password = json.GetProperty("password").GetString();
+        var token = json.GetProperty("token").GetString();
+        var (hashedPassword, salt) = PasswordHasher.HashPassword(password);
+        Console.WriteLine(hashedPassword);
+        Console.WriteLine(salt);
+        Console.WriteLine(token);
+
+        bool sucess = await queries.UpdatePasswordTask(hashedPassword, token, salt);
+
+        if (sucess)
+        {
+            return Results.Ok(new { message = "Password updated succesfully" });
+        }
+        else
+        {
+            return Results.BadRequest(new { error = "Invalid token or user not found" });
+        }
+    }
+);
 
 app.MapPost(
     "/api/login",

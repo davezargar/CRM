@@ -61,6 +61,39 @@ public class Queries
         }
     }
 
+    public async Task<bool> UpdatePasswordTask(string password, string token, string salt)
+    {
+        await using var cmd = _db.CreateCommand(
+            "SELECT user_id FROM reset_tokens WHERE token = $1"
+        );
+        cmd.Parameters.AddWithValue(token); //1
+
+        int userId = -1;
+
+        using (var reader = await cmd.ExecuteReaderAsync())
+        {
+            if (await reader.ReadAsync())
+            {
+                userId = reader.GetInt32(0);
+            }
+        }
+
+        if (userId == -1)
+        {
+            return false;
+        }
+
+        await using var cmd2 = _db.CreateCommand(
+            "UPDATE users SET password = $1, salt = $2 WHERE id = $3"
+        );
+        cmd2.Parameters.AddWithValue(password); //1
+        cmd2.Parameters.AddWithValue(salt); //2
+        cmd2.Parameters.AddWithValue(userId); //3
+
+        int rowsAffected = await cmd2.ExecuteNonQueryAsync();
+        return rowsAffected > 0;
+    }
+
     public async Task<(bool, string)> VerifyLoginTask(string email, string password)
     {
         await using var cmd = _db.CreateCommand(
