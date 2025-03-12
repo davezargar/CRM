@@ -60,31 +60,7 @@ app.Use(
 );
 
 */
-app.MapPost(
-    "/api/workers",
-    async (PasswordHasher<string> hasher, HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
-        if (requestBody == null)
-        {
-            return Results.BadRequest("Invalid email");
-        }
-        Console.WriteLine($"received email: {requestBody.Email}");
-        int companyId = requestBody.CompanyId ?? 1;
-        string defaultPassWord = "hej123";
-        string hashedPassword = hasher.HashPassword("", defaultPassWord);
-        Console.WriteLine($"hashed password: {hashedPassword}");
-
-        bool success = await queries.AddCustomerTask(requestBody.Email, companyId, hashedPassword);
-
-        if (!success)
-        {
-            Results.Problem("Failed to add worker");
-        }
-
-        return Results.Ok(new { message = "Valid mail" });
-    }
-);
+app.MapPost("/api/workers", WorkerRoutes.CreateWorker);
 
 app.MapDelete(
     "/api/workers",
