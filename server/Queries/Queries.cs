@@ -1,12 +1,7 @@
-using System.ComponentModel.Design;
-using System.Linq.Expressions;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 using Npgsql;
 using server.Records;
-using System.ComponentModel.Design;
-using System.Data;
-
+using Microsoft.AspNetCore.Identity;
 
 namespace server.Queries;
 
@@ -17,35 +12,60 @@ public class Queries
     public Queries(NpgsqlDataSource db)
     {
         _db = db;
+
     }
 
-    public async Task<(bool, string)> VerifyLoginTask(string email, string password)
+    public async Task<(bool, string, int)> VerifyLoginTask(string email, string password, PasswordHasher<string> hasher)
     {
         await using var cmd = _db.CreateCommand(
-            "SELECT password, salt, role FROM users WHERE email = $1"
+            "SELECT password, role, company_id FROM users WHERE email = $1"
         );
         cmd.Parameters.AddWithValue(email);
-        string db_salt = "";
-        string db_hashedPassword = "";
-        string db_role = "";
+        string? db_hashedPassword = null;
+        string? db_role = null;
+        int company_id = 0;
         bool verified = false;
 
         using (var reader = await cmd.ExecuteReaderAsync())
         {
             if (await reader.ReadAsync())
             {
-                db_hashedPassword = reader.GetString(0);
-                db_salt = reader.GetString(1);
-                db_role = reader.GetString(2);
+                db_role = reader.GetString(1);
+                company_id = reader.GetInt32(2);
+                if(!reader.IsDBNull(0))
+                {
+                    db_hashedPassword = reader.GetString(0);
+                    Console.WriteLine("password is read");
+                }
+                else
+                {
+                }
             }
         }
 
-        if (db_salt != "" && db_hashedPassword != "")
+        if (db_hashedPassword != null)
         {
-            verified = PasswordHasher.VerifyHashedPassword(password, db_salt, db_hashedPassword);
+            Console.WriteLine("try to verify password");
+            var result = hasher.VerifyHashedPassword("",db_hashedPassword, password);
+            if(result == PasswordVerificationResult.Failed)
+            {
+                verified = false;
+            }
+            else
+            {
+                verified = true;
+            }
+        }
+        else
+        {
+            string hashedPassword = hasher.HashPassword("",password);
+            var update_password_cmd = _db.CreateCommand("UPDATE users set password = $1 where email = $2");
+            update_password_cmd.Parameters.AddWithValue(hashedPassword);
+            update_password_cmd.Parameters.AddWithValue(email);
+            await update_password_cmd.ExecuteNonQueryAsync();
         }
 
-        return (verified, db_role);
+        return (verified, db_role,  company_id);
     }
 
     public bool IsValidEmail(string email)
@@ -57,8 +77,7 @@ public class Queries
     public async Task<bool> AddCustomerTask(
         string email,
         int companyId,
-        string defaultPassword,
-        string salt
+        string defaultPassword
     )
     {
         try
@@ -69,13 +88,11 @@ public class Queries
                 return false; // Stop and return false if email is invalid
             }
             await using var cmd = _db.CreateCommand(
-                "INSERT INTO users (email, company_id, role, password, salt) VALUES ($1, $2, $3::role, $4, $5)"
+                "INSERT INTO users (email, company_id, password) VALUES ($1, $2, $3)"
             );
             cmd.Parameters.AddWithValue(email);
             cmd.Parameters.AddWithValue(companyId);
-            cmd.Parameters.AddWithValue("support");
             cmd.Parameters.AddWithValue(defaultPassword);
-            cmd.Parameters.AddWithValue(salt);
             await cmd.ExecuteNonQueryAsync();
 
             return true;
@@ -107,7 +124,7 @@ public class Queries
         }
     }
 
-    public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
+    public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages, PasswordHasher<string> hasher)
     {
         try
         {

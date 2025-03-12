@@ -5,6 +5,7 @@ using server.Queries;
 using server.Records;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<PasswordHasher<string>>();
 
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
@@ -40,6 +41,7 @@ using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
     rng.GetBytes(iv);
 }
 
+/*
 app.Use(
     async (context, next) =>
     {
@@ -56,9 +58,10 @@ app.Use(
     }
 );
 
+*/
 app.MapPost(
     "/api/workers",
-    async (HttpContext context) =>
+    async (PasswordHasher<string> hasher, HttpContext context) =>
     {
         var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
         if (requestBody == null)
@@ -68,15 +71,13 @@ app.MapPost(
         Console.WriteLine($"received email: {requestBody.Email}");
         int companyId = requestBody.CompanyId ?? 1;
         string defaultPassWord = "hej123";
-        var (hashedPassword, salt) = PasswordHasher.HashPassword(defaultPassWord);
+        string hashedPassword = hasher.HashPassword("",defaultPassWord);
         Console.WriteLine($"hashed password: {hashedPassword}");
-        Console.WriteLine($"Salt: {salt}");
 
         bool success = await queries.AddCustomerTask(
             requestBody.Email,
             companyId,
-            hashedPassword,
-            salt
+            hashedPassword
         );
 
         if (!success)
@@ -134,20 +135,20 @@ app.MapGet(
 
 app.MapPost(
     "/api/login",
-    async (HttpContext context) =>
+    async (LoginRecord credentials,PasswordHasher<string> hasher, HttpContext context) =>
     {
-        var requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
-
-        (bool verified, string role) = await queries.VerifyLoginTask(
-            requestBody.Email,
-            requestBody.Password
+        (bool verified, string role, int company_id) = await queries.VerifyLoginTask(
+            credentials.Email,
+            credentials.Password,
+            hasher
         );
         Console.WriteLine(verified);
         if (verified)
         {
             context.Session.SetString("Authenticated", "True"); // add data to a session
-            context.Session.SetString("Email", requestBody.Email);
+            context.Session.SetString("Email", credentials.Email);
             context.Session.SetString("Role", role);
+            context.Session.SetInt32("company", company_id);
             return Results.Ok(role);
         }
         else
@@ -162,13 +163,13 @@ app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 
 app.MapPost(
     "/api/tickets",
-    async (HttpContext context) =>
+    async (PasswordHasher<string> hasher, HttpContext context) =>
     {
         NewTicketRecord ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
 
         //if (ticketRequest == null)
         //return Results.BadRequest();
-        bool success = await queries.CreateTicketTask(ticketRequest);
+        bool success = await queries.CreateTicketTask(ticketRequest, hasher);
 
         return Results.Ok(success);
     }
