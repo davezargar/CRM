@@ -157,20 +157,8 @@ app.MapPost(
     }
 );
 
-app.MapGet(
-    "/api/tickets",
-    async (HttpContext context) =>
-    {
-        string? requesterEmail = context.Session.GetString("Email");
+app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 
-        if (String.IsNullOrEmpty(requesterEmail) || context.Session.GetString("Role") == "customer")
-            return Results.Unauthorized();
-
-        List<TicketRecord> tickets = await queries.GetTicketsAll(requesterEmail);
-
-        return Results.Ok(tickets);
-    }
-);
 
 app.MapPost(
     "/api/tickets",
