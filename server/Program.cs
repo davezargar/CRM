@@ -1,10 +1,5 @@
-using System.Security.AccessControl;
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.DataProtection.XmlEncryption;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
+using Npgsql;
 using server;
 using server.Queries;
 using server.Records;
@@ -12,6 +7,10 @@ using server.Records;
 var builder = WebApplication.CreateBuilder(args);
 
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
+
+NpgsqlDataSource db = NpgsqlDataSource.Create(DotEnv.GetString("DatabaseConnectString"));
+builder.Services.AddSingleton<NpgsqlDataSource>(db);
+
 DatabaseConnection database = new();
 Queries queries = new Queries(database.Connection());
 
@@ -57,7 +56,6 @@ app.Use(
     }
 );
 
-#region Routes
 app.MapPost(
     "/api/workers",
     async (HttpContext context) =>
@@ -357,7 +355,5 @@ app.MapGet("/api/categories/{companyId:int}", async (HttpContext context, int co
 
     return Results.Ok(categories);
 });
-
-#endregion
 
 app.Run();

@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Npgsql;
+﻿using Npgsql;
 namespace server.Queries;
 
 public class DatabaseConnection
