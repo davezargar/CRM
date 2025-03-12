@@ -8,6 +8,8 @@ public static class WorkerRoutes
 {
     public record AdminRequest(string Email, int? CompanyId);
     
+    public record GetCustomerSupportEmail(string Email);
+    
     public static bool IsValidEmail(string email)
     {
         var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // En vanlig e-postformatregex
@@ -74,6 +76,33 @@ public static class WorkerRoutes
         {
             Console.WriteLine("error removing customer support worker:" + ex);
             return Results.Problem("failed to remove worker");
+        }
+    }
+
+    public static async Task<IResult> GetActiveWorkers(NpgsqlDataSource db)
+    {
+        try
+        {
+            List<GetCustomerSupportEmail> customerSupportEmails = new();
+            await using var cmd = db.CreateCommand("SELECT email FROM users WHERE role = 'support' AND active = true");
+            using var reader = await cmd.ExecuteReaderAsync();
+
+            while (await reader.ReadAsync())
+            {
+                customerSupportEmails.Add(new GetCustomerSupportEmail(reader.GetString(0)));
+            }
+
+            if (customerSupportEmails.Count == 0)
+            {
+                return Results.NotFound("no customerWorker users found");
+            }
+            return Results.Ok(customerSupportEmails);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+
+            return Results.Problem("internal error", statusCode: 500);
         }
     }
 }

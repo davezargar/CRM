@@ -135,19 +135,7 @@ public class Queries
             return false;
         }
     }
-
-    public async Task<List<GetCustomerSupportEmail>> GetCustomerSupportWorkers()
-    {
-        List<GetCustomerSupportEmail> customerSupportEmail = new();
-        await using var cmd = _db.CreateCommand("SELECT email FROM users WHERE role = 'support'");
-        using var reader = await cmd.ExecuteReaderAsync();
-
-        while (await reader.ReadAsync())
-        {
-            customerSupportEmail.Add(new GetCustomerSupportEmail(reader.GetString(0)));
-        }
-        return customerSupportEmail;
-    }
+    
 
     public async Task<bool> CustomersTask(string email, string password, int companyId)
     {

@@ -61,40 +61,18 @@ app.Use(
 
 */
 app.MapPost("/api/workers", WorkerRoutes.CreateWorker);
-
 app.MapPut("/api/workers", WorkerRoutes.InactivateWorker);
+app.MapGet("/api/workers", WorkerRoutes.GetActiveWorkers);
 
-app.MapGet(
-    "/api/workers",
-    async () =>
-    {
-        try
-        {
-            var customerSupportEmails = await queries.GetCustomerSupportWorkers();
 
-            if (customerSupportEmails == null)
-            {
-                return Results.NotFound("no customerWorker users found");
-            }
-            return Results.Ok(customerSupportEmails);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-
-            return Results.Problem("internal error", statusCode: 500);
-        }
-    }
-);
 app.MapPost("/api/login", LoginRoutes.PostLogin);
 
+
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
-
 app.MapPost("/api/tickets", TicketRoutes.PostTickets);
-
 app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
-
 app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
+
 
 app.MapPost("/api/messages", MessageRoutes.PostMessages);
 
