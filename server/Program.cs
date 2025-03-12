@@ -162,19 +162,8 @@ app.MapPost(
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 
 
-app.MapPost(
-    "/api/tickets",
-    async (PasswordHasher<string> hasher, HttpContext context) =>
-    {
-        NewTicketRecord ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
+app.MapPost("/api/tickets", TicketRoutes.PostTickets);
 
-        //if (ticketRequest == null)
-        //return Results.BadRequest();
-        bool success = await queries.CreateTicketTask(ticketRequest, hasher);
-
-        return Results.Ok(success);
-    }
-);
 
 app.MapGet(
     "/api/tickets/{ticketId:int}",

@@ -129,6 +129,24 @@ export function CreateIkeaTicket(){
     
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        try {
+            console.log(formData);
+            const response = await fetch("/api/tickets", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+            if (!response.ok) {
+                throw new Error("Something went wrong when creating ticket");
+            }
+            alert("request sent");
+        } catch (error) {
+            console.error(error);
+            alert("Couldn't create ticket.");
+        }
     };
 
     
@@ -221,6 +239,24 @@ export function CreateMikromjukTicket() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        try {
+            console.log(formData);
+            const response = await fetch("/api/tickets", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+            if (!response.ok) {
+                throw new Error("Something went wrong when creating ticket");
+            }
+            alert("request sent");
+        } catch (error) {
+            console.error(error);
+            alert("Couldn't create ticket.");
+        }
     };
 
 
