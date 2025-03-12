@@ -13,60 +13,13 @@ public class Queries
     {
         _db = db;
     }
-
+    
+    
     public bool IsValidEmail(string email)
     {
         var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // En vanlig e-postformatregex
         return Regex.IsMatch(email, emailRegex);
     }
-
-    public async Task<bool> AddCustomerTask(string email, int companyId, string defaultPassword)
-    {
-        try
-        {
-            if (!IsValidEmail(email))
-            {
-                Console.WriteLine("Invalid email format.");
-                return false; // Stop and return false if email is invalid
-            }
-            await using var cmd = _db.CreateCommand(
-                "INSERT INTO users (email, company_id, password) VALUES ($1, $2, $3)"
-            );
-            cmd.Parameters.AddWithValue(email);
-            cmd.Parameters.AddWithValue(companyId);
-            cmd.Parameters.AddWithValue(defaultPassword);
-            await cmd.ExecuteNonQueryAsync();
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("error adding customer support worker:" + ex);
-            return false;
-        }
-    }
-
-    public async Task<bool> RemoveCustomerTask(string email)
-    {
-        try
-        {
-            await using var cmd = _db.CreateCommand(
-                "UPDATE users SET active = false WHERE email = $1"
-            );
-            cmd.Parameters.AddWithValue(email);
-            int usersRowsAffected = await cmd.ExecuteNonQueryAsync();
-
-            bool success = (usersRowsAffected > 0) ? true : false;
-            return success;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("error removing customer support worker:" + ex);
-            return false;
-        }
-    }
-    
-
     public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag
     {
         List<TicketRecord> tickets = new List<TicketRecord>();

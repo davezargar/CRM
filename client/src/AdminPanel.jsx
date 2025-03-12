@@ -103,7 +103,7 @@ export function RemoveWorker() {
 
         try {
             const response = await fetch("/api/workers", {
-                method: "DELETE",
+                method: "put",
                 headers: {
                     "Content-Type": "application/json",
                 },

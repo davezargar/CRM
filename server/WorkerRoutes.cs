@@ -50,6 +50,30 @@ public static class WorkerRoutes
             return Results.Problem("Failed to add worker");
         }
     }
-    
-    
+
+    public static async Task<IResult> InactivateWorker(HttpContext context, NpgsqlDataSource db)
+    {
+        var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
+        if (requestBody == null)
+        {
+            return Results.BadRequest("Invalid email");
+        }
+        Console.WriteLine(requestBody.Email);
+        try
+        {
+            await using var cmd = db.CreateCommand(
+                "UPDATE users SET active = false WHERE email = $1"
+            );
+            cmd.Parameters.AddWithValue(requestBody.Email);
+            int usersRowsAffected = await cmd.ExecuteNonQueryAsync();
+
+            bool success = (usersRowsAffected > 0) ? true : false;
+            return Results.Ok(new { message = "Successfully removed wroker" });
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("error removing customer support worker:" + ex);
+            return Results.Problem("failed to remove worker");
+        }
+    }
 }

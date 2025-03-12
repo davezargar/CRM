@@ -21,17 +21,17 @@ Queries queries = new Queries(database.Connection());
 // a client is given a session identifier that is sent alongside a http request, server reads it and
 // accesses server stored data. Data is not sent to client
 
-builder.Services.AddDistributedMemoryCache(); //part of setting up session
+builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(600); //time until session expires, all session data is lost
+    options.IdleTimeout = TimeSpan.FromSeconds(600); 
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
 var app = builder.Build();
 
-app.UseSession(); // where the session middleware is run, ordering is important, must be before middleware using it
+app.UseSession(); // where the session middleware is run, ordering is important
 
 byte[] key = new byte[16];
 byte[] iv = new byte[16];
@@ -62,26 +62,7 @@ app.Use(
 */
 app.MapPost("/api/workers", WorkerRoutes.CreateWorker);
 
-app.MapDelete(
-    "/api/workers",
-    async (HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
-        if (requestBody == null)
-        {
-            return Results.BadRequest("Invalid email");
-        }
-        Console.WriteLine(requestBody.Email);
-        bool success = await queries.RemoveCustomerTask(requestBody.Email);
-
-        if (!success)
-        {
-            Results.Problem("failed to remove worker");
-        }
-
-        return Results.Ok(new { message = "Successfully removed wroker" });
-    }
-);
+app.MapPut("/api/workers", WorkerRoutes.InactivateWorker);
 
 app.MapGet(
     "/api/workers",
