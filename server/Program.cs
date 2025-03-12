@@ -130,33 +130,9 @@ app.MapGet(
     }
 );
 
-app.MapPost(
-    "/api/login",
-    async (LoginRecord credentials, PasswordHasher<string> hasher, HttpContext context) =>
-    {
-        (bool verified, string role, int company_id) = await queries.VerifyLoginTask(
-            credentials.Email,
-            credentials.Password,
-            hasher
-        );
-        Console.WriteLine(verified);
-        if (verified)
-        {
-            context.Session.SetString("Authenticated", "True"); // add data to a session
-            context.Session.SetString("Email", credentials.Email);
-            context.Session.SetString("Role", role);
-            context.Session.SetInt32("company", company_id);
-            return Results.Ok(role);
-        }
-        else
-        {
-            return TypedResults.Forbid();
-        }
-    }
-);
-
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 app.MapPost("/api/messages", MessageRoutes.PostMessages);
+app.MapPost("/api/login", LoginRoutes.PostLogin);
 
 app.MapPost(
     "/api/tickets",
