@@ -184,7 +184,7 @@ app.MapPost(
             using var rng = RandomNumberGenerator.Create();
             var bytes = new byte[20];
             rng.GetBytes(bytes);
-            return Convert.ToBase64String(bytes).TrimEnd('=');
+            return Convert.ToBase64String(bytes).TrimEnd('=').Replace('/', 'o');
         }
         //if (ticketRequest == null)
         //return Results.BadRequest();

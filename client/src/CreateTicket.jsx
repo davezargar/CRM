@@ -158,6 +158,7 @@ export function CreateIkeaTicket(){
                 setSubcategories(categories[i].subcategories);
             }
         }
+        console.log(formData)
     }, [formData]);
     
 
@@ -266,6 +267,7 @@ export function CreateMikromjukTicket() {
                 setSubcategories(categories[i].subcategories);
             }
         }
+        console.log(formData)
     }, [formData]);
 
 
