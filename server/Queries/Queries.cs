@@ -1,7 +1,7 @@
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using server.Records;
-using Microsoft.AspNetCore.Identity;
 
 namespace server.Queries;
 
@@ -12,60 +12,6 @@ public class Queries
     public Queries(NpgsqlDataSource db)
     {
         _db = db;
-
-    }
-
-    public async Task<(bool, string, int)> VerifyLoginTask(string email, string password, PasswordHasher<string> hasher)
-    {
-        await using var cmd = _db.CreateCommand(
-            "SELECT password, role, company_id FROM users WHERE email = $1"
-        );
-        cmd.Parameters.AddWithValue(email);
-        string? db_hashedPassword = null;
-        string? db_role = null;
-        int company_id = 0;
-        bool verified = false;
-
-        using (var reader = await cmd.ExecuteReaderAsync())
-        {
-            if (await reader.ReadAsync())
-            {
-                db_role = reader.GetString(1);
-                company_id = reader.GetInt32(2);
-                if(!reader.IsDBNull(0))
-                {
-                    db_hashedPassword = reader.GetString(0);
-                    Console.WriteLine("password is read");
-                }
-                else
-                {
-                }
-            }
-        }
-
-        if (db_hashedPassword != null)
-        {
-            Console.WriteLine("try to verify password");
-            var result = hasher.VerifyHashedPassword("",db_hashedPassword, password);
-            if(result == PasswordVerificationResult.Failed)
-            {
-                verified = false;
-            }
-            else
-            {
-                verified = true;
-            }
-        }
-        else
-        {
-            string hashedPassword = hasher.HashPassword("",password);
-            var update_password_cmd = _db.CreateCommand("UPDATE users set password = $1 where email = $2");
-            update_password_cmd.Parameters.AddWithValue(hashedPassword);
-            update_password_cmd.Parameters.AddWithValue(email);
-            await update_password_cmd.ExecuteNonQueryAsync();
-        }
-
-        return (verified, db_role,  company_id);
     }
 
     public bool IsValidEmail(string email)
@@ -74,11 +20,7 @@ public class Queries
         return Regex.IsMatch(email, emailRegex);
     }
 
-    public async Task<bool> AddCustomerTask(
-        string email,
-        int companyId,
-        string defaultPassword
-    )
+    public async Task<bool> AddCustomerTask(string email, int companyId, string defaultPassword)
     {
         try
         {
@@ -222,29 +164,6 @@ public class Queries
         return messages;
     }
 
-    public async Task<bool> PostMessageTask(SendEmail message, byte[] key, byte[] iv)
-    {
-        try
-        {
-            await using var cmd = _db.CreateCommand(
-                "INSERT INTO messages (Title, message, user_id, ticket_id, encryption_key, encryption_iv) VALUES ($1, $2, (SELECT id FROM users where email = $3), $4, $5, $6)"
-            );
-            cmd.Parameters.AddWithValue(message.Title.ToString());
-            cmd.Parameters.AddWithValue(message.Description.ToString());
-            cmd.Parameters.AddWithValue(message.UserEmail);
-            cmd.Parameters.AddWithValue(message.Ticket_id_fk);
-            cmd.Parameters.AddWithValue(Convert.ToBase64String(key));
-            cmd.Parameters.AddWithValue(Convert.ToBase64String(iv));
-            await cmd.ExecuteNonQueryAsync();
-            return true;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine("Couldn't post message" + ex);
-            return false;
-        }
-    }
-
     public async Task<bool> PostTicketStatusTask(NewTicketStatus ticketStatus)
     {
         try
@@ -309,21 +228,20 @@ public class Queries
     {
         List<CategoryPairs> categoryPairs = new List<CategoryPairs>();
         List<CategoryRecord> categories = new List<CategoryRecord>();
-        
-        await using var cmd = _db.CreateCommand("SELECT categories.name, subcategories.name FROM categories " +
-                                                "INNER JOIN subcategories ON categories.id = subcategories.main_category_id WHERE company_id = $1");
+
+        await using var cmd = _db.CreateCommand(
+            "SELECT categories.name, subcategories.name FROM categories "
+                + "INNER JOIN subcategories ON categories.id = subcategories.main_category_id WHERE company_id = $1"
+        );
         cmd.Parameters.AddWithValue(companyId);
         using var reader = await cmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
         {
-            categoryPairs.Add(new CategoryPairs (
-                reader.GetString(0),
-                reader.GetString(1)
-             ));
+            categoryPairs.Add(new CategoryPairs(reader.GetString(0), reader.GetString(1)));
         }
-        
-        List<string> buffer = new List<string>(); 
+
+        List<string> buffer = new List<string>();
         string categoryPrevious = categoryPairs[0].MainCategory;
         foreach (var categoryPair in categoryPairs)
         {
@@ -333,7 +251,7 @@ public class Queries
                 categoryPrevious = categoryPair.MainCategory;
                 continue;
             }
-            
+
             categories.Add(new CategoryRecord(categoryPrevious, new List<string>(buffer)));
             categoryPrevious = categoryPair.MainCategory;
             buffer.Clear();
@@ -349,10 +267,16 @@ public class Queries
         List<TicketCategoryRecord> ticketCategories = new();
         await using var cmd = _db.CreateCommand("SELECT id, name, company_id FROM categories");
         using var reader = await cmd.ExecuteReaderAsync();
-    
+
         while (await reader.ReadAsync())
         {
-            ticketCategories.Add(new TicketCategoryRecord(reader.GetInt32(0), reader.GetString(1), reader.GetInt32(2)));
+            ticketCategories.Add(
+                new TicketCategoryRecord(
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetInt32(2)
+                )
+            );
         }
         return ticketCategories;
     }
@@ -360,9 +284,9 @@ public class Queries
     public async Task<Dictionary<string, List<int>>> GetAssignedCategories()
     {
         Dictionary<string, List<int>> assignments = new();
-        await using var cmd =
-            _db.CreateCommand(
-                "SELECT u.email, ac.category_id FROM assigned_categories ac JOIN users u ON ac.user_id = u.id");
+        await using var cmd = _db.CreateCommand(
+            "SELECT u.email, ac.category_id FROM assigned_categories ac JOIN users u ON ac.user_id = u.id"
+        );
         using var reader = await cmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
@@ -383,15 +307,14 @@ public class Queries
     {
         try
         {
-            await using var connection = await _db.OpenConnectionAsync(); 
-            await using var transaction = await connection.BeginTransactionAsync(); 
+            await using var connection = await _db.OpenConnectionAsync();
+            await using var transaction = await connection.BeginTransactionAsync();
 
             foreach (var entry in assignments)
             {
                 string workerEmail = entry.Key;
                 List<int> categoryIds = entry.Value;
 
-                
                 await using var getUserCmd = connection.CreateCommand();
                 getUserCmd.CommandText = "SELECT id FROM users WHERE email = $1";
                 getUserCmd.Parameters.AddWithValue(workerEmail);
@@ -403,24 +326,23 @@ public class Queries
                 int userId = reader.GetInt32(0);
                 await reader.CloseAsync();
 
-                
                 await using var deleteCmd = connection.CreateCommand();
                 deleteCmd.CommandText = "DELETE FROM assigned_categories WHERE user_id = $1";
                 deleteCmd.Parameters.AddWithValue(userId);
                 await deleteCmd.ExecuteNonQueryAsync();
 
-                
                 foreach (var categoryId in categoryIds)
                 {
                     await using var insertCmd = connection.CreateCommand();
-                    insertCmd.CommandText = "INSERT INTO assigned_categories (user_id, category_id) VALUES ($1, $2)";
+                    insertCmd.CommandText =
+                        "INSERT INTO assigned_categories (user_id, category_id) VALUES ($1, $2)";
                     insertCmd.Parameters.AddWithValue(userId);
                     insertCmd.Parameters.AddWithValue(categoryId);
                     await insertCmd.ExecuteNonQueryAsync();
                 }
             }
 
-            await transaction.CommitAsync(); 
+            await transaction.CommitAsync();
             return true;
         }
         catch (Exception ex)
@@ -429,12 +351,14 @@ public class Queries
             return false;
         }
     }
-    
+
     public async Task<bool> CreateCategory(string name, int companyId)
     {
         try
         {
-            await using var cmd = _db.CreateCommand("INSERT INTO categories (name, company_id) VALUES ($1, $2)");
+            await using var cmd = _db.CreateCommand(
+                "INSERT INTO categories (name, company_id) VALUES ($1, $2)"
+            );
             cmd.Parameters.AddWithValue(name);
             cmd.Parameters.AddWithValue(companyId);
             await cmd.ExecuteNonQueryAsync();
@@ -446,5 +370,4 @@ public class Queries
             return false;
         }
     }
-
 }
