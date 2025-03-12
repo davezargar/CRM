@@ -165,41 +165,9 @@ app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 app.MapPost("/api/tickets", TicketRoutes.PostTickets);
 
 
-app.MapGet(
-    "/api/tickets/{ticketId:int}",
-    async (HttpContext context, int ticketId) =>
-    {
-        string? requesterEmail = context.Session.GetString("Email");
+app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
 
-        if (String.IsNullOrEmpty(requesterEmail))
-            return Results.Unauthorized();
-
-        TicketRecord ticket = await queries.GetTicket(requesterEmail, ticketId);
-        List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
-        TicketMessagesRecord ticketMessages = new(ticket, messages);
-        return Results.Ok(ticketMessages);
-    }
-);
-
-app.MapPut(
-    "/api/tickets",
-    async (HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
-        if (requestBody == null)
-        {
-            return Results.BadRequest("The request body is empty");
-        }
-        bool success = await queries.PostTicketStatusTask(requestBody);
-
-        if (!success)
-        {
-            Results.Problem("Couldn't process the Sql Query");
-        }
-
-        return Results.Ok(new { message = "Successfully posted the ticket status to database" });
-    }
-);
+app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
 
 app.MapPost(
     "/api/messages",
