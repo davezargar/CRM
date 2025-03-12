@@ -129,17 +129,17 @@ app.MapGet(
         }
     }
 );
-
-app.MapGet("/api/tickets", TicketRoutes.GetTickets);
-app.MapPost("/api/messages", MessageRoutes.PostMessages);
 app.MapPost("/api/login", LoginRoutes.PostLogin);
 
-app.MapPost("/api/tickets", TicketRoutes.PostTickets);
+app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 
+app.MapPost("/api/tickets", TicketRoutes.PostTickets);
 
 app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
 
 app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
+
+app.MapPost("/api/messages", MessageRoutes.PostMessages);
 
 app.MapGet(
     "/api/ticket-categories",
