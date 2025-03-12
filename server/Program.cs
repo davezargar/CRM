@@ -60,95 +60,34 @@ app.Use(
 );
 
 */
+
+//account stuff
 app.MapPost("/api/workers", WorkerRoutes.CreateWorker);
 app.MapPut("/api/workers", WorkerRoutes.InactivateWorker);
 app.MapGet("/api/workers", WorkerRoutes.GetActiveWorkers);
 
-
 app.MapPost("/api/login", LoginRoutes.PostLogin);
 
-
+//ticket stuff
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 app.MapPost("/api/tickets", TicketRoutes.PostTickets);
 app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
 app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
 
+app.MapGet("/api/form/categories/{companyId:int}", CategoryRoutes.GetFormCategories);
 
 app.MapPost("/api/messages", MessageRoutes.PostMessages);
 
-app.MapGet(
-    "/api/ticket-categories",
-    async () =>
-    {
-        var categories = await queries.GetTicketCategories();
-        return Results.Ok(categories);
-    }
-);
+//category assign stuff
+app.MapGet("/api/ticket-categories", CategoryRoutes.GetCategories);
+app.MapPost("/api/ticket-categories", CategoryRoutes.CreateCategory);
 
-app.MapPost(
-    "/api/ticket-categories",
-    async (HttpContext context) =>
-    {
-        try
-        {
-            var requestBody = await context.Request.ReadFromJsonAsync<TicketCategoryRequest>();
+app.MapGet("/api/assign-tickets", CategoryRoutes.GetAssignCategories);
+app.MapPost("/api/assign-tickets", CategoryRoutes.AssignCategories);
 
-            if (requestBody == null || string.IsNullOrWhiteSpace(requestBody.Name))
-            {
-                return Results.BadRequest("Category name cannot be empty.");
-            }
 
-            Console.WriteLine(
-                $"Received category '{requestBody.Name}' for company ID {requestBody.CompanyId}"
-            ); // for debugging
-
-            bool success = await queries.CreateCategory(requestBody.Name, requestBody.CompanyId);
-
-            if (!success)
-            {
-                Console.WriteLine("Failed to insert category into DB.");
-                return Results.Problem("Failed to add category.");
-            }
-
-            Console.WriteLine("Category successfully added!");
-            return Results.Ok(new { message = "Category added!" });
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error in /api/categories: {ex.Message}");
-            return Results.Problem("Internal server error.");
-        }
-    }
-);
-
-app.MapGet(
-    "/api/assign-tickets",
-    async () =>
-    {
-        var assignments = await queries.GetAssignedCategories();
-        return Results.Ok(assignments);
-    }
-);
-
-app.MapPost(
-    "/api/assign-tickets",
-    async (HttpContext context) =>
-    {
-        var assignments = await context.Request.ReadFromJsonAsync<Dictionary<string, List<int>>>();
-
-        if (assignments == null || assignments.Count == 0)
-        {
-            return Results.BadRequest("The request body is empty or invalid.");
-        }
-
-        bool success = await queries.AssignCategoriesToWorkers(assignments);
-        return success
-            ? Results.Ok(new { message = "Assignments saved!" })
-            : Results.Problem("Failed to assign tickets.");
-    }
-);
-
-app.MapPost(
+//unused feature for registering new user accounts
+app.MapPost( 
     "/api/customers",
     async (HttpContext context) =>
     {
@@ -171,18 +110,6 @@ app.MapPost(
         }
 
         return Results.Ok(new { message = "Successfully posted the account to database" });
-    }
-);
-
-app.MapGet(
-    "/api/categories/{companyId:int}",
-    async (HttpContext context, int companyId) =>
-    {
-        List<CategoryRecord> categories = new List<CategoryRecord>(
-            await queries.GetCategories(companyId)
-        );
-
-        return Results.Ok(categories);
     }
 );
 

@@ -117,7 +117,7 @@ export function CreateIkeaTicket(){
     const [subcategories, setSubcategories] = useState([]);
 
     useEffect(()=>{
-        fetch(`/api/categories/${formData.CompanyFk}`)
+        fetch(`/api/form/categories/${formData.CompanyFk}`)
             .then(response => response.json())
             .then(data => {
                 formData.CategoryName = data[0].mainCategory;
@@ -227,7 +227,7 @@ export function CreateMikromjukTicket() {
     const [subcategories, setSubcategories] = useState([]);
 
     useEffect(() => {
-        fetch(`/api/categories/${formData.CompanyFk}`)
+        fetch(`/api/form/categories/${formData.CompanyFk}`)
             .then(response => response.json())
             .then(data => {
                 formData.CategoryName = data[0].mainCategory;

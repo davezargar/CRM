@@ -1,4 +1,3 @@
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using server.Records;
