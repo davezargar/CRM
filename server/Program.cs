@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
+using System.Text.RegularExpressions;
 using Npgsql;
 using server;
-using server.Queries;
 using server.Records;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,9 +12,6 @@ DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 
 NpgsqlDataSource db = NpgsqlDataSource.Create(DotEnv.GetString("DatabaseConnectString"));
 builder.Services.AddSingleton<NpgsqlDataSource>(db);
-
-DatabaseConnection database = new();
-Queries queries = new Queries(database.Connection());
 
 // session handling documentation:
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-9.0
@@ -87,30 +84,48 @@ app.MapPost("/api/assign-tickets", CategoryRoutes.AssignCategories);
 
 
 //unused feature for registering new user accounts
-app.MapPost( 
-    "/api/customers",
-    async (HttpContext context) =>
+app.MapPost("/api/customers", registerCustomer);
+
+
+
+async Task<IResult> registerCustomer(HttpContext context, NpgsqlDataSource db)
+{
+    var accountRequest = await context.Request.ReadFromJsonAsync<CustomerRequest>();
+
+    if (accountRequest == null)
     {
-        var accountRequest = await context.Request.ReadFromJsonAsync<CustomerRequest>();
-
-        if (accountRequest == null)
+        return Results.BadRequest("The request body is empty");
+    }
+    try
+    {
+        bool IsValidEmail(string email)
         {
-            return Results.BadRequest("The request body is empty");
+            var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // En vanlig e-postformatregex
+            return Regex.IsMatch(email, emailRegex);
         }
-
-        bool success = await queries.CustomersTask(
-            accountRequest.Email,
-            accountRequest.Password,
-            1
-        );
-
-        if (!success)
+            
+        if (!IsValidEmail(accountRequest.Email))
         {
+            Console.WriteLine("Invalid email format.");
             return Results.Problem("Couldn't process the SQL Query");
         }
 
+        await using var cmd = db.CreateCommand(
+            "INSERT INTO users (email, company_id, role, password) VALUES ($1, $2, $3, $4)"
+        );
+        cmd.Parameters.AddWithValue(accountRequest.Email);
+        cmd.Parameters.AddWithValue(1);
+        cmd.Parameters.AddWithValue("customer");
+        cmd.Parameters.AddWithValue(accountRequest.Password);
+        await cmd.ExecuteNonQueryAsync();
+
         return Results.Ok(new { message = "Successfully posted the account to database" });
     }
-);
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error creating account: " + ex);
+        return Results.Problem("Couldn't process the SQL Query");
+    }
+}
 
 app.Run();
