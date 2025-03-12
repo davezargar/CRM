@@ -41,7 +41,7 @@ function TicketDetailed() {
         <div className="info">
             <ul id={"information"}>
                 <li key={Ticket.ticketId}>
-                    <p>From: {Ticket.userFk} </p> {checkStatus(Ticket)}
+                    <p>From: {Ticket.userId} </p> {checkStatus(Ticket)}
                     <p>Created: {datetimeFormatter(Ticket.timePosted)} </p>
                 </li>
             </ul>

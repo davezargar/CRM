@@ -55,10 +55,7 @@ public static class TicketRoutes
 
         List<TicketRecord> tickets = new List<TicketRecord>();
         await using var cmd = db.CreateCommand(
-            "SELECT tickets.id, title, status, categories.name, subcategories.name, posted, closed, users.email, tickets.company_id, elevated FROM tickets "
-            + "INNER JOIN categories ON tickets.category_id = categories.id "
-            + "INNER JOIN subcategories ON tickets.subcategory_id = subcategories.id "
-            + "INNER JOIN users ON tickets.company_id = users.company_id WHERE email = $1"
+            "SELECT id, title, status, main_category, sub_category, posted, closed, email, company_id, elevated FROM tickets_view WHERE company_id = (SELECT company_id FROM users WHERE email = $1 LIMIT 1)"
         );
         cmd.Parameters.AddWithValue(requesterEmail);
         using var reader = await cmd.ExecuteReaderAsync();
@@ -93,10 +90,7 @@ public static class TicketRoutes
         
         TicketRecord ticket = null;
         await using var cmd1 = db.CreateCommand(
-            "SELECT tickets.id, title, status, categories.name, subcategories.name, posted, closed, users.email,  tickets.company_id, elevated FROM tickets "
-            + "INNER JOIN categories ON categories.id = tickets.category_id "
-            + "INNER JOIN subcategories ON subcategories.id = tickets.subcategory_id "
-            + "INNER JOIN users ON tickets.company_id = users.company_id WHERE tickets.id = $1 AND email = $2"
+            "SELECT id, title, status, main_category, sub_category, posted, closed, email, company_id, elevated FROM tickets_view WHERE id = $1"
         );
         cmd1.Parameters.AddWithValue(ticketId);
         cmd1.Parameters.AddWithValue(email1);
