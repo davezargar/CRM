@@ -67,8 +67,8 @@ function Index() {
 function TicketForms(){
     
     return <div id={"ticket-forms-nav"}>
-        <NavLink to={"/create-ticket/ikea-form"}><button type="button">ikea form</button>></NavLink>
-        <NavLink to={"/create-ticket/mikromjuk-form"}><button type="button">mikromjuk form</button>></NavLink>
+        <NavLink to={"/create-ticket/ikea-form"}><button type="button">ikea form</button></NavLink>
+        <NavLink to={"/create-ticket/mikromjuk-form"}><button type="button">mikromjuk form</button></NavLink>
     </div>
 }
 
