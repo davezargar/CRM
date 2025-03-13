@@ -15,7 +15,7 @@ function CustomerTicket() {
     const [FeedbackForm, setFeedbackForm] = useState(false);
 
     useEffect(() => {
-        fetch(`/api/tickets/${ticketId}`)
+        fetch(`/api/tickets/1`)
             .then(response => response.json())
             .then(data => {
                 console.log(data);
@@ -91,7 +91,7 @@ function CustomerTicket() {
             </div>
         )}
 
-        {showFeedbackPopup && (
+        {FeedbackForm && (
             <div className="popup">
                 <div className="popup-content">
                     <h3>Provide Feedback</h3>
