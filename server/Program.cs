@@ -16,6 +16,18 @@ DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
 NpgsqlDataSource db = NpgsqlDataSource.Create(DotEnv.GetString("DatabaseConnectString"));
 builder.Services.AddSingleton<NpgsqlDataSource>(db);
 
+var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>();
+if (emailSettings != null)
+{
+    builder.Services.AddSingleton(emailSettings);
+}
+else
+{
+    throw new InvalidOperationException("Email settings are not configured properly.");
+}
+
+builder.Services.AddScoped<IEmailService, EmailService>();
+
 // session handling documentation:
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-9.0
 // a client is given a session identifier that is sent alongside a http request, server reads it and
