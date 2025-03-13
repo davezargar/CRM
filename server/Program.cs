@@ -1,36 +1,34 @@
-using System.Security.AccessControl;
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.DataProtection.XmlEncryption;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Diagnostics;
+using System.Text.RegularExpressions;
+using Npgsql;
 using server;
-using server.Queries;
 using server.Records;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<PasswordHasher<string>>();
 
 DotEnv.Load(Path.Combine(Directory.GetCurrentDirectory(), ".env"));
-DatabaseConnection database = new();
-Queries queries = new Queries(database.Connection());
+
+NpgsqlDataSource db = NpgsqlDataSource.Create(DotEnv.GetString("DatabaseConnectString"));
+builder.Services.AddSingleton<NpgsqlDataSource>(db);
 
 // session handling documentation:
 // https://learn.microsoft.com/en-us/aspnet/core/fundamentals/app-state?view=aspnetcore-9.0
 // a client is given a session identifier that is sent alongside a http request, server reads it and
 // accesses server stored data. Data is not sent to client
 
-builder.Services.AddDistributedMemoryCache(); //part of setting up session
+builder.Services.AddDistributedMemoryCache(); 
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(600); //time until session expires, all session data is lost
+    options.IdleTimeout = TimeSpan.FromSeconds(600); 
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
 
 var app = builder.Build();
 
-app.UseSession(); // where the session middleware is run, ordering is important, must be before middleware using it
+app.UseSession(); // where the session middleware is run, ordering is important
 
 byte[] key = new byte[16];
 byte[] iv = new byte[16];
@@ -41,6 +39,7 @@ using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
     rng.GetBytes(iv);
 }
 
+/*
 app.Use(
     async (context, next) =>
     {
@@ -57,343 +56,78 @@ app.Use(
     }
 );
 
-#region Routes
-app.MapPost(
-    "/api/workers",
-    async (HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
-        if (requestBody == null)
-        {
-            return Results.BadRequest("Invalid email");
-        }
-        Console.WriteLine($"received email: {requestBody.Email}");
-        int companyId = requestBody.CompanyId ?? 1;
-        string defaultPassWord = "hej123";
-        var (hashedPassword, salt) = PasswordHasher.HashPassword(defaultPassWord);
-        Console.WriteLine($"hashed password: {hashedPassword}");
-        Console.WriteLine($"Salt: {salt}");
+*/
 
-        bool success = await queries.AddCustomerTask(
-            requestBody.Email,
-            companyId,
-            hashedPassword,
-            salt
-        );
+//account stuff
+app.MapPost("/api/workers", WorkerRoutes.CreateWorker);
+app.MapPut("/api/workers", WorkerRoutes.InactivateWorker);
+app.MapGet("/api/workers", WorkerRoutes.GetActiveWorkers);
 
-        if (!success)
-        {
-            Results.Problem("Failed to add worker");
-        }
+app.MapPost("/api/login", LoginRoutes.PostLogin);
 
-        return Results.Ok(new { message = "Valid mail" });
-    }
-);
-
-app.MapDelete(
-    "/api/workers",
-    async (HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<AdminRequest>();
-        if (requestBody == null)
-        {
-            return Results.BadRequest("Invalid email");
-        }
-        Console.WriteLine(requestBody.Email);
-        bool success = await queries.RemoveCustomerTask(requestBody.Email);
-
-        if (!success)
-        {
-            Results.Problem("failed to remove worker");
-        }
-
-        return Results.Ok(new { message = "Successfully removed wroker" });
-    }
-);
-
-app.MapGet(
-    "/api/workers",
-    async () =>
-    {
-        try
-        {
-            var customerSupportEmails = await queries.GetCustomerSupportWorkers();
-
-            if (customerSupportEmails == null)
-            {
-                return Results.NotFound("no customerWorker users found");
-            }
-            return Results.Ok(customerSupportEmails);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error: {ex.Message}");
-
-            return Results.Problem("internal error", statusCode: 500);
-        }
-    }
-);
-
-app.MapPost(
-    "/api/login",
-    async (HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<LoginRecord>();
-
-        (bool verified, string role) = await queries.VerifyLoginTask(
-            requestBody.Email,
-            requestBody.Password
-        );
-        Console.WriteLine(verified);
-        if (verified)
-        {
-            context.Session.SetString("Authenticated", "True"); // add data to a session
-            context.Session.SetString("Email", requestBody.Email);
-            context.Session.SetString("Role", role);
-            return Results.Ok(role);
-        }
-        else
-        {
-            return TypedResults.Forbid();
-        }
-    }
-);
-
-app.MapGet(
-    "/api/tickets",
-    async (HttpContext context) =>
-    {
-        string? requesterEmail = context.Session.GetString("Email");
-
-        if (String.IsNullOrEmpty(requesterEmail) || context.Session.GetString("Role") == "customer")
-            return Results.Unauthorized();
-
-        List<TicketRecord> tickets = await queries.GetTicketsAll(requesterEmail);
-
-        return Results.Ok(tickets);
-    }
-);
-
-app.MapPost(
-    "/api/tickets",
-    async (HttpContext context) =>
-    {
-        static string GenerateUniqueTicketLink()
-        {
-
-            using var rng = RandomNumberGenerator.Create();
-            var bytes = new byte[20];
-            rng.GetBytes(bytes);
-            return Convert.ToBase64String(bytes).TrimEnd('=').Replace('/', 'o');
-        }
-        //if (ticketRequest == null)
-        //return Results.BadRequest();
-        
-        NewTicketRecord? ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
-        if (ticketRequest is null)
-            return Results.BadRequest();
- 
-        if(!await queries.InsertCustomer(ticketRequest.UserEmail, ticketRequest.CompanyFk))
-            Console.WriteLine("couldnt create a user ");
-        
-        int ticketId = await queries.CreateTicketTask(ticketRequest);
-        string token = GenerateUniqueTicketLink();
-        while (!await queries.InsertTicketLink(ticketId, token))
-        {
-            token = GenerateUniqueTicketLink();
-        } 
-        
-        Console.WriteLine("http://localhost:5173/tickets/" + ticketId + "/" + token);
-        return Results.Ok();
-    }
-);
-
-app.MapGet(
-    "/api/tickets/{ticketId:int}/{token}",
-    async (HttpContext context, int ticketId, string token) =>
-    {
-        TicketRecord? ticket = await queries.GetTicket(ticketId, "", token);
-        if (ticket is null)
-            return Results.BadRequest("ticketget fail ");
-        
-        List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
-        TicketMessagesRecord ticketMessages = new(ticket, messages);
-        return Results.Ok(ticketMessages);
-    }
-);
-
-app.MapGet(
-    "/api/tickets/{ticketId:int}",
-    async (HttpContext context, int ticketId) =>
-    {
-        string? requesterEmail = context.Session.GetString("Email");
-
-        if (String.IsNullOrEmpty(requesterEmail))
-            return Results.Unauthorized();
-
-        TicketRecord? ticket = await queries.GetTicket(ticketId, requesterEmail);
-        if (ticket is null)
-            return Results.BadRequest("ticketget fail ");
-        List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
-        TicketMessagesRecord ticketMessages = new(ticket, messages);
-        return Results.Ok(ticketMessages);
-    }
-);
-
-app.MapPut(
-    "/api/tickets",
-    async (HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
-        if (requestBody == null)
-        {
-            return Results.BadRequest("The request body is empty");
-        }
-        bool success = await queries.PostTicketStatusTask(requestBody);
-
-        if (!success)
-        {
-            Results.Problem("Couldn't process the Sql Query");
-        }
-
-        return Results.Ok(new { message = "Successfully posted the ticket status to database" });
-    }
-);
-
-app.MapPost(
-    "/api/messages",
-    async (HttpContext context) =>
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<SendEmail>();
-        if (requestBody == null)
-        {
-            return Results.BadRequest("The request body is empty");
-        }
-        string userId = context.Session.GetString("Email");
-        Console.WriteLine("SESSION EMAIL: " + userId);
-        Console.WriteLine("TICKET ID: " + requestBody.Ticket_id_fk);
-
-        byte[] key = new byte[16];
-        byte[] iv = new byte[16];
-
-        using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-        {
-            rng.GetBytes(key);
-            rng.GetBytes(iv);
-        }
-
-        byte[] encryptedDescriptionBytes = EncryptionSolver.Encrypt(
-            requestBody.Description,
-            key,
-            iv
-        );
-        string encryptedDescription = Convert.ToBase64String(encryptedDescriptionBytes);
-
-        var updatedRequest = requestBody with
-        {
-            UserEmail = userId,
-            Description = encryptedDescription,
-        };
-
-        bool success = await queries.PostMessageTask(updatedRequest, key, iv);
-
-        if (!success)
-        {
-            Results.Problem("Couldn't process the Sql Query");
-        }
-
-        return Results.Ok(new { message = "Successfully posted the message to database" });
-    }
-);
-
-app.MapGet("/api/ticket-categories", async () =>
-{
-    var categories = await queries.GetTicketCategories();
-    return Results.Ok(categories);
-});
-
-app.MapPost("/api/ticket-categories", async (HttpContext context) =>
-{
-    try
-    {
-        var requestBody = await context.Request.ReadFromJsonAsync<TicketCategoryRequest>();
-
-        if (requestBody == null || string.IsNullOrWhiteSpace(requestBody.Name))
-        {
-            return Results.BadRequest("Category name cannot be empty.");
-        }
-
-        Console.WriteLine($"Received category '{requestBody.Name}' for company ID {requestBody.CompanyId}"); // for debugging
-
-        bool success = await queries.CreateCategory(requestBody.Name, requestBody.CompanyId);
-
-        if (!success)
-        {
-            Console.WriteLine("Failed to insert category into DB.");
-            return Results.Problem("Failed to add category.");
-        }
-
-        Console.WriteLine("Category successfully added!");
-        return Results.Ok(new { message = "Category added!" });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error in /api/categories: {ex.Message}");
-        return Results.Problem("Internal server error.");
-    }
-});
-
-app.MapGet("/api/assign-tickets", async () =>
-{
-    var assignments = await queries.GetAssignedCategories();
-    return Results.Ok(assignments);
-});
-
-app.MapPost("/api/assign-tickets", async (HttpContext context) =>
-{
-    var assignments = await context.Request.ReadFromJsonAsync<Dictionary<string, List<int>>>();
-
-    if (assignments == null || assignments.Count == 0)
-    {
-        return Results.BadRequest("The request body is empty or invalid.");
-    }
-
-    bool success = await queries.AssignCategoriesToWorkers(assignments);
-    return success ? Results.Ok(new { message = "Assignments saved!" }) : Results.Problem("Failed to assign tickets.");
-});
+//ticket stuff
+app.MapGet("/api/tickets", TicketRoutes.GetTickets);
+app.MapPost("/api/tickets", TicketRoutes.PostTickets);
+app.MapGet("/api/customer/tickets/{token}", TicketRoutes.GetTicketWithToken);
+app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
+app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
 
 
-app.MapPost("/api/customers", async (HttpContext context) =>
+app.MapGet("/api/form/categories/{companyId:int}", CategoryRoutes.GetFormCategories);
+
+app.MapPost("/api/messages", MessageRoutes.PostMessages);
+
+//category assign stuff
+app.MapGet("/api/ticket-categories", CategoryRoutes.GetCategories);
+app.MapPost("/api/ticket-categories", CategoryRoutes.CreateCategory);
+
+app.MapGet("/api/assign-tickets", CategoryRoutes.GetAssignCategories);
+app.MapPost("/api/assign-tickets", CategoryRoutes.AssignCategories);
+
+
+//unused feature for registering new user accounts
+app.MapPost("/api/customers", registerCustomer);
+
+
+
+async Task<IResult> registerCustomer(HttpContext context, NpgsqlDataSource db)
 {
     var accountRequest = await context.Request.ReadFromJsonAsync<CustomerRequest>();
 
-        if (accountRequest == null)
+    if (accountRequest == null)
+    {
+        return Results.BadRequest("The request body is empty");
+    }
+    try
+    {
+        bool IsValidEmail(string email)
         {
-            return Results.BadRequest("The request body is empty");
+            var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // En vanlig e-postformatregex
+            return Regex.IsMatch(email, emailRegex);
         }
-
-        bool success = await queries.CustomersTask(
-            accountRequest.Email,
-            accountRequest.Password,
-            1
-        );
-
-        if (!success)
+            
+        if (!IsValidEmail(accountRequest.Email))
         {
+            Console.WriteLine("Invalid email format.");
             return Results.Problem("Couldn't process the SQL Query");
         }
 
+        await using var cmd = db.CreateCommand(
+            "INSERT INTO users (email, company_id, role, password) VALUES ($1, $2, $3, $4)"
+        );
+        cmd.Parameters.AddWithValue(accountRequest.Email);
+        cmd.Parameters.AddWithValue(1);
+        cmd.Parameters.AddWithValue("customer");
+        cmd.Parameters.AddWithValue(accountRequest.Password);
+        await cmd.ExecuteNonQueryAsync();
+
         return Results.Ok(new { message = "Successfully posted the account to database" });
     }
-);
-
-app.MapGet("/api/categories/{companyId:int}", async (HttpContext context, int companyId) =>
-{
-    List<CategoryRecord> categories = new List<CategoryRecord>( await queries.GetCategories(companyId));
-
-    return Results.Ok(categories);
-});
-
-#endregion
+    catch (Exception ex)
+    {
+        Console.WriteLine("Error creating account: " + ex);
+        return Results.Problem("Couldn't process the SQL Query");
+    }
+}
 
 app.Run();

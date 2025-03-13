@@ -15,7 +15,7 @@ function TicketDetailed() {
     const [Messages, SetMessages] = useState([]);
     
     useEffect(() => {
-        if(token === null || token === "")
+        if(token == null || token === "")
         {
             fetch(`/api/tickets/${ticketId}`)
                 .then(response => response.json())
@@ -26,7 +26,7 @@ function TicketDetailed() {
                 });
         }else
         {
-            fetch(`/api/tickets/${ticketId}/${token}`)
+            fetch(`/api/customer/tickets/${token}`)
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
