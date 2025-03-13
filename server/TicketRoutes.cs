@@ -119,7 +119,7 @@ public static class TicketRoutes
         
         List<MessagesRecord> messages = new List<MessagesRecord>();
         await using var cmd2 = db.CreateCommand(
-            "SELECT messages.id, message, ticket_id, title, users.email, sent FROM messages "
+            "SELECT messages.id, message, ticket_id, title, users.email, sent, encryption_key, encryption_iv FROM messages "
             + "INNER JOIN users ON users.id = messages.user_id WHERE ticket_id = $1"
         );
         cmd2.Parameters.AddWithValue(ticketId);
@@ -132,20 +132,23 @@ public static class TicketRoutes
             string title = reader2.GetString(3);
             string email = reader2.GetString(4);
             DateTime sentTime = reader2.GetDateTime(5);
-            //string encryptionKey = reader2.GetString(6);
-            //string encryptionIv = reader2.GetString(7);
+            if (!reader2.IsDBNull(6) && !reader2.IsDBNull(7))
+            {
+                string encryptionKey = reader2.GetString(6);
+                string encryptionIv = reader2.GetString(7);
+                byte[] key = Convert.FromBase64String(encryptionKey);
+                byte[] iv = Convert.FromBase64String(encryptionIv);
 
-            //byte[] key = Convert.FromBase64String(encryptionKey);
-            //byte[] iv = Convert.FromBase64String(encryptionIv);
+                byte[] encryptedBytes = Convert.FromBase64String(Message);
 
-            //byte[] encryptedBytes = Convert.FromBase64String(encryptedMessage);
-
-            //string decryptedMessage = EncryptionSolver.Decrypt(encryptedBytes, key, iv);
-
+                Message = EncryptionSolver.Decrypt(encryptedBytes, key, iv);
+            }
+            
             messages.Add(
                 new MessagesRecord(messageId, Message, ticketId2, title, email, sentTime)
             );
         }
+        
         
         TicketMessagesRecord ticketMessages = new(ticket, messages);
         return Results.Ok(ticketMessages);
