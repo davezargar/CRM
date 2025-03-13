@@ -178,13 +178,47 @@ app.MapPost(
     "/api/tickets",
     async (HttpContext context) =>
     {
-        NewTicketRecord ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
+        static string GenerateUniqueTicketLink()
+        {
 
+            using var rng = RandomNumberGenerator.Create();
+            var bytes = new byte[20];
+            rng.GetBytes(bytes);
+            return Convert.ToBase64String(bytes).TrimEnd('=').Replace('/', 'o');
+        }
         //if (ticketRequest == null)
         //return Results.BadRequest();
-        bool success = await queries.CreateTicketTask(ticketRequest);
+        
+        NewTicketRecord? ticketRequest = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
+        if (ticketRequest is null)
+            return Results.BadRequest();
+ 
+        if(!await queries.InsertCustomer(ticketRequest.UserEmail, ticketRequest.CompanyFk))
+            Console.WriteLine("couldnt create a user ");
+        
+        int ticketId = await queries.CreateTicketTask(ticketRequest);
+        string token = GenerateUniqueTicketLink();
+        while (!await queries.InsertTicketLink(ticketId, token))
+        {
+            token = GenerateUniqueTicketLink();
+        } 
+        
+        Console.WriteLine("http://localhost:5173/tickets/" + ticketId + "/" + token);
+        return Results.Ok();
+    }
+);
 
-        return Results.Ok(success);
+app.MapGet(
+    "/api/tickets/{ticketId:int}/{token}",
+    async (HttpContext context, int ticketId, string token) =>
+    {
+        TicketRecord? ticket = await queries.GetTicket(ticketId, "", token);
+        if (ticket is null)
+            return Results.BadRequest("ticketget fail ");
+        
+        List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
+        TicketMessagesRecord ticketMessages = new(ticket, messages);
+        return Results.Ok(ticketMessages);
     }
 );
 
@@ -197,7 +231,9 @@ app.MapGet(
         if (String.IsNullOrEmpty(requesterEmail))
             return Results.Unauthorized();
 
-        TicketRecord ticket = await queries.GetTicket(requesterEmail, ticketId);
+        TicketRecord? ticket = await queries.GetTicket(ticketId, requesterEmail);
+        if (ticket is null)
+            return Results.BadRequest("ticketget fail ");
         List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
         TicketMessagesRecord ticketMessages = new(ticket, messages);
         return Results.Ok(ticketMessages);

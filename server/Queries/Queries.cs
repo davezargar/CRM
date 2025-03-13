@@ -6,6 +6,8 @@ using Npgsql;
 using server.Records;
 using System.ComponentModel.Design;
 using System.Data;
+using System.Runtime.InteropServices.JavaScript;
+using Microsoft.AspNetCore.Mvc.Diagnostics;
 
 
 namespace server.Queries;
@@ -107,30 +109,82 @@ public class Queries
         }
     }
 
-    public async Task<bool> CreateTicketTask(NewTicketRecord ticketMessages)
+    public async Task<bool> InsertCustomer(string email, int companyId)
+    {
+        await using var cmd1 = _db.CreateCommand(
+            "SELECT EXISTS(SELECT 1 FROM users WHERE email = $1)");
+        cmd1.Parameters.AddWithValue(email);
+        bool exists = (bool?) await cmd1.ExecuteScalarAsync() ?? false;
+
+        if (!exists)
+        {
+            await using var cmd2 = _db.CreateCommand(
+                "INSERT INTO users (email, company_id, role) VALUES ($1, $2, $3::role)"
+            );
+            cmd2.Parameters.AddWithValue(email);
+            cmd2.Parameters.AddWithValue(companyId);
+            cmd2.Parameters.AddWithValue("customer");
+            int rows = await cmd2.ExecuteNonQueryAsync();
+            exists = (rows > 0);
+        }
+
+        return exists;
+    }
+    
+    public async Task<int> CreateTicketTask(NewTicketRecord ticketMessages)
     {
         try
         {
-            await using var cmd = _db.CreateCommand(
-                "WITH ticketIns AS (INSERT INTO tickets(category_id, subcategory_id, title, user_id, company_id) "
-                    + "values((SELECT id FROM categories WHERE name = $1 AND company_id = $6), (SELECT id FROM subcategories WHERE name = $2 AND main_category_id = (SELECT id FROM categories WHERE name = $1 AND company_id = $6)), $3, (SELECT id FROM users WHERE email = $4 AND company_id = $6), $6) returning id) "
-                    + "INSERT INTO messages(title, message, ticket_id, user_id) "
-                    + "values ($3, $5, (SELECT id FROM ticketIns), (SELECT id FROM users WHERE email = $4 AND company_id = $6))"
-            );
-            cmd.Parameters.AddWithValue(ticketMessages.CategoryName); //$1
-            cmd.Parameters.AddWithValue(ticketMessages.SubcategoryName); //$2
-            cmd.Parameters.AddWithValue(ticketMessages.Title); //$3
-            cmd.Parameters.AddWithValue(ticketMessages.UserEmail); //$4
-            cmd.Parameters.AddWithValue(ticketMessages.Message); //$5
-            cmd.Parameters.AddWithValue(ticketMessages.CompanyFk); //$6
-            await cmd.ExecuteNonQueryAsync();
-            return true;
+            Console.WriteLine("running insert now!");
+            Console.WriteLine(ticketMessages.SubcategoryName);
+            await using var cmd1 = _db.CreateCommand(
+                "INSERT INTO tickets(category_id, subcategory_id, title, user_id, company_id) " +
+                "values((SELECT id FROM categories WHERE name = $1 AND company_id = $5), (SELECT id FROM subcategories WHERE name = $2 AND " +
+                "main_category_id = (SELECT id FROM categories WHERE name = $1 AND company_id = $5)), $3, (SELECT id FROM users WHERE email = $4 AND " +
+                "company_id = $5), $5) RETURNING id");
+            cmd1.Parameters.AddWithValue(ticketMessages.CategoryName); //$1
+            cmd1.Parameters.AddWithValue(ticketMessages.SubcategoryName); //$2
+            cmd1.Parameters.AddWithValue(ticketMessages.Title); //$3
+            cmd1.Parameters.AddWithValue(ticketMessages.UserEmail); //$4
+            cmd1.Parameters.AddWithValue(ticketMessages.CompanyFk); //$5
+            int ticketid =  (int?) await cmd1.ExecuteScalarAsync() ?? -1;
+            
+            Console.WriteLine("generated ticket, id: " + ticketid.ToString());
+
+            if (ticketid == -1)
+                return ticketid;
+
+            await using var cmd2 = _db.CreateCommand(
+                "INSERT INTO messages(title, message, ticket_id, user_id) " +
+                "values ($1, $4, $5, (SELECT id FROM users WHERE email = $2 AND company_id = $3))");
+            cmd2.Parameters.AddWithValue(ticketMessages.Title);     //$1
+            cmd2.Parameters.AddWithValue(ticketMessages.UserEmail); //$2
+            cmd2.Parameters.AddWithValue(ticketMessages.CompanyFk); //$3
+            cmd2.Parameters.AddWithValue(ticketMessages.Message);   //$4
+            cmd2.Parameters.AddWithValue(ticketid);                 //$5
+            int rows = await cmd2.ExecuteNonQueryAsync();
+            if (rows <= 0)
+                return -1;
+            return ticketid;
+                
+            
+            
         }
         catch (Exception ex)
         {
             Console.WriteLine("Error creating ticket" + ex);
-            return false;
+            return -1;
         }
+    }
+
+    public async Task<bool> InsertTicketLink(int id, string token)
+    {
+        await using var cmd = _db.CreateCommand("INSERT INTO ticket_access_links (ticket_id, access_link) " +
+            "VALUES ($1, $2)");
+        cmd.Parameters.AddWithValue(id);
+        cmd.Parameters.AddWithValue(token);
+
+        return (await cmd.ExecuteNonQueryAsync() > 0);
     }
 
     public async Task<List<TicketRecord>> GetTicketsAll(string email) //email för den som gjort request används för att få vilket företag
@@ -165,33 +219,69 @@ public class Queries
         return tickets;
     }
 
-    public async Task<TicketRecord> GetTicket(string email, int id) //email för den som gjort request används för att få vilket företag
+    public async Task<TicketRecord?> GetTicket(int id, string? email, string? token = "") //email för den som gjort request används för att få vilket företag
     {
-        TicketRecord ticket;
-        await using var cmd = _db.CreateCommand(
-            "SELECT tickets.id, title, status, categories.name, subcategories.name, posted, closed, users.email,  tickets.company_id, elevated FROM tickets "
+
+        if (!String.IsNullOrEmpty(email))
+        {
+            TicketRecord ticket;
+            await using var cmd = _db.CreateCommand(
+                "SELECT tickets.id, title, status, categories.name, subcategories.name, posted, closed, users.email,  tickets.company_id, elevated FROM tickets "
                 + "INNER JOIN categories ON categories.id = tickets.category_id "
                 + "INNER JOIN subcategories ON subcategories.id = tickets.subcategory_id "
                 + "INNER JOIN users ON tickets.company_id = users.company_id WHERE tickets.id = $1 AND email = $2"
-        );
-        cmd.Parameters.AddWithValue(id);
-        cmd.Parameters.AddWithValue(email);
-        using var reader = await cmd.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
-        {
-            ticket = new(
-                reader.GetInt32(0),
-                reader.GetString(1),
-                reader.GetString(2),
-                reader.GetString(3),
-                reader.GetString(4),
-                reader.GetDateTime(5),
-                reader.IsDBNull(6) ? null : reader.GetDateTime(6),
-                reader.GetString(7),
-                reader.GetInt32(8),
-                reader.GetBoolean(9)
             );
-            return ticket;
+            cmd.Parameters.AddWithValue(id);
+            cmd.Parameters.AddWithValue(email);
+            using var reader = await cmd.ExecuteReaderAsync();
+            while (await reader.ReadAsync())
+            {
+                ticket = new(
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetString(4),
+                    reader.GetDateTime(5),
+                    reader.IsDBNull(6) ? null : reader.GetDateTime(6),
+                    reader.GetString(7),
+                    reader.GetInt32(8),
+                    reader.GetBoolean(9)
+                );
+                return ticket;
+            }
+        }
+        else if (!String.IsNullOrEmpty(token))
+        {
+            TicketRecord ticket;
+            Console.WriteLine("id:" + id);
+            Console.WriteLine("token" + token);
+            await using var cmd = _db.CreateCommand(
+                "SELECT tickets.id, title, status, categories.name, subcategories.name, posted, closed, users.email,  tickets.company_id, elevated FROM tickets " +
+                "INNER JOIN categories ON categories.id = tickets.category_id " +
+                "INNER JOIN subcategories ON subcategories.id = tickets.subcategory_id " +
+                "INNER JOIN users ON tickets.user_id = users.id " +
+                "INNER JOIN ticket_access_links ON ticket_access_links.ticket_id = tickets.id " +
+                "WHERE tickets.id = $1 AND ticket_access_links.access_link = $2");
+            cmd.Parameters.AddWithValue(id);
+            cmd.Parameters.AddWithValue(token);
+            using var reader = await cmd.ExecuteReaderAsync();
+            if (await reader.ReadAsync())
+            {
+                ticket = new(
+                    reader.GetInt32(0),
+                    reader.GetString(1),
+                    reader.GetString(2),
+                    reader.GetString(3),
+                    reader.GetString(4),
+                    reader.GetDateTime(5),
+                    reader.IsDBNull(6) ? null : reader.GetDateTime(6),
+                    reader.GetString(7),
+                    reader.GetInt32(8),
+                    reader.GetBoolean(9)
+                );
+                return ticket;
+            }
         }
         return null;
     }
@@ -200,32 +290,22 @@ public class Queries
     {
         List<MessagesRecord> messages = new List<MessagesRecord>();
         await using var cmd = _db.CreateCommand(
-            "SELECT messages.id, message, ticket_id, title, users.email, sent, encryption_key, encryption_iv FROM messages "
+            "SELECT messages.id, message, ticket_id, title, users.email, sent FROM messages "
                 + "INNER JOIN users ON users.id = messages.user_id WHERE ticket_id = $1"
         );
         cmd.Parameters.AddWithValue(id);
         using var reader = await cmd.ExecuteReaderAsync();
         while (await reader.ReadAsync())
         {
-            int messageId = reader.GetInt32(0);
-            string encryptedMessage = reader.GetString(1);
-            int ticketId = reader.GetInt32(2);
-            string title = reader.GetString(3);
-            string email = reader.GetString(4);
-            DateTime sentTime = reader.GetDateTime(5);
-            string encryptionKey = reader.GetString(6);
-            string encryptionIv = reader.GetString(7);
-
-            byte[] key = Convert.FromBase64String(encryptionKey);
-            byte[] iv = Convert.FromBase64String(encryptionIv);
-
-            byte[] encryptedBytes = Convert.FromBase64String(encryptedMessage);
-
-            string decryptedMessage = EncryptionSolver.Decrypt(encryptedBytes, key, iv);
-
-            messages.Add(
-                new MessagesRecord(messageId, decryptedMessage, ticketId, title, email, sentTime)
-            );
+            
+            
+            messages.Add(new MessagesRecord(
+                reader.GetInt32(0),
+            reader.GetString(1),
+            reader.GetInt32(2),
+            reader.GetString(3),
+            reader.GetString(4),
+            reader.GetDateTime(5)));
         }
         return messages;
     }
