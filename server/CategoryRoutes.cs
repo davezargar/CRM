@@ -13,11 +13,12 @@ public static class CategoryRoutes
         List<CategoryPairs> categoryPairs = new List<CategoryPairs>();
         List<CategoryRecord> categories = new List<CategoryRecord>();
         
-        //todo refactor entire logic >:|
+        //todo refactor entire logic >:| ૮(•͈⌔•͈)ა 
         
         await using var cmd = db.CreateCommand(
             "SELECT categories.name, subcategories.name FROM categories "
-            + "INNER JOIN subcategories ON categories.id = subcategories.main_category_id WHERE company_id = $1"
+            + "INNER JOIN subcategories ON categories.id = subcategories.main_category_id" +
+            " WHERE categories.company_id = $1"
         );
         cmd.Parameters.AddWithValue(companyId);
         using var reader = await cmd.ExecuteReaderAsync();
@@ -28,7 +29,7 @@ public static class CategoryRoutes
         }
 
         List<string> buffer = new List<string>();
-        string categoryPrevious = categoryPairs[0].MainCategory;
+        string categoryPrevious = categoryPairs.Count > 0 ? categoryPairs[0].MainCategory : "";
         foreach (var categoryPair in categoryPairs)
         {
             if (categoryPair.MainCategory == categoryPrevious)
@@ -43,10 +44,15 @@ public static class CategoryRoutes
             buffer.Clear();
             buffer.Add(categoryPair.Subcategory);
         }
-        categories.Add(new CategoryRecord(categoryPrevious, buffer));
+
+        if (buffer.Count > 0)
+        {
+            categories.Add(new CategoryRecord(categoryPrevious, buffer));
+        }
+        
         return Results.Ok(categories);
     }
-
+    
     public static async Task<IResult> GetCategories(NpgsqlDataSource db)
     {
         List<TicketCategoryRecord> ticketCategories = new();
@@ -66,6 +72,8 @@ public static class CategoryRoutes
         return Results.Ok(ticketCategories);
     }
 
+    
+    
     public static async Task<IResult> CreateCategory(HttpContext context, NpgsqlDataSource db)
     {
         try
@@ -76,6 +84,13 @@ public static class CategoryRoutes
             {
                 return Results.BadRequest("Category name cannot be empty.");
             }
+            
+            string? userEmail = context.Session.GetString("Email");
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                return Results.BadRequest("Could not determine company.");
+            }
+            
 
             Console.WriteLine(
                 $"Received category '{requestBody.Name}' for company ID {requestBody.CompanyId}"
