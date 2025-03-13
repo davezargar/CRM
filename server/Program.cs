@@ -98,6 +98,8 @@ static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
 app.MapPost("/api/workers", WorkerRoutes.CreateWorker);
 app.MapPut("/api/workers", WorkerRoutes.InactivateWorker);
 app.MapGet("/api/workers", WorkerRoutes.GetActiveWorkers);
+app.MapPost("/api/workers/password", WorkerRoutes.PostResetPasswordRequest);
+app.MapPut("/api/workers/password", WorkerRoutes.PutChangePassword);
 
 app.MapPost("/api/login", LoginRoutes.PostLogin);
 
