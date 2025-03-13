@@ -1,9 +1,12 @@
 using System.Security.Cryptography;
-using Microsoft.AspNetCore.Identity;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.Identity;
 using Npgsql;
 using server;
+using server.Classes;
+using server.Config;
 using server.Records;
+using server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSingleton<PasswordHasher<string>>();
@@ -18,10 +21,10 @@ builder.Services.AddSingleton<NpgsqlDataSource>(db);
 // a client is given a session identifier that is sent alongside a http request, server reads it and
 // accesses server stored data. Data is not sent to client
 
-builder.Services.AddDistributedMemoryCache(); 
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromSeconds(600); 
+    options.IdleTimeout = TimeSpan.FromSeconds(600);
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
@@ -58,6 +61,27 @@ app.Use(
 
 */
 
+// NEEDS TO BE REMOVED AFTER TESTING
+
+app.MapPost("/api/email", SendEmail);
+
+static async Task<IResult> SendEmail(EmailRequest request, IEmailService email)
+{
+    Console.WriteLine("Send email is called... Sending email now");
+
+    await email.SendEmailAsync(request.To, request.Subject, request.Body);
+
+    Console.WriteLine(
+        "Email sent to: "
+            + request.To
+            + " with subject: "
+            + request.Subject
+            + " and body: "
+            + request.Body
+    );
+    return Results.Ok(new { message = "Email sent." });
+}
+
 //account stuff
 app.MapPost("/api/workers", WorkerRoutes.CreateWorker);
 app.MapPut("/api/workers", WorkerRoutes.InactivateWorker);
@@ -82,11 +106,8 @@ app.MapPost("/api/ticket-categories", CategoryRoutes.CreateCategory);
 app.MapGet("/api/assign-tickets", CategoryRoutes.GetAssignCategories);
 app.MapPost("/api/assign-tickets", CategoryRoutes.AssignCategories);
 
-
 //unused feature for registering new user accounts
 app.MapPost("/api/customers", registerCustomer);
-
-
 
 async Task<IResult> registerCustomer(HttpContext context, NpgsqlDataSource db)
 {
@@ -103,7 +124,7 @@ async Task<IResult> registerCustomer(HttpContext context, NpgsqlDataSource db)
             var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // En vanlig e-postformatregex
             return Regex.IsMatch(email, emailRegex);
         }
-            
+
         if (!IsValidEmail(accountRequest.Email))
         {
             Console.WriteLine("Invalid email format.");
