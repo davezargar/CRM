@@ -216,6 +216,8 @@ app.MapGet(
         if (ticket is null)
             return Results.BadRequest("ticketget fail ");
         
+        context.Session.SetString("Email", ticket.UserEmail);
+        
         List<MessagesRecord> messages = await queries.GetTicketMessages(ticketId);
         TicketMessagesRecord ticketMessages = new(ticket, messages);
         return Results.Ok(ticketMessages);

@@ -355,7 +355,7 @@ public class Queries
         try
         {
             await using var cmd = _db.CreateCommand(
-                "UPDATE tickets set time_closed = CURRENT_TIMESTAMP, status = 'closed' WHERE ticket_id = $1 AND $2 = true"
+                "UPDATE tickets set closed = CURRENT_TIMESTAMP, status = 'closed' WHERE id = $1 AND $2 = true"
             );
             cmd.Parameters.AddWithValue(ticketStatus.Ticket_id);
             cmd.Parameters.AddWithValue(ticketStatus.Resolved);
