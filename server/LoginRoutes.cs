@@ -1,10 +1,9 @@
-using System.Security.Cryptography;
 using Microsoft.AspNetCore.Identity;
 using Npgsql;
-using server.Records;
 
 namespace server;
 
+public record LoginRecord(string Email, string Password);
 public record LoginDetails(string Email, string Password);
 
 public static class LoginRoutes

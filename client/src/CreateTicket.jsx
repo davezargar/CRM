@@ -117,7 +117,7 @@ export function CreateIkeaTicket(){
     const [subcategories, setSubcategories] = useState([]);
 
     useEffect(()=>{
-        fetch(`/api/categories/${formData.CompanyFk}`)
+        fetch(`/api/form/categories/${formData.CompanyFk}`)
             .then(response => response.json())
             .then(data => {
                 formData.CategoryName = data[0].mainCategory;
@@ -126,7 +126,7 @@ export function CreateIkeaTicket(){
                 setCategories(data);
             });
     }, []);
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -158,6 +158,7 @@ export function CreateIkeaTicket(){
                 setSubcategories(categories[i].subcategories);
             }
         }
+        console.log(formData)
     }, [formData]);
     
 
@@ -227,7 +228,7 @@ export function CreateMikromjukTicket() {
     const [subcategories, setSubcategories] = useState([]);
 
     useEffect(() => {
-        fetch(`/api/categories/${formData.CompanyFk}`)
+        fetch(`/api/form/categories/${formData.CompanyFk}`)
             .then(response => response.json())
             .then(data => {
                 formData.CategoryName = data[0].mainCategory;
@@ -266,6 +267,7 @@ export function CreateMikromjukTicket() {
                 setSubcategories(categories[i].subcategories);
             }
         }
+        console.log(formData)
     }, [formData]);
 
 

@@ -3,14 +3,14 @@
     padding: 20px;
 }
 
-.categories {
+.assign-tickets-container .categories {
     display: flex;
     justify-content: center;
     gap: 10px;
     margin-bottom: 20px;
 }
 
-.category {
+.assign-tickets-container .category {
     padding: 10px 20px;
     background-color: #007bff;
     color: white;
@@ -19,7 +19,7 @@
     user-select: none;
 }
 
-.worker {
+.assign-tickets-container .worker {
     border: 2px dashed #333;
     padding: 20px;
     margin: 10px;
