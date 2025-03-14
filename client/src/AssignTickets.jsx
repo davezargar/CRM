@@ -9,28 +9,60 @@ export function AssignTickets() {
     const [selectedCategory, setSelectedCategory] = useState(null);
 
     useEffect(() => {
-        async function fetchData() {
+        async function fetchAssignments() {
             try {
-                const workersResponse = await fetch("/api/workers");
-                const categoriesResponse = await fetch("/api/ticket-categories");
-                const assignmentsResponse = await fetch("/api/assign-tickets");
+                const response = await fetch("/api/assign-tickets", { credentials: "include" });
 
-                if (!workersResponse.ok || !categoriesResponse.ok || !assignmentsResponse.ok) {
-                    throw new Error("Failed to fetch data");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch assigned categories");
                 }
 
-                const workersData = await workersResponse.json();
-                const ticketCategoriesData = await categoriesResponse.json();
-                const assignmentsData = await assignmentsResponse.json();
-
-                setWorkers(workersData);
-                setTicketCategories(ticketCategoriesData);
-                setAssignments(assignmentsData);
+                const data = await response.json();
+                console.log("Fetched Assigned Categories:", data); 
+                setAssignments(data);
             } catch (error) {
-                console.error(error);
+                console.error("Error fetching assigned categories:", error);
             }
         }
-        fetchData();
+        fetchAssignments();
+    }, []);
+
+    useEffect(() => {
+        async function fetchCategories() {
+            try {
+                const response = await fetch("/api/ticket-categories", { credentials: "include" });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch ticket categories");
+                }
+
+                const data = await response.json();
+                console.log("Fetched Ticket Categories:", data); 
+                setTicketCategories(data);
+            } catch (error) {
+                console.error("Error fetching ticket categories:", error);
+            }
+        }
+        fetchCategories();
+    }, []);
+
+    useEffect(() => {
+        async function fetchWorkers() {
+            try {
+                const response = await fetch("/api/workers", { credentials: "include" });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch workers");
+                }
+
+                const data = await response.json();
+                console.log("Fetched Workers:", data); 
+                setWorkers(data);
+            } catch (error) {
+                console.error("Error fetching workers:", error);
+            }
+        }
+        fetchWorkers();
     }, []);
 
     const handleDragStart = (event, categoryId) => {
