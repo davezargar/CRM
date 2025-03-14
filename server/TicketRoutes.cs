@@ -89,7 +89,7 @@ public static class TicketRoutes
 
             if (await cmd.ExecuteNonQueryAsync() > 0)
                 collision = false;
-
+            token = GenerateUniqueTicketLink();
         }
         string link = DotEnv.GetString("Localhost") + "tickets/" + id + "/" + token;
         string emailSubject = "Here's a link to your new ticket";
