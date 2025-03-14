@@ -3,8 +3,19 @@
     justify-content: center;
     }
 
-#formId {
+.default-form #formId {
     background-color: grey;
     padding: 20px;
     border-radius: 10px;
+}
+
+/*Ikea ticket Styling*/
+.ikea-form {
+    background-color: green;
+    color: white;
+}
+
+.ikea-form #formId {
+    background-color: blue;
+    border: 2px solid
 }

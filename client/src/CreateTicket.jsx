@@ -168,6 +168,9 @@ export function CreateIkeaTicket(){
             [id]: value,
         }));
     };
+    
+    
+    const formClassName = formData.CompanyFk === 1? "ikea-form" : "default-form";
 
     return (
         <div id="createTicket">
