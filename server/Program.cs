@@ -106,8 +106,10 @@ app.MapPost("/api/login", LoginRoutes.PostLogin);
 //ticket stuff
 app.MapGet("/api/tickets", TicketRoutes.GetTickets);
 app.MapPost("/api/tickets", TicketRoutes.PostTickets);
+app.MapGet("/api/customer/tickets/{token}", TicketRoutes.GetTicketWithToken);
 app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
 app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
+
 
 app.MapGet("/api/form/categories/{companyId:int}", CategoryRoutes.GetFormCategories);
 
@@ -120,47 +122,5 @@ app.MapPost("/api/ticket-categories", CategoryRoutes.CreateCategory);
 app.MapGet("/api/assign-tickets", CategoryRoutes.GetAssignCategories);
 app.MapPost("/api/assign-tickets", CategoryRoutes.AssignCategories);
 
-//unused feature for registering new user accounts
-app.MapPost("/api/customers", registerCustomer);
-
-async Task<IResult> registerCustomer(HttpContext context, NpgsqlDataSource db)
-{
-    var accountRequest = await context.Request.ReadFromJsonAsync<CustomerRequest>();
-
-    if (accountRequest == null)
-    {
-        return Results.BadRequest("The request body is empty");
-    }
-    try
-    {
-        bool IsValidEmail(string email)
-        {
-            var emailRegex = @"^[^@\s]+@[^@\s]+\.[^@\s]+$"; // En vanlig e-postformatregex
-            return Regex.IsMatch(email, emailRegex);
-        }
-
-        if (!IsValidEmail(accountRequest.Email))
-        {
-            Console.WriteLine("Invalid email format.");
-            return Results.Problem("Couldn't process the SQL Query");
-        }
-
-        await using var cmd = db.CreateCommand(
-            "INSERT INTO users (email, company_id, role, password) VALUES ($1, $2, $3, $4)"
-        );
-        cmd.Parameters.AddWithValue(accountRequest.Email);
-        cmd.Parameters.AddWithValue(1);
-        cmd.Parameters.AddWithValue("customer");
-        cmd.Parameters.AddWithValue(accountRequest.Password);
-        await cmd.ExecuteNonQueryAsync();
-
-        return Results.Ok(new { message = "Successfully posted the account to database" });
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine("Error creating account: " + ex);
-        return Results.Problem("Couldn't process the SQL Query");
-    }
-}
 
 app.Run();
