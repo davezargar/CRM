@@ -50,8 +50,8 @@ function App() {
                 <Route path={"/tickets/:ticketId/:token?"} element={<TicketDetailed />} />
                 
                 <Route path="/create-ticket">
-                    <Route path={"ikea-form"} element={<CreateIkeaTicket />} />
-                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket />} />
+                    <Route path={"ikea-form"} element={<CreateIkeaTicket/>}/>
+                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket/>}/>
                 </Route>
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/customers" element={<CreateAccount />} />
@@ -67,8 +67,8 @@ function Index() {
     </div>
 }
 
-function TicketForms() {
-
+function TicketForms(){
+    
     return <div id={"ticket-forms-nav"}>
         <NavLink to={"/create-ticket/ikea-form"}><button type="button">ikea form</button></NavLink>
         <NavLink to={"/create-ticket/mikromjuk-form"}><button type="button">mikromjuk form</button></NavLink>

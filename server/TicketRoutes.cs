@@ -1,8 +1,8 @@
 ﻿using System.Security.Cryptography;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Npgsql;
 using Microsoft.AspNetCore.Identity;
-
+using server.Classes;
+using server.Services;
 
 namespace server;
 
@@ -17,7 +17,7 @@ public static class TicketRoutes
     public record TicketMessagesRecord(TicketRecord TicketRecord, List<MessagesRecord> Messages);
     
     public record NewTicketStatus(int Ticket_id, bool Resolved);
-    public static async Task<IResult> PostTickets(PasswordHasher<string> hasher, HttpContext context,
+    public static async Task<IResult> PostTickets(PasswordHasher<string> hasher, IEmailService emailService, HttpContext context,
         NpgsqlDataSource db)
     {
         NewTicketRecord? ticketMessages = await context.Request.ReadFromJsonAsync<NewTicketRecord>();
@@ -91,7 +91,17 @@ public static class TicketRoutes
                 collision = false;
 
         }
-        Console.WriteLine("http://localhost:5173/tickets/" + id + "/" + token);
+        string link = DotEnv.GetString("Localhost") + "tickets/" + id + "/" + token;
+        string emailSubject = "Here's a link to your new ticket";
+        string emailBody = "Hello \n" +
+                           " \n" +
+                           "We've recieved you ticket and will respond shortly," + 
+                           " to acceess your ticket you can click the link below\n" +
+                           link;
+        
+        await emailService.SendEmailAsync(ticketMessages.UserEmail, emailSubject, emailBody);
+
+        Console.WriteLine(link);
         return Results.Ok(true);
     }
     
