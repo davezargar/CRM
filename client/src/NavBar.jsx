@@ -6,7 +6,7 @@ const NavLinks = {
     Admin: [
         { name: "Manage workers", path: "./" },
         { name: "Add worker", path: "./add-worker" },
-        { name: "Remove worker", path: "/remove-worker" },
+        { name: "Remove worker", path: "./remove-worker" },
         { name: "Assign Tickets", path: "./assign-tickets" }
     ],
     Customer: [

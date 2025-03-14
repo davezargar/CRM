@@ -10,10 +10,10 @@ import { RoleContext } from "./main.jsx";
 export function AdminPanel() {
     return <div id="admin-panel">
         <RoleContext.Provider value={"Admin"}>
-            <NavBar/>
+            <NavBar />
 
             <div id={"admin-panel-main"}>
-                <Outlet/> {/*child routes will be rendered here??*/}
+                <Outlet /> {/*child routes will be rendered here??*/}
             </div>
         </RoleContext.Provider>
     </div>
@@ -41,7 +41,7 @@ export function AddWorker() {
         e.preventDefault();
 
         try {
-            const response = await fetch("/api/workers", {
+            const response = await fetch("/api/workers/password", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -103,7 +103,7 @@ export function RemoveWorker() {
 
         try {
             const response = await fetch("/api/workers", {
-                method: "DELETE",
+                method: "put",
                 headers: {
                     "Content-Type": "application/json",
                 },
