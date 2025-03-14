@@ -152,7 +152,8 @@ public static class WorkerRoutes
                 return Results.Problem("Failed to store reset token");
             }
 
-            string resetLink = $"http://localhost:5174/admin-panel/change-password/?token={token}";
+            string resetLink =  DotEnv.GetString("Localhost") + $"admin-panel/change-password/?token={token}";
+            
 
             var emailRequest = new EmailRequest(
                 requestBody.Email,
