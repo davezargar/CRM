@@ -219,7 +219,8 @@ public static class CategoryRoutes
                 {
                     await using var insertCmd = connection.CreateCommand();
                     insertCmd.CommandText =
-                        "INSERT INTO assigned_categories (user_id, category_id) VALUES ($1, $2)";
+                        "INSERT INTO assigned_categories (user_id, category_id) VALUES ($1, $2)" +
+                        "ON CONFLICT (user_id, category_id) DO NOTHING";
                     insertCmd.Parameters.AddWithValue(userId);
                     insertCmd.Parameters.AddWithValue(categoryId);
                     await insertCmd.ExecuteNonQueryAsync();
