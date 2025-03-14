@@ -88,14 +88,15 @@ public static class WorkerRoutes
         }
     }
 
-    public static async Task<IResult> GetActiveWorkers(NpgsqlDataSource db)
+    public static async Task<IResult> GetActiveWorkers(HttpContext context, NpgsqlDataSource db)
     {
         try
         {
             List<GetCustomerSupportEmail> customerSupportEmails = new();
             await using var cmd = db.CreateCommand(
-                "SELECT email FROM users WHERE role = 'support' AND active = true"
+                "SELECT email FROM users WHERE role = 'support' AND active = true AND company_id = $1"
             );
+            cmd.Parameters.AddWithValue(context.Session.GetInt32("company"));
             using var reader = await cmd.ExecuteReaderAsync();
 
             while (await reader.ReadAsync())
