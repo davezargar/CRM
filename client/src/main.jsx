@@ -8,14 +8,15 @@ import TicketDetailed from "./TicketDetailed.jsx";
 
 import { AddRemoveWorkers, AdminPanel } from './adminPanel';
 import { AddWorker, RemoveWorker } from './adminPanel';
-import { AssignTickets} from "./AssignTickets.jsx";
+import { AssignTickets } from "./AssignTickets.jsx";
 
 import CustomerTicket from "./CustomerTicket";
 import CustomerPanel from "./CustomerPanel";
-import { CreateTicket, CreateIkeaTicket, CreateMikromjukTicket} from "./CreateTicket";
+import { CreateTicket, CreateIkeaTicket, CreateMikromjukTicket } from "./CreateTicket";
 
 import "./style/Login.css";
 import CreateAccount from "./CreateAccount.jsx";
+import ChangePassword from './ChangePassword.jsx';
 
 export const RoleContext = createContext({});
 
@@ -31,25 +32,26 @@ function App() {
             <Routes>
                 <Route index element={<Index />} />
                 <Route path={"/customer-panel"} element={<CustomerPanel />} />
-                <Route path={"/customer-panel/tickets/:ticketId"} element={<CustomerTicket />}/>
+                <Route path={"/customer-panel/tickets/:ticketId"} element={<CustomerTicket />} />
                 <Route path={"/customer-service-panel"} element={<CustomerServicePanel />}>
                     <Route path={"/customer-service-panel/tickets"} element={<TicketDisplayActive />} /> {/*Should default to this path dont know how*/}
                     <Route path={"/customer-service-panel/tickets/:ticketId"} element={<TicketDetailed />} />
                     {/*Route account settings*/}
                 </Route>
 
-                <Route path='/admin-panel' element={<AdminPanel/>} >
-                    <Route index element={<AddRemoveWorkers/>}/>
-                    <Route path='add-worker' element={<AddWorker/>}/>
-                    <Route path='remove-worker' element={<RemoveWorker/>} />
-                    <Route path='assign-tickets' element={<AssignTickets/>} />
+                <Route path='/admin-panel' element={<AdminPanel />} >
+                    <Route index element={<AddRemoveWorkers />} />
+                    <Route path='add-worker' element={<AddWorker />} />
+                    <Route path='remove-worker' element={<RemoveWorker />} />
+                    <Route path='assign-tickets' element={<AssignTickets />} />
+                    <Route path='change-password' element={<ChangePassword />} />
                 </Route>
                 
                 <Route path={"/tickets/:ticketId/:token?"} element={<TicketDetailed />} />
                 
                 <Route path="/create-ticket">
-                    <Route path={"ikea-form"} element={<CreateIkeaTicket/>}/>
-                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket/>}/>
+                    <Route path={"ikea-form"} element={<CreateIkeaTicket />} />
+                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket />} />
                 </Route>
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/customers" element={<CreateAccount />} />
@@ -65,8 +67,8 @@ function Index() {
     </div>
 }
 
-function TicketForms(){
-    
+function TicketForms() {
+
     return <div id={"ticket-forms-nav"}>
         <NavLink to={"/create-ticket/ikea-form"}><button type="button">ikea form</button></NavLink>
         <NavLink to={"/create-ticket/mikromjuk-form"}><button type="button">mikromjuk form</button></NavLink>
