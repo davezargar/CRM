@@ -1,5 +1,8 @@
 ﻿using Npgsql;
 using Microsoft.AspNetCore.Identity;
+using Org.BouncyCastle.Cms;
+using server.Services;
+using server.Classes;
 
 
 namespace server;
@@ -148,7 +151,7 @@ public static class TicketRoutes
         return Results.Ok(ticketMessages);
     }
 
-    public static async Task<IResult> UpdateTicket(HttpContext context, NpgsqlDataSource db)
+    public static async Task<IResult> UpdateTicket(HttpContext context, NpgsqlDataSource db, IEmailService email)
     {
         NewTicketStatus requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
         if (requestBody == null)
@@ -160,12 +163,31 @@ public static class TicketRoutes
         try
         {
             await using var cmd = db.CreateCommand(
-                "UPDATE tickets set closed = CURRENT_TIMESTAMP, status = 'closed' WHERE id = $1 AND $2 = true"
+                "UPDATE tickets set closed = CURRENT_TIMESTAMP, status = 'closed' WHERE id = $1 AND $2 = true returning email"
             );
             cmd.Parameters.AddWithValue(requestBody.Ticket_id);
             cmd.Parameters.AddWithValue(requestBody.Resolved);
-            await cmd.ExecuteNonQueryAsync();
+            string fromEmail = (string?)await cmd.ExecuteScalarAsync() ?? "";
             success = true;
+            string token = Guid.NewGuid().ToString();
+
+            bool successToken = await StoreFeedbackToken(requestBody.Ticket_id, token, db);
+
+            if (!successToken)
+            {
+                return Results.Problem("Failed to store feeback token");
+            }
+
+            string feedbackLink = $"http://localhost:5173/feedback-form/?token={token}";
+
+            var emailRequest = new EmailRequest(
+                fromEmail,
+                "Give Feedback",
+                $"Hello, {fromEmail}, \n\nYour ticket has been resolved. \nPlease click the link to give us feedback: \n<a href='{feedbackLink}'>Feedback Form</a>"
+            );
+
+            await email.SendEmailAsync(emailRequest.To, emailRequest.Subject, emailRequest.Body);
+
         }
         catch (Exception ex)
         {
@@ -181,4 +203,42 @@ public static class TicketRoutes
         return Results.Ok(new { message = "Successfully posted the ticket status to database" });
     }
     
+    private static async Task<bool> StoreFeedbackToken( int ticket_id, string token, NpgsqlDataSource db)
+    {
+        try
+        {
+            int user_id;
+
+            await using var getUserIdCmd = db.CreateCommand(
+                "SELECT user_id from tickets WHERE id = $1"
+            );
+            getUserIdCmd.Parameters.AddWithValue(ticket_id);
+            Console.WriteLine(ticket_id);
+
+            await using var reader = await getUserIdCmd.ExecuteReaderAsync();
+            if (!await reader.ReadAsync()){
+                Console.WriteLine("No user found for ticket id" + ticket_id);
+                return false;
+            }
+
+            user_id = reader.GetInt32(0);
+            Console.WriteLine("User found" + user_id);
+
+            await using var insertTokenCmd = db.CreateCommand(
+                "INSERT INTO feedback_token (id, token) VALUES ($1, $2)"
+            );
+            insertTokenCmd.Parameters.AddWithValue(user_id);
+            insertTokenCmd.Parameters.AddWithValue(token);
+
+            int rowsAffected = await insertTokenCmd.ExecuteNonQueryAsync();
+            return rowsAffected > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in StoreFeedbackToken: {ex.Message}");
+            return false;
+        }
+
+    }
+
 }
