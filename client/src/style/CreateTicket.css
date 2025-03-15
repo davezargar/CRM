@@ -6,10 +6,16 @@ h1{
     color: white;
 }
 
+#formId {
+    background-color: grey;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: rgb(46, 44, 77); 
+}
 #createTicket {
     display: grid;
     justify-content: center;
-    min-height: 100vh;
+    
     
 }
 /*Ikea ticket Styling*/
@@ -25,6 +31,7 @@ h1{
 .ikea-form #formId {
     background-color: #259797;
     border: 2px solid #0058a3;
+    overflow: auto;
     
 }
 
