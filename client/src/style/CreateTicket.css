@@ -1,21 +1,38 @@
-#createTicket {
-    display: grid;
-    justify-content: center;
-    }
-
-.default-form #formId {
+#formId {
     background-color: grey;
     padding: 20px;
     border-radius: 10px;
 }
 
+#createTicket {
+    display: grid;
+    justify-content: center;
+    min-height: 100vh;
+    
+}
 /*Ikea ticket Styling*/
 .ikea-form {
-    background-color: green;
-    color: white;
+    background-color: #78b1bf;
+    padding: 20px;
+    border-radius: 10px;
+    color: black;
+    font: bold 18px "Lucida Grande", Helvetica, Arial, sans-serif;
+    
 }
 
 .ikea-form #formId {
-    background-color: blue;
-    border: 2px solid
+    background-color: #259797;
+    border: 2px solid #0058a3;
+    
+}
+
+.default-form {
+    background-color: grey;
+    color: black;
+}
+
+.default-form #formId {
+    background-color: grey;
+    padding: 20px;
+    border-radius: 10px;
 }

@@ -173,7 +173,7 @@ export function CreateIkeaTicket(){
     const formClassName = formData.CompanyFk === 1? "ikea-form" : "default-form";
 
     return (
-        <div id="createTicket">
+        <div id="createTicket" className={formClassName}>
             <h1>Create Ticket</h1>
             <form id="formId" onSubmit={handleSubmit}>
                 <h3>Category (temp data)</h3>
