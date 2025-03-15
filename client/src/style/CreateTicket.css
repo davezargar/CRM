@@ -6,14 +6,43 @@ h1{
     color: white;
 }
 
-#createTicket {
-    display: grid;
-    justify-content: center;
-    }
-
 #formId {
     background-color: grey;
     padding: 20px;
     border-radius: 10px;
+    background-color: rgb(46, 44, 77); 
+}
+
+#createTicket {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height:100vh;
+    overflow: auto;
+    
+    
+}
+/*Default ticket styling*/
+.default-form {
+    background-color: grey;
+    color: black;
+}
+
+.default-form #formId {
+    background-color: grey;
+    padding: 20px;
+    border-radius: 10px;
     background-color: rgb(46, 44, 77);
+}
+/*Ikea ticket Styling*/
+.ikea-form {
+    background-color: #78b1bf;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.ikea-form #formId {
+    background-color: #259797;
+    border: 2px solid #0058a3;
+    overflow: auto;
 }
