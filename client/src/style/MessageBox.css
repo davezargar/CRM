@@ -2,8 +2,9 @@
     width: 120px;
     height: 40px;
     cursor: pointer;
-    background-color: rgb(63, 152, 208);
+    background-color: white;
     right: 20px;
+    border-radius: 5px;
 }
 
 .replyContainer,
