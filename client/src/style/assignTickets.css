@@ -1,4 +1,8 @@
-﻿.assign-tickets-container {
+﻿h2 {
+    color: white;
+}
+
+.assign-tickets-container {
     text-align: center;
     padding: 20px;
 }
@@ -20,11 +24,13 @@
 }
 
 .assign-tickets-container .worker {
-    border: 2px dashed #333;
+    border: 2px white;
+    border-radius: 10px;
     padding: 20px;
     margin: 10px;
-    background-color: #f9f9f9;
+    background-color: grey;
     min-height: 100px;
+    
 }
 
 .assigned-categories {
