@@ -39,17 +39,17 @@ function ChangePassword() {
     return <div>
         <form className="formContainer" onSubmit={handleSubmit}>
             <div className="formRow">
-                <label>New Password: <input type="text" name="password1" required value={checkPassword}
-                    onChange={(e) => setCheckPassword(e.target.value)}></input></label>
+                <label>New Password: </label><input type="text" name="password1" required value={checkPassword}
+                    onChange={(e) => setCheckPassword(e.target.value)}></input>
             </div>
 
             <div className="formRow">
-                <label>Repeat New Password: <input type="text" name="password2" required value={password}
-                    onChange={(e) => setPassword(e.target.value)}></input></label>
+                <label>Repeat New Password: </label><input type="text" name="password2" required value={password}
+                    onChange={(e) => setPassword(e.target.value)}></input>
             </div>
 
-            <div className="submitContainer">
-                <button type="submit" id="sendButton">Send</button>
+            <div className="submitContainer1">
+                <button type="submit" id="sendButton">Confirm</button>
             </div>
         </form>
     </div>
