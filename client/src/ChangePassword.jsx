@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext, createContext } from "react";
+import "./style/changePassword.css"
 
 export default ChangePassword;
 
@@ -6,6 +7,7 @@ function ChangePassword() {
     const [checkPassword, setCheckPassword] = useState("");
     const [password, setPassword] = useState("");
     const token = new URLSearchParams(window.location.search).get('token');
+    const [message, setMessage] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -13,7 +15,8 @@ function ChangePassword() {
         if (checkPassword !== password) {
             setCheckPassword("");
             setPassword("");
-            alert("The passwords don't match each other... Please try again");
+            setMessage("❌ The passwords don't match each other... Please try again");
+            setTimeout(() => setMessage(""), 3000);
             return;
         }
 
@@ -28,10 +31,12 @@ function ChangePassword() {
             if (!response.ok) {
                 throw new Error("Something went wrong with updating password");
             }
-            alert("Password Changed!");
+            setMessage("✅ Password changed successfully!");
+            setTimeout(() => setMessage(""), 3000);
         } catch (error) {
             console.error(error);
-            alert("Couldn't change password...");
+            setMessage("❌  Password couldn't be updated!");
+            setTimeout(() => setMessage(""), 3000);
         }
     }
 
@@ -51,6 +56,7 @@ function ChangePassword() {
             <div className="submitContainer1">
                 <button type="submit" id="sendButton">Confirm</button>
             </div>
+            <p style={{ color: "green" }}>{message}</p>
         </form>
     </div>
 }
