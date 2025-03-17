@@ -1,5 +1,5 @@
 import { useState, use } from 'react'
-import { NavLink } from "react-router";
+import {NavLink, useNavigate} from "react-router";
 import "./style/NavBar.css"
 import { RoleContext } from "./main.jsx";
 const NavLinks = {
@@ -23,6 +23,16 @@ const NavLinks = {
 
 function NavBar() {
     const role = use(RoleContext);
+    const navigate = useNavigate();
+
+    const handleLogout = async () => {
+        try {
+            await fetch("/api/logout", { method: "POST", credentials: "include" });
+            navigate("/"); 
+        } catch (error) {
+            console.error("Logout failed:", error);
+        }
+    };
 
 
     return (<div id={"nav-container"}>
@@ -36,10 +46,21 @@ function NavBar() {
                             </li>
                         </div>
                     ))}
+                    <div className='optionContainer'>
+                        <li>
+                            <NavLink
+                                className='Options' 
+                                to='/'
+                                onClick={() => handleLogout()}
+                                >
+                                Logout
+                            </NavLink>
+                        </li>
+                    </div>
                 </ul>
             </nav>
         </div>
-    )
+    );
 }
 
 export default NavBar;
