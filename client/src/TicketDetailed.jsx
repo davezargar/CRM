@@ -52,6 +52,7 @@ function TicketDetailed() {
     }
 
     return <div id={"ticket-detailed"}>
+        <span id={"ticketflex"}>
         <div className="info">
             <ul id={"information"}>
                 <li key={Ticket.ticketId}>
@@ -59,17 +60,17 @@ function TicketDetailed() {
                     <p>Created: {datetimeFormatter(Ticket.timePosted)} </p>
                 </li>
             </ul>
+            
         </div>
         <div className="refreshContainer">
             <button className="refreshButton" onClick={() => SetRefresh(current => !current)}>Refresh</button>
         </div>
+            </span>
         <ul id={"ticketList"}>
             <li key={Ticket.ticketId}>
-                <p className={"ticketId"}>{Ticket.ticketId}</p>
-                <p className={"category"}>{Ticket.category}</p>
-                <p className={"subcategory"}>{Ticket.subcategory}</p>
-                <p className={"title"}>{Ticket.title}</p>
-                <p className={"timeposted"}>{datetimeFormatter(Ticket.timePosted)}</p>
+                <p className={"category"}>Main category: {Ticket.category}</p>
+                <p className={"subcategory"}>Subcategory: {Ticket.subcategory}</p>
+                <p className={"title"}>Title: {Ticket.title}</p>
             </li>
         </ul>
         <div className="messageContainer">
@@ -77,7 +78,7 @@ function TicketDetailed() {
                 {Messages.map((Message =>
                     <li key={Message.messageId}>
                         <p className={"time_Posted"}>Time sent: {datetimeFormatter(Message.timePosted)}</p>
-                        <h3>Title:<p className={"title"}>{Message.title}</p></h3>
+                        <h3><p className={"title"}>{Message.title}</p></h3>
                         <h4>Message:</h4>
                         <p className={"message"}>{Message.message}</p>
                         <h5>From:<p className={"messageSender"}>{Message.userId}</p></h5>

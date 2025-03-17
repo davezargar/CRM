@@ -64,6 +64,25 @@ p{
 .refreshContainer {
     display: flex;
     justify-content: flex-end;
+    margin-top: 2%;
+    margin-right: 5vh;
+}
+
+#ticketList{
+    list-style-type: none;
+    margin: 0;
+    margin-bottom: 5px;
+    background-color: rgb(46, 44, 77);
+    padding-bottom: 5px;
+    P:first-child{
+        margin-top: 0;
+    }
+}
+
+#ticketflex{
+    display: flex;
+    justify-content: space-between;
+    background-color: rgb(46, 44, 77);
 }
 
 #ticket-detailed {
