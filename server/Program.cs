@@ -109,7 +109,7 @@ app.MapPost("/api/tickets", TicketRoutes.PostTickets);
 app.MapGet("/api/customer/tickets/{token}", TicketRoutes.GetTicketWithToken);
 app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
 app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
-
+app.MapGet("api/tickets/resolved", TicketRoutes.GetResolvedTickets);
 
 app.MapGet("/api/form/categories/{companyId:int}", CategoryRoutes.GetFormCategories);
 
@@ -121,6 +121,5 @@ app.MapPost("/api/ticket-categories", CategoryRoutes.CreateCategory);
 
 app.MapGet("/api/assign-tickets", CategoryRoutes.GetAssignCategories);
 app.MapPost("/api/assign-tickets", CategoryRoutes.AssignCategories);
-
 
 app.Run();
