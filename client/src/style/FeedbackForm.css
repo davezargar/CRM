@@ -4,7 +4,7 @@ justify-content: center;
 flex-wrap: wrap;
 }
 
-div{
+#reviewForm{
 display: flex;
 flex-wrap: wrap;
 background-color: rgb(46, 44, 77);
@@ -20,14 +20,14 @@ display: flex;
 display: grid;
 max-width: 25%;
 }
-input{
+#reviewInput{
     height: fit-content;
 }
 
-select{
+#reviewSelect{
     max-width: 100px;
 }
-label{
+#reviewLabel{
     flex-wrap: wrap;
 }
 

@@ -36,10 +36,10 @@ function FeedbackForm () {
             alert("Couldn't create review.");
         }
     }
-        return <div>
+        return <div id="reviewForm">
     <form className="reviewContainer" onSubmit={handleSubmit}>
         <h3>Rating</h3>
-    <select name="rating" required value={feedbackData.Rating} onChange={handleChange}>
+    <select id="reviewSelect" name="rating" required value={feedbackData.Rating} onChange={handleChange}>
         <option value="" disabled>Give 1-5 stars</option>
         <option value="1">★☆☆☆☆</option>
         <option value="2">★★☆☆☆</option>
@@ -48,9 +48,9 @@ function FeedbackForm () {
         <option value="5">★★★★★</option>
     </select>
     <h3>Comments</h3>
-    <label>How was your experience?<br></br>
+    <label id="reviewLabel">How was your experience?<br></br>
         Please elaborate
-        <input type="text" name="comment" value={feedbackData.Comments} onChange={handleChange}></input></label>
+        <input id="reviewInput" type="text" name="comment" value={feedbackData.Comments} onChange={handleChange}></input></label>
     <div className="submitContainer">
                 <button type="submit" id="sendButton">Send</button>
             </div>
