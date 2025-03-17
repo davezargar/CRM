@@ -1,37 +1,39 @@
-body{
-display: flex;
-justify-content: center;
-flex-wrap: wrap;
-}
-
 #reviewForm{
 display: flex;
 flex-wrap: wrap;
 background-color: rgb(46, 44, 77);
 border-radius: 10px;
-}
-.reviewContainer{
-    display:flex;
-    flex-wrap: wrap;
-color: white;
-padding: 20px;
-border-radius: 10px;
-display: flex;
-display: grid;
-max-width: 25%;
-}
-#reviewInput{
-    height: fit-content;
-}
 
-#reviewSelect{
-    max-width: 100px;
-}
-#reviewLabel{
-    flex-wrap: wrap;
-}
+    body{
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+    
+    
+    .reviewContainer{
+        display:flex;
+        flex-wrap: wrap;
+        color: white;
+        padding: 20px;
+        border-radius: 10px;
+        display: flex;
+        display: grid;
+        max-width: 25%;
+    }
+    #reviewInput{
+        height: fit-content;
+    }
 
-#sendButton{
-    margin-left:0;
-    margin-top: 5px;
+    #reviewSelect{
+        max-width: 100px;
+    }
+    #reviewLabel{
+        flex-wrap: wrap;
+    }
+
+    #sendButton{
+        margin-left:0;
+        margin-top: 5px;
+    }
 }

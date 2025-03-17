@@ -116,7 +116,7 @@ public static class TicketRoutes
                 "WITH ticketIns AS (INSERT INTO tickets(category_id, subcategory_id, title, user_id, company_id) "
                     + "values((SELECT id FROM categories WHERE name = $1 AND company_id = $6), (SELECT id FROM subcategories WHERE name = $2 AND main_category_id = (SELECT id FROM categories WHERE name = $1 AND company_id = $6)), $3, (SELECT id FROM users WHERE email = $4 AND company_id = $6), $6) returning id) "
                     + "INSERT INTO messages(title, message, ticket_id, user_id) "
-                    + "values ($3, $5, (SELECT id FROM ticketIns), (SELECT id FROM users WHERE email = $4 AND company_id = $6)) returning ticket_id"
+                    + "values ($3, $5, (SELECT id FROM ticketIns), (SELECT id FROM users WHERE email = $4)) returning ticket_id"
             );
             cmd.Parameters.AddWithValue(ticketMessages.CategoryName); //$1
             cmd.Parameters.AddWithValue(ticketMessages.SubcategoryName); //$2
@@ -178,7 +178,7 @@ public static class TicketRoutes
 
         List<TicketRecord> tickets = new List<TicketRecord>();
         await using var cmd = db.CreateCommand(
-            "SELECT id, title, status, main_category, sub_category, posted, closed, email, company_id, elevated FROM tickets_view WHERE company_id = (SELECT company_id FROM users WHERE email = $1 LIMIT 1)"
+            "SELECT id, title, status, main_category, sub_category, posted, closed, email, company_id, elevated FROM tickets_view WHERE company_id = (SELECT company_id FROM users WHERE email = $1 AND status = 'pending' LIMIT 1)"
         );
         cmd.Parameters.AddWithValue(requesterEmail);
         using var reader = await cmd.ExecuteReaderAsync();
