@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using server.Classes;
 using server.Services;
 using Org.BouncyCastle.Cms;
+using Microsoft.VisualBasic;
 
 
 namespace server;
@@ -19,6 +20,43 @@ public static class TicketRoutes
     public record TicketMessagesRecord(TicketRecord TicketRecord, List<MessagesRecord> Messages);
     
     public record NewTicketStatus(int Ticket_id, bool Resolved);
+
+    public record FeedbackRecord(int Id, int Rating, string Comment, DateTime Written, int From, int Target, int TicketId);
+
+    public record FeedbackFormRecord(int Rating, string Comment);
+
+    public record FeedbackRequest(FeedbackFormRecord FeedbackData, string Token);
+
+    public static async Task<bool> PostReview(NpgsqlDataSource db, FeedbackRequest request)
+    {
+        Console.WriteLine(request.Token);
+        Console.WriteLine(request.FeedbackData.Rating);
+        Console.WriteLine(request.FeedbackData.Comment);
+        int ticketId = 0;
+        int userId = 0;
+        await using var cmd1 = db.CreateCommand(
+            "SELECT tickets.id, tickets.user_id FROM tickets INNER JOIN feedback_token ON tickets.id = feedback_token.id WHERE token = $1"
+        );
+        cmd1.Parameters.AddWithValue(request.Token);
+        using var reader = await cmd1.ExecuteReaderAsync();
+        if (await reader.ReadAsync())
+        {
+            ticketId = reader.GetInt32(0);
+            userId = reader.GetInt32(1);
+        }
+        if (ticketId == 0 || userId == 0)
+            return false;
+
+        await using var cmd2 = db.CreateCommand(
+            "INSERT INTO feedback (rating, comment, from_user, ticket_id) VALUES ($1, $2, $3, $4)"
+        );
+        cmd2.Parameters.AddWithValue(request.FeedbackData.Rating);
+        cmd2.Parameters.AddWithValue(request.FeedbackData.Comment);
+        cmd2.Parameters.AddWithValue(userId);
+        cmd2.Parameters.AddWithValue(ticketId);
+        await cmd2.ExecuteNonQueryAsync();
+        return true;
+    }
     public static async Task<IResult> PostTickets(PasswordHasher<string> hasher, IEmailService emailService, HttpContext context,
         NpgsqlDataSource db)
     {
@@ -290,11 +328,22 @@ public static class TicketRoutes
         try
         {
             await using var cmd = db.CreateCommand(
-                "UPDATE tickets set closed = CURRENT_TIMESTAMP, status = 'closed' WHERE id = $1 AND $2 = true returning email"
+                "UPDATE tickets set closed = CURRENT_TIMESTAMP, status = 'closed' WHERE id = $1 AND $2 = true returning user_id"
             );
             cmd.Parameters.AddWithValue(requestBody.Ticket_id);
             cmd.Parameters.AddWithValue(requestBody.Resolved);
-            string fromEmail = (string?)await cmd.ExecuteScalarAsync() ?? "";
+            int id = (int?)await cmd.ExecuteScalarAsync() ?? -1;
+
+            if (id == -1)
+            return Results.Problem("Couldn't find user ID from update");
+
+            await using var cmd1 = db.CreateCommand(
+                "SELECT email FROM users WHERE id = $1"
+            );
+
+            cmd1.Parameters.AddWithValue(id);
+
+            string fromEmail = (string?)await cmd1.ExecuteScalarAsync() ?? "";
             success = true;
             string token = Guid.NewGuid().ToString();
 
@@ -354,7 +403,7 @@ public static class TicketRoutes
             await using var insertTokenCmd = db.CreateCommand(
                 "INSERT INTO feedback_token (id, token) VALUES ($1, $2)"
             );
-            insertTokenCmd.Parameters.AddWithValue(user_id);
+            insertTokenCmd.Parameters.AddWithValue(ticket_id);
             insertTokenCmd.Parameters.AddWithValue(token);
 
             int rowsAffected = await insertTokenCmd.ExecuteNonQueryAsync();
