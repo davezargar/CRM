@@ -1,16 +1,16 @@
-#nav-container{
+#nav-container {
     width: 100%;
     display: flex;
     justify-content: center;
     border-right: 1px solid black;
     box-shadow: 0 0 15px rgb(0, 0, 0);
-    
+
     nav {
         grid-area: navBar;
         display: flex;
         font-size: larger;
         text-decoration: none;
-        height: 100vh;
+        min-height: 100vh;
         background-color: rgb(46, 44, 77);
         overflow-y: auto;
     }
@@ -68,7 +68,7 @@
     p {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         color: white;
-        
+
     }
 
     .roleText {
@@ -80,6 +80,3 @@
         margin: 0 auto;
     }
 }
-
-
-
