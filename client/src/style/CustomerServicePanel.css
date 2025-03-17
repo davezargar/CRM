@@ -10,6 +10,8 @@
     padding-left: 40px;
     padding-right: 40px;
     width: auto;
+    overflow-y: scroll;
+    max-height: 100vh;
 }
 
 
@@ -51,7 +53,7 @@ h5 {
     color: white;
 }
 
-p{
+p {
     color: white;
 }
 

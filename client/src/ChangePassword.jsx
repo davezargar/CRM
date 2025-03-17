@@ -1,4 +1,5 @@
 import { useEffect, useState, useContext, createContext } from "react";
+import "./style/changePassword.css"
 
 export default ChangePassword;
 
@@ -6,6 +7,7 @@ function ChangePassword() {
     const [checkPassword, setCheckPassword] = useState("");
     const [password, setPassword] = useState("");
     const token = new URLSearchParams(window.location.search).get('token');
+    const [message, setMessage] = useState("");
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -13,7 +15,8 @@ function ChangePassword() {
         if (checkPassword !== password) {
             setCheckPassword("");
             setPassword("");
-            alert("The passwords don't match each other... Please try again");
+            setMessage("❌ The passwords don't match each other... Please try again");
+            setTimeout(() => setMessage(""), 3000);
             return;
         }
 
@@ -28,10 +31,12 @@ function ChangePassword() {
             if (!response.ok) {
                 throw new Error("Something went wrong with updating password");
             }
-            alert("Password Changed!");
+            setMessage("✅ Password changed successfully!");
+            setTimeout(() => setMessage(""), 10000);
         } catch (error) {
             console.error(error);
-            alert("Couldn't change password...");
+            setMessage("❌  Password couldn't be updated!");
+            setTimeout(() => setMessage(""), 10000);
         }
     }
 
@@ -39,17 +44,18 @@ function ChangePassword() {
     return <div>
         <form className="formContainer" onSubmit={handleSubmit}>
             <div className="formRow">
-                <label>New Password: <input type="text" name="password1" required value={checkPassword}
-                    onChange={(e) => setCheckPassword(e.target.value)}></input></label>
+                <label>New Password: </label><input type="text" name="password1" required value={checkPassword}
+                    onChange={(e) => setCheckPassword(e.target.value)}></input>
             </div>
 
             <div className="formRow">
-                <label>Repeat New Password: <input type="text" name="password2" required value={password}
-                    onChange={(e) => setPassword(e.target.value)}></input></label>
+                <label>Repeat New Password: </label><input type="text" name="password2" required value={password}
+                    onChange={(e) => setPassword(e.target.value)}></input>
             </div>
 
-            <div className="submitContainer">
-                <button type="submit" id="sendButton">Send</button>
+            <div className="submitContainer1">
+                <button type="submit" id="sendButton">Confirm</button>
+                {message && <p className="message-password">{message}</p>}
             </div>
         </form>
     </div>
