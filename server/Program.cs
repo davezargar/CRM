@@ -110,6 +110,7 @@ app.MapGet("/api/customer/tickets/{token}", TicketRoutes.GetTicketWithToken);
 app.MapGet("/api/tickets/{ticketId:int}", TicketRoutes.GetTicket);
 app.MapPut("/api/tickets", TicketRoutes.UpdateTicket);
 app.MapGet("api/tickets/resolved", TicketRoutes.GetResolvedTickets);
+app.MapPost("/api/feedback-form", TicketRoutes.PostReview);
 
 app.MapGet("/api/form/categories/{companyId:int}", CategoryRoutes.GetFormCategories);
 

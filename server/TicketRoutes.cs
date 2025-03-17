@@ -1,6 +1,6 @@
 ﻿using System.Security.Cryptography;
-using Microsoft.AspNetCore.Identity;
 using Npgsql;
+using Microsoft.AspNetCore.Identity;
 using server.Classes;
 using server.Services;
 
@@ -45,12 +45,44 @@ public static class TicketRoutes
 
     public record NewTicketStatus(int Ticket_id, bool Resolved);
 
-    public static async Task<IResult> PostTickets(
-        PasswordHasher<string> hasher,
-        IEmailService emailService,
-        HttpContext context,
-        NpgsqlDataSource db
-    )
+    public record FeedbackRecord(int Id, int Rating, string Comment, DateTime Written, int From, int Target, int TicketId);
+
+    public record FeedbackFormRecord(int Rating, string Comment);
+
+    public record FeedbackRequest(FeedbackFormRecord FeedbackData, string Token);
+
+    public static async Task<bool> PostReview(NpgsqlDataSource db, FeedbackRequest request)
+    {
+        Console.WriteLine(request.Token);
+        Console.WriteLine(request.FeedbackData.Rating);
+        Console.WriteLine(request.FeedbackData.Comment);
+        int ticketId = 0;
+        int userId = 0;
+        await using var cmd1 = db.CreateCommand(
+            "SELECT tickets.id, tickets.user_id FROM tickets INNER JOIN feedback_token ON tickets.id = feedback_token.id WHERE token = $1"
+        );
+        cmd1.Parameters.AddWithValue(request.Token);
+        using var reader = await cmd1.ExecuteReaderAsync();
+        if (await reader.ReadAsync())
+        {
+            ticketId = reader.GetInt32(0);
+            userId = reader.GetInt32(1);
+        }
+        if (ticketId == 0 || userId == 0)
+            return false;
+
+        await using var cmd2 = db.CreateCommand(
+            "INSERT INTO feedback (rating, comment, from_user, ticket_id) VALUES ($1, $2, $3, $4)"
+        );
+        cmd2.Parameters.AddWithValue(request.FeedbackData.Rating);
+        cmd2.Parameters.AddWithValue(request.FeedbackData.Comment);
+        cmd2.Parameters.AddWithValue(userId);
+        cmd2.Parameters.AddWithValue(ticketId);
+        await cmd2.ExecuteNonQueryAsync();
+        return true;
+    }
+    public static async Task<IResult> PostTickets(PasswordHasher<string> hasher, IEmailService emailService, HttpContext context,
+        NpgsqlDataSource db)
     {
         NewTicketRecord? ticketMessages =
             await context.Request.ReadFromJsonAsync<NewTicketRecord>();
@@ -84,7 +116,7 @@ public static class TicketRoutes
                 "WITH ticketIns AS (INSERT INTO tickets(category_id, subcategory_id, title, user_id, company_id) "
                     + "values((SELECT id FROM categories WHERE name = $1 AND company_id = $6), (SELECT id FROM subcategories WHERE name = $2 AND main_category_id = (SELECT id FROM categories WHERE name = $1 AND company_id = $6)), $3, (SELECT id FROM users WHERE email = $4 AND company_id = $6), $6) returning id) "
                     + "INSERT INTO messages(title, message, ticket_id, user_id) "
-                    + "values ($3, $5, (SELECT id FROM ticketIns), (SELECT id FROM users WHERE email = $4 AND company_id = $6)) returning ticket_id"
+                    + "values ($3, $5, (SELECT id FROM ticketIns), (SELECT id FROM users WHERE email = $4)) returning ticket_id"
             );
             cmd.Parameters.AddWithValue(ticketMessages.CategoryName); //$1
             cmd.Parameters.AddWithValue(ticketMessages.SubcategoryName); //$2
@@ -146,7 +178,7 @@ public static class TicketRoutes
 
         List<TicketRecord> tickets = new List<TicketRecord>();
         await using var cmd = db.CreateCommand(
-            "SELECT id, title, status, main_category, sub_category, posted, closed, email, company_id, elevated FROM tickets_view WHERE company_id = (SELECT company_id FROM users WHERE email = $1 LIMIT 1)"
+            "SELECT id, title, status, main_category, sub_category, posted, closed, email, company_id, elevated FROM tickets_view WHERE company_id = (SELECT company_id FROM users WHERE email = $1 AND status = 'pending' LIMIT 1)"
         );
         cmd.Parameters.AddWithValue(requesterEmail);
         using var reader = await cmd.ExecuteReaderAsync();
@@ -309,7 +341,7 @@ public static class TicketRoutes
         return Results.Ok(ticketMessages);
     }
 
-    public static async Task<IResult> UpdateTicket(HttpContext context, NpgsqlDataSource db)
+    public static async Task<IResult> UpdateTicket(HttpContext context, NpgsqlDataSource db, IEmailService email)
     {
         NewTicketStatus requestBody = await context.Request.ReadFromJsonAsync<NewTicketStatus>();
         if (requestBody == null)
@@ -321,12 +353,42 @@ public static class TicketRoutes
         try
         {
             await using var cmd = db.CreateCommand(
-                "UPDATE tickets set closed = CURRENT_TIMESTAMP, status = 'closed' WHERE id = $1 AND $2 = true"
+                "UPDATE tickets set closed = CURRENT_TIMESTAMP, status = 'closed' WHERE id = $1 AND $2 = true returning user_id"
             );
             cmd.Parameters.AddWithValue(requestBody.Ticket_id);
             cmd.Parameters.AddWithValue(requestBody.Resolved);
-            await cmd.ExecuteNonQueryAsync();
+            int id = (int?)await cmd.ExecuteScalarAsync() ?? -1;
+
+            if (id == -1)
+            return Results.Problem("Couldn't find user ID from update");
+
+            await using var cmd1 = db.CreateCommand(
+                "SELECT email FROM users WHERE id = $1"
+            );
+
+            cmd1.Parameters.AddWithValue(id);
+
+            string fromEmail = (string?)await cmd1.ExecuteScalarAsync() ?? "";
             success = true;
+            string token = Guid.NewGuid().ToString();
+
+            bool successToken = await StoreFeedbackToken(requestBody.Ticket_id, token, db);
+
+            if (!successToken)
+            {
+                return Results.Problem("Failed to store feeback token");
+            }
+
+            string feedbackLink = $"http://localhost:5173/feedback-form/?token={token}";
+
+            var emailRequest = new EmailRequest(
+                fromEmail,
+                "Give Feedback",
+                $"Hello, {fromEmail}, \n\nYour ticket has been resolved. \nPlease click the link to give us feedback: \n<a href='{feedbackLink}'>Feedback Form</a>"
+            );
+
+            await email.SendEmailAsync(emailRequest.To, emailRequest.Subject, emailRequest.Body);
+
         }
         catch (Exception ex)
         {
@@ -376,4 +438,43 @@ public static class TicketRoutes
 
         return Results.Ok(tickets);
     }
+    
+    private static async Task<bool> StoreFeedbackToken( int ticket_id, string token, NpgsqlDataSource db)
+    {
+        try
+        {
+            int user_id;
+
+            await using var getUserIdCmd = db.CreateCommand(
+                "SELECT user_id from tickets WHERE id = $1"
+            );
+            getUserIdCmd.Parameters.AddWithValue(ticket_id);
+            Console.WriteLine(ticket_id);
+
+            await using var reader = await getUserIdCmd.ExecuteReaderAsync();
+            if (!await reader.ReadAsync()){
+                Console.WriteLine("No user found for ticket id" + ticket_id);
+                return false;
+            }
+
+            user_id = reader.GetInt32(0);
+            Console.WriteLine("User found" + user_id);
+
+            await using var insertTokenCmd = db.CreateCommand(
+                "INSERT INTO feedback_token (id, token) VALUES ($1, $2)"
+            );
+            insertTokenCmd.Parameters.AddWithValue(ticket_id);
+            insertTokenCmd.Parameters.AddWithValue(token);
+
+            int rowsAffected = await insertTokenCmd.ExecuteNonQueryAsync();
+            return rowsAffected > 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error in StoreFeedbackToken: {ex.Message}");
+            return false;
+        }
+
+    }
+
 }
