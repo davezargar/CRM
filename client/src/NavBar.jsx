@@ -1,5 +1,5 @@
 import { useState, use } from 'react'
-import {NavLink, useNavigate} from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import "./style/NavBar.css"
 import { RoleContext } from "./main.jsx";
 const NavLinks = {
@@ -16,7 +16,7 @@ const NavLinks = {
     ],
     CustomerService: [
         { name: "Active Tickets", path: "/customer-service-panel/tickets" },
-        { name: "Resolved tickets", path: "/customer-service-panel/resolved-tickets" },
+        { name: "Resolved tickets", path: "/customer-service-panel/tickets/resolved" },
         { name: "Account settings", path: "/customer-service-panel/account-settings" },
     ]
 };
@@ -28,7 +28,7 @@ function NavBar() {
     const handleLogout = async () => {
         try {
             await fetch("/api/logout", { method: "POST", credentials: "include" });
-            navigate("/"); 
+            navigate("/");
         } catch (error) {
             console.error("Logout failed:", error);
         }
@@ -36,30 +36,30 @@ function NavBar() {
 
 
     return (<div id={"nav-container"}>
-            <nav>
-                <ul><h1 id='Menu'>Account Email:</h1>
-                    <p className='roleText'>{role}</p>
-                    {NavLinks[role].map((link, index) => (
-                        <div className='optionContainer'>
-                            <li key={("navkey- " + index)}>
-                                <NavLink className="Options" to={link.path}>{link.name}</NavLink>
-                            </li>
-                        </div>
-                    ))}
+        <nav>
+            <ul><h1 id='Menu'>Account Email:</h1>
+                <p className='roleText'>{role}</p>
+                {NavLinks[role].map((link, index) => (
                     <div className='optionContainer'>
-                        <li>
-                            <NavLink
-                                className='Options' 
-                                to='/'
-                                onClick={() => handleLogout()}
-                                >
-                                Logout
-                            </NavLink>
+                        <li key={("navkey- " + index)}>
+                            <NavLink className="Options" to={link.path}>{link.name}</NavLink>
                         </li>
                     </div>
-                </ul>
-            </nav>
-        </div>
+                ))}
+                <div className='optionContainer'>
+                    <li>
+                        <NavLink
+                            className='Options'
+                            to='/'
+                            onClick={() => handleLogout()}
+                        >
+                            Logout
+                        </NavLink>
+                    </li>
+                </div>
+            </ul>
+        </nav>
+    </div>
     );
 }
 

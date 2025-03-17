@@ -5,6 +5,7 @@ import { BrowserRouter, Routes, Route, NavLink, useNavigate } from "react-router
 import CustomerServicePanel from "./CustomerServicePanel";
 import TicketDisplayActive from "./TicketDisplayActive.jsx";
 import TicketDetailed from "./TicketDetailed.jsx";
+import TicketDisplayResolved from "./TicketDisplayResolved.jsx";
 
 import { AddRemoveWorkers, AdminPanel } from './adminPanel';
 import { AddWorker, RemoveWorker } from './adminPanel';
@@ -36,6 +37,7 @@ function App() {
                 <Route path={"/customer-service-panel"} element={<CustomerServicePanel />}>
                     <Route path={"/customer-service-panel/tickets"} element={<TicketDisplayActive />} /> {/*Should default to this path dont know how*/}
                     <Route path={"/customer-service-panel/tickets/:ticketId"} element={<TicketDetailed />} />
+                    <Route path={"/customer-service-panel/tickets/resolved"} element={<TicketDisplayResolved />} />
                     {/*Route account settings*/}
                 </Route>
 
@@ -46,12 +48,12 @@ function App() {
                     <Route path='assign-tickets' element={<AssignTickets />} />
                     <Route path='change-password' element={<ChangePassword />} />
                 </Route>
-                
+
                 <Route path={"/tickets/:ticketId/:token?"} element={<TicketDetailed />} />
-                
+
                 <Route path="/create-ticket">
-                    <Route path={"ikea-form"} element={<CreateIkeaTicket/>}/>
-                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket/>}/>
+                    <Route path={"ikea-form"} element={<CreateIkeaTicket />} />
+                    <Route path={"mikromjuk-form"} element={<CreateMikromjukTicket />} />
                 </Route>
                 <Route path="/register" element={<RegisterForm />} />
                 <Route path="/customers" element={<CreateAccount />} />
@@ -67,8 +69,8 @@ function Index() {
     </div>
 }
 
-function TicketForms(){
-    
+function TicketForms() {
+
     return <div id={"ticket-forms-nav"}>
         <NavLink to={"/create-ticket/ikea-form"}><button type="button">ikea form</button></NavLink>
         <NavLink to={"/create-ticket/mikromjuk-form"}><button type="button">mikromjuk form</button></NavLink>
@@ -116,7 +118,7 @@ function LoginForm() {
 
     return <form className='formContainer' onSubmit={verifyLogin}>
         <div className='registerCon'>
-            </div>
+        </div>
         <div className="inputCon">
             <label>Email: </label>
             <input type="text" name="email" />
