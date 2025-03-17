@@ -9,18 +9,32 @@ function TicketDetailed() {
     const [Ticket, SetTicket] = useState([]);
     let params = useParams();
     let ticketId = params.ticketId;
+    let token = params.token;
     const [Refresh, SetRefresh] = useState(false);
 
     const [Messages, SetMessages] = useState([]);
-
+    
     useEffect(() => {
-        fetch(`/api/tickets/${ticketId}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                SetMessages(data.messages);
-                SetTicket(data.ticketRecord);
-            });
+        if(token == null || token === "")
+        {
+            fetch(`/api/tickets/${ticketId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    SetMessages(data.messages);
+                    SetTicket(data.ticketRecord);
+                });
+        }else
+        {
+            fetch(`/api/customer/tickets/${token}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+                    SetMessages(data.messages);
+                    SetTicket(data.ticketRecord);
+                });
+        }
+        
     }, [Refresh]);
 
     function datetimeFormatter(datetime) {

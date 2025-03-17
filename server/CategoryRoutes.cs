@@ -13,11 +13,12 @@ public static class CategoryRoutes
         List<CategoryPairs> categoryPairs = new List<CategoryPairs>();
         List<CategoryRecord> categories = new List<CategoryRecord>();
         
-        //todo refactor entire logic >:|
+        //todo refactor entire logic >:| ૮(•͈⌔•͈)ა 
         
         await using var cmd = db.CreateCommand(
             "SELECT categories.name, subcategories.name FROM categories "
-            + "INNER JOIN subcategories ON categories.id = subcategories.main_category_id WHERE company_id = $1"
+            + "INNER JOIN subcategories ON categories.id = subcategories.main_category_id" +
+            " WHERE categories.company_id = $1"
         );
         cmd.Parameters.AddWithValue(companyId);
         using var reader = await cmd.ExecuteReaderAsync();
@@ -28,7 +29,7 @@ public static class CategoryRoutes
         }
 
         List<string> buffer = new List<string>();
-        string categoryPrevious = categoryPairs[0].MainCategory;
+        string categoryPrevious = categoryPairs.Count > 0 ? categoryPairs[0].MainCategory : "";
         foreach (var categoryPair in categoryPairs)
         {
             if (categoryPair.MainCategory == categoryPrevious)
@@ -43,14 +44,33 @@ public static class CategoryRoutes
             buffer.Clear();
             buffer.Add(categoryPair.Subcategory);
         }
-        categories.Add(new CategoryRecord(categoryPrevious, buffer));
+
+        if (buffer.Count > 0)
+        {
+            categories.Add(new CategoryRecord(categoryPrevious, buffer));
+        }
+        
         return Results.Ok(categories);
     }
-
-    public static async Task<IResult> GetCategories(NpgsqlDataSource db)
+    
+    public static async Task<IResult> GetCategories(HttpContext context, NpgsqlDataSource db)
     {
+        string? userEmail = context.Session.GetString("Email");
+        
+        if (string.IsNullOrEmpty(userEmail))
+        {
+            return Results.Unauthorized();
+        }
+        
+        int? companyId = await GetCompanyIdByEmail(db, userEmail);
+        if (companyId == null)
+        {
+            return Results.BadRequest("Could not find company");
+        }
+        
         List<TicketCategoryRecord> ticketCategories = new();
-        await using var cmd = db.CreateCommand("SELECT id, name, company_id FROM categories");
+        await using var cmd = db.CreateCommand("SELECT id, name, company_id FROM categories WHERE company_id = $1");
+        cmd.Parameters.AddWithValue(companyId);
         using var reader = await cmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
@@ -66,6 +86,8 @@ public static class CategoryRoutes
         return Results.Ok(ticketCategories);
     }
 
+    
+    
     public static async Task<IResult> CreateCategory(HttpContext context, NpgsqlDataSource db)
     {
         try
@@ -76,10 +98,17 @@ public static class CategoryRoutes
             {
                 return Results.BadRequest("Category name cannot be empty.");
             }
+            
+            string? userEmail = context.Session.GetString("Email");
+            if (string.IsNullOrWhiteSpace(userEmail))
+            {
+                return Results.BadRequest("Could not determine company.");
+            }
+            
 
             Console.WriteLine(
                 $"Received category '{requestBody.Name}' for company ID {requestBody.CompanyId}"
-            ); // for debugging
+            ); 
 
             try
             {
@@ -106,12 +135,28 @@ public static class CategoryRoutes
         }
     }
 
-    public static async Task<IResult> GetAssignCategories(NpgsqlDataSource db)
+    public static async Task<IResult> GetAssignCategories(HttpContext context, NpgsqlDataSource db)
     {
+        string? userEmail = context.Session.GetString("Email");
+        
+        if (string.IsNullOrWhiteSpace(userEmail))
+        {
+            return Results.Unauthorized();
+        }
+        
+        int? companyId = await GetCompanyIdByEmail(db, userEmail);
+        
+        if (companyId == null)
+        {
+            return Results.BadRequest("Could not determine company for this user.");
+        }
+        
         Dictionary<string, List<int>> assignments = new();
+        
         await using var cmd = db.CreateCommand(
-            "SELECT u.email, ac.category_id FROM assigned_categories ac JOIN users u ON ac.user_id = u.id"
+            "SELECT email, category_id FROM tickets_view WHERE company_id = $1"
         );
+        cmd.Parameters.AddWithValue(companyId);
         using var reader = await cmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
@@ -125,6 +170,14 @@ public static class CategoryRoutes
             assignments[email].Add(categoryId);
         }
         return Results.Ok(assignments);
+    }
+    
+    private static async Task<int?> GetCompanyIdByEmail(NpgsqlDataSource db, string email)
+    {
+        await using var cmd = db.CreateCommand("SELECT company_id FROM users WHERE email = $1");
+        cmd.Parameters.AddWithValue(email);
+        var result = await cmd.ExecuteScalarAsync();
+        return result as int?;
     }
 
     public static async Task<IResult> AssignCategories(HttpContext context, NpgsqlDataSource db)
@@ -166,7 +219,8 @@ public static class CategoryRoutes
                 {
                     await using var insertCmd = connection.CreateCommand();
                     insertCmd.CommandText =
-                        "INSERT INTO assigned_categories (user_id, category_id) VALUES ($1, $2)";
+                        "INSERT INTO assigned_categories (user_id, category_id) VALUES ($1, $2)" +
+                        "ON CONFLICT (user_id, category_id) DO NOTHING";
                     insertCmd.Parameters.AddWithValue(userId);
                     insertCmd.Parameters.AddWithValue(categoryId);
                     await insertCmd.ExecuteNonQueryAsync();
