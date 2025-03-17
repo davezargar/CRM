@@ -32,11 +32,11 @@ function ChangePassword() {
                 throw new Error("Something went wrong with updating password");
             }
             setMessage("✅ Password changed successfully!");
-            setTimeout(() => setMessage(""), 3000);
+            setTimeout(() => setMessage(""), 10000);
         } catch (error) {
             console.error(error);
             setMessage("❌  Password couldn't be updated!");
-            setTimeout(() => setMessage(""), 3000);
+            setTimeout(() => setMessage(""), 10000);
         }
     }
 
@@ -55,8 +55,8 @@ function ChangePassword() {
 
             <div className="submitContainer1">
                 <button type="submit" id="sendButton">Confirm</button>
+                {message && <p className="message">{message}</p>}
             </div>
-            <p style={{ color: "green" }}>{message}</p>
         </form>
     </div>
 }
