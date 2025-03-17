@@ -1,0 +1,117 @@
+#TicketDisplayResolved {
+    padding-right: 20px;
+
+    header {
+        height: 5vh;
+
+        h3 {
+            margin: 0;
+        }
+
+        >div {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-left: 10px;
+            padding-right: 10px;
+
+            button {
+                max-height: 100%;
+                margin-right: 50px;
+            }
+        }
+    }
+
+    #ticketTableContainer {
+        width: 100%;
+        height: 93vh;
+        overflow: scroll;
+    }
+
+    table {
+        width: 100%;
+        border-spacing: 0;
+        border: 1px solid black;
+        border-top: none;
+        position: relative;
+    }
+
+    thead {
+
+        th {
+            background-color: #e8e5e5;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            color: white;
+        }
+
+        th:not(:last-child):after {
+
+            content: '';
+            height: 76%;
+            width: 2px;
+
+            position: absolute;
+            right: 0;
+            top: 12%;
+            background-color: #aca7a7;
+        }
+    }
+
+    tbody {
+        background-color: #cac7c7;
+
+        td,
+        th {
+            border-bottom: 1px solid black;
+            position: relative;
+        }
+
+        th:after {
+            content: '';
+            height: 76%;
+            width: 2px;
+
+            position: absolute;
+            right: 0;
+            top: 12%;
+            background-color: #787676;
+        }
+
+        td:not(:last-child):after {
+
+            content: '';
+            height: 76%;
+            width: 2px;
+
+            position: absolute;
+            right: 0;
+            top: 12%;
+            background-color: #787676;
+        }
+
+
+        td {
+            padding-left: 15px;
+        }
+    }
+
+
+    .time-posted {
+        text-align: center;
+        padding: 0;
+        max-width: 5rem;
+    }
+
+    .ticket-status {
+        text-align: center;
+        padding: 0;
+    }
+
+
+}
