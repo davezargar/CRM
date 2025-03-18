@@ -16,7 +16,7 @@ const NavLinks = {
     ],
     CustomerService: [
         { name: "Active Tickets", path: "/customer-service-panel/tickets" },
-        { name: "Resolved tickets", path: "/customer-service-panel/tickets/resolved" },
+        { name: "Resolved tickets", path: "/customer-service-panel/tickets/resolved" }, 
     ]
 };
 

@@ -81,7 +81,6 @@ function DisplayMailWindow({ onClose }) {
                 throw new Error("Response failed");
             }
             console.log("Sending ticket_id: ", ticket_id);
-            alert("Successfully sent the message to the endpoint");
             localStorage.removeItem("title");
             localStorage.removeItem("description");
 

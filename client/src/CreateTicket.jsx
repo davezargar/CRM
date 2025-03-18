@@ -142,7 +142,7 @@ export function CreateIkeaTicket(){
             if (!response.ok) {
                 throw new Error("Something went wrong when creating ticket");
             }
-            alert("request sent");
+            //alert("request sent");
         } catch (error) {
             console.error(error);
             alert("Couldn't create ticket.");
@@ -256,7 +256,7 @@ export function CreateMikromjukTicket() {
             if (!response.ok) {
                 throw new Error("Something went wrong when creating ticket");
             }
-            alert("request sent");
+            //alert("request sent");
         } catch (error) {
             console.error(error);
             alert("Couldn't create ticket.");

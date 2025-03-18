@@ -51,7 +51,7 @@ export function AddWorker() {
             if (!response.ok) {
                 throw new Error("Something went wrong with adding worker");
             }
-            alert("Worker added!");
+            //alert("Worker added!");
         } catch (error) {
             console.error(error);
             alert("Couldn't add custom service worker");
