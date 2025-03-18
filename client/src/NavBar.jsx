@@ -17,10 +17,10 @@ const NavLinks = {
     CustomerService: [
         { name: "Active Tickets", path: "/customer-service-panel/tickets" },
         { name: "Resolved tickets", path: "/customer-service-panel/tickets/resolved" },
-        { name: "Account settings", path: "/customer-service-panel/account-settings" },
     ]
 };
 
+/*        { name: "Account settings", path: "/customer-service-panel/account-settings" },*/
 function NavBar() {
     const role = use(RoleContext);
     const navigate = useNavigate();
