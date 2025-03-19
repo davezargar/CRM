@@ -196,7 +196,61 @@ change the password from the link using the reset tokens from the url
   **Type:** string
 
 ##### response
+
+
 string message
 a message stating success or failure
+
+### Ticket-Categories
+
+#### Post ticket-categories
+
+path: `/ticket-categories`
+
+The name of the category to be created 
+
+##### Request body
+
+*  **Name**
+
+  The name of the category
+
+  **Type:** string
+  
+##### Response
+
+**Message**
+
+A message stating whether or not the category was successfully added or not
+
+type: string
+
+#### Get ticket-categories
+
+path: `/ticket-categories`
+
+Fetches all ticket categories
+
+##### Context
+
+**Type:** array
+
+**array content:**
+
+  * id
+
+**Type:** int
+
+  * name
+
+**Type:** string
+
+  * companyId
+
+**Type:** int 
+
+##### Response
+A succsess response and a fail to connect to server response
+
 
 
