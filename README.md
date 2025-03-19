@@ -96,3 +96,107 @@ Creates a new feedback review in the database.
   
   **type:** string
 
+### Workers
+
+##### POST
+path: `/workers`
+
+Creates a new workers in the database
+
+##### Requestbody
+
+* **Email**
+
+  the email of the user that the admin wrote
+
+  **Type:** string
+
+##### Context
+
+* **Company id**
+
+  Which company to add the user to
+  
+  **type:** int
+
+
+##### response
+string message
+a message stating success or failure
+
+##### PUT
+path: `/workers`
+
+Update the workers active status to false
+
+##### Requestbody
+
+* **Email**
+
+  the email that the admin clicked "remove"
+
+  **Type:** string
+
+##### response
+string message
+a message stating success or failure
+
+##### GET
+path: `/workers`
+
+Collect all the workers from the database thats active from the admins company
+
+##### Context
+
+* **customerSupportEmails**
+
+  Collect the customerSupportEmails from the database
+  
+  **type:** string
+
+
+##### response
+string message
+a message stating success or failure if success **customerSupportEmails** will be return as a list
+
+##### POST
+path: `/workers/password`
+
+Post a reset password request to the newly added user through email and store the reset token
+
+##### Context
+
+* **CompanyId**
+
+  gets the company id from requestbody that the user will be added to
+
+  **Type:** int
+
+##### response
+string message
+a message stating success or failure
+
+##### PUT
+path: `/workers/password`
+
+change the password from the link using the reset tokens from the url
+
+##### Requestbody
+
+* **Password**
+
+  the password the user put in
+
+  **Type:** string
+
+* **Token**
+
+  the reset token from the params in the url
+
+  **Type:** string
+
+##### response
+string message
+a message stating success or failure
+
+
