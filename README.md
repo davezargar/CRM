@@ -1,4 +1,10 @@
-## Usage
+#PROJECT CRM
+
+
+## API
+the root of the api is http://localhost:5000/api
+
+### Usage
 
 in order to use the program you would need to start the server trough either your IDE or trough your terminal while sitting in /CRM/src/server with
 
@@ -23,8 +29,44 @@ Localhost="http://localhost:5173/"
 ```
 
 
-### API
-the root of the api is http://localhost:5000/api/feedback-form
+
+### Messages
+
+#### Post messages
+path: `/messages`
+
+Creates a new message in the database for a specific ticket
+
+##### Requestbody
+
+* **Title**
+
+  the title of the message
+
+  **Type:** string
+
+* **Description**
+
+  The message text
+  
+  **type:** string
+
+* **UserEmail**
+
+  the email of the account that creates the message, taken from sessiondata that is generated on login or on fetch of a ticket via token
+
+  **type:** string 
+
+* **ticket_id_fk**
+
+  The id of the ticket that the message is created for
+
+  **type:** int32
+
+##### response
+string message
+a message stating success or failure
+
 
 #### Feedback 
 
