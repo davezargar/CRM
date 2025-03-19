@@ -33,6 +33,7 @@ Localhost="http://localhost:5173/"
 ### Messages
 
 #### Post messages
+
 path: `/messages`
 
 Creates a new message in the database for a specific ticket
@@ -64,11 +65,63 @@ Creates a new message in the database for a specific ticket
   **type:** int32
 
 ##### response
+
 string message
+
 a message stating success or failure
 
 
 #### Feedback 
 
 This api inserts the  feedback data (rating, comment) into the database.
+
+
+### Ticket-Categories
+
+#### Post ticket-categories
+
+path: `/ticket-categories`
+
+The name of the category to be created 
+
+##### Request body
+
+*  **Name**
+
+  The name of the category
+
+  **Type:** string
+  
+##### Response
+
+**Message**
+
+A message stating whether or not the category was successfully added or not
+
+type: string
+
+#### Get ticket-categories
+
+path: `/ticket-categories`
+
+##### Response
+
+**Type:** array
+
+**array content:**
+
+  * id
+
+**Type:** int
+
+  * name
+
+**Type:** string
+
+  * companyId
+
+**Type:** int 
+
+
+
 
