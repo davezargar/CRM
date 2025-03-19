@@ -28,8 +28,39 @@ DatabaseConnectString="Host=localhost;Port=5432;Username=postgres;Password=postg
 Localhost="http://localhost:5173/"
 ```
 
+## Endpoints
 
+### Tickets
 
+#### **GET** tickets
+  **Path:** `/tickets`
+  
+  Fetches all tickets that are assigned for a worker account. Assigned tickets are based on the company associated to user and categories that are assigned
+  
+  __Context__
+  >
+  >**requesterEmail**
+  >
+  >The email of the account that requests the ticket list, provided by context.Session which is set upon login
+  >
+  >**Type:** String
+  
+  ### Response
+  >
+  >**Type:** array
+  >
+  >array of ticket object
+  >
+  >**array content:**
+  >>
+  >>**Tickets**
+  >>
+  >> An object containing the ticket data
+  >>
+  >> **type** Object See: [TicketRecord](#ticketrecord)
+      
+  
+        
 ### Messages
 
 #### Post messages
@@ -37,7 +68,15 @@ path: `/messages`
 
 Creates a new message in the database for a specific ticket
 
-##### Requestbody
+#### Context
+
+* **UserEmail**
+
+  the email of the account that creates the message, taken from sessiondata that is generated on login or on fetch of a ticket via token
+
+  **type:** string 
+
+#### Requestbody
 
 * **Title**
 
@@ -50,12 +89,6 @@ Creates a new message in the database for a specific ticket
   The message text
   
   **type:** string
-
-* **UserEmail**
-
-  the email of the account that creates the message, taken from sessiondata that is generated on login or on fetch of a ticket via token
-
-  **type:** string 
 
 * **ticket_id_fk**
 
@@ -200,3 +233,64 @@ string message
 a message stating success or failure
 
 
+
+## Objects
+
+### TicketRecord
+>
+>the TicketRecord contains ticket data
+>
+>**Type:** object
+>
+>**Object variables**:
+>>
+>>* TicketId
+>>          
+>>  Id of the ticket
+>>     
+>>  **type:** int32
+>>* Title
+>>   
+>>  The title of the ticket
+>>     
+>>   **type:** string
+>>* Status
+>>    
+>>   the status of the ticket, enum status in database
+>>   
+>>   **type:** string
+>>* Category
+>>  
+>>   the main category of the ticket
+>>   
+>>   **type:** string
+>>* Subcategory
+>>  
+>>   the subcategory of the ticket
+>>   
+>>   **type:** string
+>>* TimePosted
+>>  
+>>   the time the ticket was posted
+>>   
+>>   **type:** DateTime
+>>* TimeClosed
+>>  
+>>   the time the ticket was closed, null if ticket is open
+>>   
+>>   **type:** nullable DateTime
+>>* UserEmail
+>>  
+>>   The email of the ticket creator (not used as it was changed to user_id which is an int foreign key to user, email used to be pk for users)
+>>   
+>>   **type:** string
+>>* CompanyFk
+>>  
+>>   the foreign key to company
+>>   
+>>   **type:** int32
+>>* Elevated
+>>
+>>   a bool representing wether a ticket is elevated to human response
+>>   
+>>   **type:** bool
