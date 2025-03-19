@@ -1,6 +1,16 @@
 ## Usage
 
-in order to use...
+in order to use the program you would need to start the server trough either your IDE or trough your terminal while sitting in /CRM/src/server with
+
+```
+dotnet run
+```
+
+and while being in a another terminal sitting in /CRM/src/client
+
+```
+npm run dev
+```
 
 ### Installation
 
