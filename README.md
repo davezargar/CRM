@@ -5,6 +5,13 @@ in order to use...
 ### Installation
 
 to install this you need to set up the server and parts of the application...
+create a postgres database and import the database dump from the project repo in /database/crm-dump-final.sql
+create a file called ".env" in /server with the following lines containing the connectstring for your database and localhostport for vite for your machine.
+```
+DatabaseConnectString="Host=localhost;Port=5432;Username=postgres;Password=postgres;Database=crm;SearchPath=public"
+Localhost="http://localhost:5173/"
+```
+
 
 ### API
 the root of the api is http://localhost:5000/api/feedback-form
