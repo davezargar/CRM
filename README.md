@@ -114,49 +114,112 @@ Gets all ticket info as well as associated messages for a specific ticket based 
 Gets all ticket info as well as associated messages for a specific ticket based on token that was generated and sent via email to creator of ticket
 
 
-### API 
 
-the root of the api is http://localhost:5000/api/messages and this route will upload the messages to the database for storage.
-
-####  Messages
+### Workers
 
 ##### POST
+path: `/workers`
 
-This inserts the message (“title” and “description”) into the database with a reference to the ticket id (foreign key).
+Creates a new workers in the database
+
+##### Requestbody
+
+* **Email**
+
+  the email of the user that the admin wrote
+
+  **Type:** string
+
+##### Context
+
+* **Company id**
+
+  Which company to add the user to
+  
+  **type:** int
 
 
-### API 
-
-the root of the api is http://localhost:5000/api/workers/password and this route is meant for updating the password.
-
-#### Workers/password
-
-##### POST
-
-This post will send out an email to the newly created account with a reset token in the url params and store the reset token in the database.
+##### response
+string message
+a message stating success or failure
 
 ##### PUT
+path: `/workers`
 
-This put will update the password. We use the token in the url to change the password in the database and to find which user it is.
+Update the workers active status to false
 
-### API
+##### Requestbody
 
-the root of the api is http://localhost:5000/api/workers and this route is meant for creating new accounts and updating their active status in the database and as well as getting all the active workers.
+* **Email**
 
-#### Workers
+  the email that the admin clicked "remove"
 
+  **Type:** string
 
-##### POST
-
-This post will create a new customer support
-
-##### PUT
-
-This put will update the users status to false meaning their account is inactive
+##### response
+string message
+a message stating success or failure
 
 ##### GET
+path: `/workers`
 
-This get will collect all customer support that are active
+Collect all the workers from the database thats active from the admins company
+
+##### Context
+
+* **customerSupportEmails**
+
+  Collect the customerSupportEmails from the database
+  
+  **type:** string
+
+
+##### response
+string message
+a message stating success or failure if success **customerSupportEmails** will be return as a list
+
+##### POST
+path: `/workers/password`
+
+Post a reset password request to the newly added user through email and store the reset token
+
+##### Context
+
+* **CompanyId**
+
+  gets the company id from requestbody that the user will be added to
+
+  **Type:** int
+
+##### response
+string message
+a message stating success or failure
+
+##### PUT
+path: `/workers/password`
+
+change the password from the link using the reset tokens from the url
+
+##### Requestbody
+
+* **Password**
+
+  the password the user put in
+
+  **Type:** string
+
+* **Token**
+
+  the reset token from the params in the url
+
+  **Type:** string
+
+##### response
+string message
+a message stating success or failure
+
+
+
 
 
 ### API
