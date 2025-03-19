@@ -70,7 +70,7 @@ This inserts the message (“title” and “description”) into the database w
 
 the root of the api is http://localhost:5000/api/workers/password and this route is meant for updating the password.
 
-####  Workers/password
+#### Workers/password
 
 ##### POST
 
@@ -80,11 +80,11 @@ This post will send out an email to the newly created account with a reset token
 
 This put will update the password. We use the token in the url to change the password in the database and to find which user it is.
 
-###API 
+### API
 
 the root of the api is http://localhost:5000/api/workers and this route is meant for creating new accounts and updating their active status in the database and as well as getting all the active workers.
 
-####  Workers
+#### Workers
 
 
 ##### POST
