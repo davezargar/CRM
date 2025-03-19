@@ -68,7 +68,31 @@ string message
 a message stating success or failure
 
 
-#### Feedback 
+### Feedback 
 
-This api inserts the  feedback data (rating, comment) into the database.
+#### Post feedback
+path: `feedback-form`
+
+Creates a new feedback review in the database.
+
+#### Requestbody
+* **feedbackdata**
+  Holds the feedback data
+    * **object** 
+        * **rating**
+          
+          The rating 1-5 stars
+
+          **type:** int
+        * **comment**
+            
+          The feedback comment.
+
+          **type:** string
+
+* **token**
+  
+  Holds the token for that specific feedback.
+  
+  **type:** string
 
